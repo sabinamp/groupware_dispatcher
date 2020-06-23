@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+}
+
+group 'ch.fhnw.ip6'
+version '1.0'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/java", "src/main/resources"]
+        }
+    }
+    test{
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}
+
+dependencies {
+    compile 'com.dlsc.formsfx:formsfx-core:11.3.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
+    testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
+}
+
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
