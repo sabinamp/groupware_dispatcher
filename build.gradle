@@ -27,7 +27,13 @@ sourceSets {
 
 dependencies {
     compile 'com.dlsc.formsfx:formsfx-core:11.3.2'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.3'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.3'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.10.3'
+    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.3'
+
+    implementation "com.hivemq:hivemq-mqtt-client:1.2.0"
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
 }
 
