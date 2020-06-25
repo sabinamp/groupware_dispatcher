@@ -39,10 +39,14 @@ public ApplicationUI() {
         HBox hb1= new HBox();
         hb1.setSpacing(10);
 
-        hb1.setPrefSize(900,700);
+        VBox vbLeft= new VBox();
+        vbLeft.setSpacing(10);
+
+        vbLeft.setPrefSize(550,700);
         VBox vboxOnTheRight= new VBox();
-        vboxOnTheRight.getChildren().addAll(new HBox(), new VBox());
-        hb1.getChildren().addAll(new VBox(),vboxOnTheRight);
+        vboxOnTheRight.setPrefSize(550,700);
+
+        hb1.getChildren().addAll(vbLeft,vboxOnTheRight);
         getChildren().addAll(header, hb1);
         setVgrow(hb1, Priority.ALWAYS);
         }
