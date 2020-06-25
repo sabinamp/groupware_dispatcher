@@ -23,6 +23,9 @@ public class OrderService {
         client.connectAndRequestExistingOrders();
         client.connectToBrokerAndSubscribeToNewOrders();
     }
+    public OrderDescriptiveInfo getOrder(String orderId){
+        return orders.get(orderId);
+    }
 
     public void saveOrderInMemory(String id, OrderDescriptiveInfo order){
         orders.put(order.getOrderId(), order);
