@@ -1,4 +1,6 @@
 package groupware.dispatcher.service.util;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import groupware.dispatcher.service.model.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -52,9 +54,10 @@ public class ModelObjManager {
     public static OrderDescriptiveInfo convertJsonToOrderDescriptiveInfo(String jsonString) {
         JsonNode node= null;
         try {
-            OrderDescriptiveInfo orderInfo = objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
+            if(jsonString != null && !jsonString.isEmpty()) {
+                return objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
+            }
 
-            return orderInfo;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,9 +72,28 @@ public class ModelObjManager {
     public static TaskRequest convertJsonToTaskRequest(String jsonString) {
         JsonNode node= null;
         try {
-            TaskRequest task = objectMapper.readValue(jsonString, TaskRequest.class);
-            return task;
+            if(jsonString != null && !jsonString.isEmpty()) {
+                TaskRequest task = objectMapper.readValue(jsonString, TaskRequest.class);
+                return task;
+            }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
+    public static Courier convertJsonToCourier(String jsonString) {
+        JsonNode node= null;
+        try {
+            if(jsonString != null && !jsonString.isEmpty() && jsonString.startsWith("C")){
+                Courier courier = objectMapper.readValue(jsonString, Courier.class);
+                return courier;
+            }
+        }catch (JsonParseException | JsonMappingException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         return  null;
