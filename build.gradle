@@ -1,6 +1,5 @@
 plugins {
     id 'java'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
 group 'ch.fhnw.ip6'
@@ -9,10 +8,7 @@ version '1.0'
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 compileJava.options.encoding = 'UTF-8'
-javafx {
-    version = "11.0.2"
-    modules = [ 'javafx.controls' ]
-}
+
 repositories {
     mavenCentral()
 }
