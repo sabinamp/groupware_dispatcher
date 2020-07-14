@@ -24,9 +24,8 @@ public class MainHeader extends VBox implements ViewMixin {
 
         Text title= new Text("City Courier Services");
         topBanner.getChildren().addAll(title);
-
-
     }
+
     @Override
     public void initializeSelf() {
         getStyleClass().add("main-header");

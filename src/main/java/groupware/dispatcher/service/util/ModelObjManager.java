@@ -1,5 +1,6 @@
 package groupware.dispatcher.service.util;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import groupware.dispatcher.service.model.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -54,11 +55,16 @@ public class ModelObjManager {
     public static OrderDescriptiveInfo convertJsonToOrderDescriptiveInfo(String jsonString) {
         JsonNode node= null;
         try {
-            if(jsonString != null && !jsonString.isEmpty()) {
-                return objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
+            JsonParser parser = objectMapper.getFactory().createParser(jsonString);
+            if(jsonString != null && !jsonString.isEmpty() && jsonString.startsWith("OR")){
+                //OrderDescriptiveInfo orderInfo = objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
+                OrderDescriptiveInfo orderInfo = objectMapper.readValue(parser, OrderDescriptiveInfo.class);
+                return orderInfo;
             }
-
-        } catch (Exception e) {
+        }catch (JsonParseException | JsonMappingException e) {
+            e.printStackTrace();
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
         return  null;
@@ -73,8 +79,7 @@ public class ModelObjManager {
         JsonNode node= null;
         try {
             if(jsonString != null && !jsonString.isEmpty()) {
-                TaskRequest task = objectMapper.readValue(jsonString, TaskRequest.class);
-                return task;
+                return objectMapper.readValue(jsonString, TaskRequest.class);
             }
         } catch (Exception e) {
             e.printStackTrace();

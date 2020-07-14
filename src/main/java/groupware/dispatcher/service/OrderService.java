@@ -11,11 +11,13 @@ import java.util.Map;
 
 public class OrderService {
 
-    private Map<String, OrderDescriptiveInfo> orders;
-
+    private static Map<String, OrderDescriptiveInfo> orders;
+    static{
+        orders= new HashMap<>();
+    }
 
     public OrderService(){
-        orders= new HashMap<>();
+
     }
 
 
@@ -23,7 +25,7 @@ public class OrderService {
         return orders.get(orderId);
     }
 
-    public void saveOrderInMemory(String id, OrderDescriptiveInfo order){
+    public static void saveOrderInMemory(String id, OrderDescriptiveInfo order){
         orders.put(id, order);
     }
 

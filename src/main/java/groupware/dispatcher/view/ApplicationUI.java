@@ -7,16 +7,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 public class ApplicationUI extends VBox implements ViewMixin {
 
+        private Node header;
 
-
-private Node header;
-
-
-
-
-public ApplicationUI() {
-
-        init();
+        public ApplicationUI() {
+                init();
         }
 
         @Override
@@ -27,20 +21,18 @@ public ApplicationUI() {
 
         @Override
         public void initializeParts() {
-
-
-
-
+                header = new MainHeader();
         }
 
         @Override
         public void layoutParts() {
-        header = new MainHeader();
+
         HBox hb1= new HBox();
         hb1.setSpacing(10);
 
         VBox vbLeft= new VBox();
         vbLeft.setSpacing(10);
+        vbLeft.getChildren().add(new OrderListView());
 
         vbLeft.setPrefSize(550,700);
         VBox vboxOnTheRight= new VBox();

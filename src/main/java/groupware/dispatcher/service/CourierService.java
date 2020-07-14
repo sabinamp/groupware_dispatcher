@@ -21,9 +21,6 @@ public class CourierService {
         couriers = new HashMap<>();
     }
 
-
-
-
     public Courier getCourier(String id){
         return couriers.get(id);
     }

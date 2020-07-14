@@ -67,8 +67,6 @@ public class OrdersBrokerClient extends BrokerClient {
                         logger.info("successful connection to the broker. The client "+ UUID + " is connected");
                     }
                 });
-
-
         }
 
 
@@ -81,7 +79,7 @@ public class OrdersBrokerClient extends BrokerClient {
                 if(mqtt3Publish.getPayload().isPresent()){
                    OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(mqtt3Publish.getPayload().toString());
                    if(order != null) {
-                       orderService.saveOrderInMemory(order.getOrderId(), order);
+                       OrderService.saveOrderInMemory(order.getOrderId(), order);
                    }
                 }
             } ).send()
@@ -102,7 +100,7 @@ public class OrdersBrokerClient extends BrokerClient {
     public void connectAndRequestExistingOrder(String orderId){
         System.out.println("connecting to Broker and subscribing for existing order "+orderId);
         this.client1.connectWith()
-                .keepAlive(60)
+                .keepAlive(30)
                 .cleanSession(false)
                 .willPublish()
                 .topic("orders/get/"+ orderId)
@@ -132,7 +130,7 @@ public class OrdersBrokerClient extends BrokerClient {
                     if(mqtt3Publish.getPayload().isPresent()){
                         OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(mqtt3Publish.getPayload().toString());
                         if (order != null) {
-                            orderService.saveOrderInMemory(order.getOrderId(), order);
+                            OrderService.saveOrderInMemory(order.getOrderId(), order);
                         } else {
                             logger.warning("OrderId "+orderId + " order is null");
                         }
@@ -169,6 +167,5 @@ public class OrdersBrokerClient extends BrokerClient {
     public void stopClient2BrokerConnection(){
         client2.disconnect();
     }
-
 
 }
