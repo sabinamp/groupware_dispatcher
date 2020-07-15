@@ -31,8 +31,7 @@ public class ModelObjManager {
     public static DeliveryStep convertDeliveryStepData(String jsonValue){
         JsonNode node= null;
         try {
-            DeliveryStep step = objectMapper.readValue(jsonValue, DeliveryStep.class);
-            return step;
+            return objectMapper.readValue(jsonValue, DeliveryStep.class);
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -43,9 +42,7 @@ public class ModelObjManager {
    public static OrderInfo convert(String jsonString){
        JsonNode node= null;
        try {
-           OrderInfo orderInfo = objectMapper.readValue(jsonString, OrderInfo.class);
-
-           return orderInfo;
+           return objectMapper.readValue(jsonString, OrderInfo.class);
        } catch (Exception e) {
            e.printStackTrace();
        }
@@ -53,16 +50,14 @@ public class ModelObjManager {
    }
 
     public static OrderDescriptiveInfo convertJsonToOrderDescriptiveInfo(String jsonString) {
-        JsonNode node= null;
+        //JsonNode node= null;
         try {
-            JsonParser parser = objectMapper.getFactory().createParser(jsonString);
+            //JsonParser parser = objectMapper.getFactory().createParser(jsonString);
             if(jsonString != null && !jsonString.isEmpty() && jsonString.startsWith("OR")){
-                //OrderDescriptiveInfo orderInfo = objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
-                OrderDescriptiveInfo orderInfo = objectMapper.readValue(parser, OrderDescriptiveInfo.class);
+                OrderDescriptiveInfo orderInfo = objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
+                //OrderDescriptiveInfo orderInfo = objectMapper.readValue(parser, OrderDescriptiveInfo.class);
                 return orderInfo;
             }
-        }catch (JsonParseException | JsonMappingException e) {
-            e.printStackTrace();
         }
         catch (Exception e) {
             e.printStackTrace();

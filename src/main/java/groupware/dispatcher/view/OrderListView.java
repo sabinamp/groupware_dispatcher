@@ -1,18 +1,19 @@
 package groupware.dispatcher.view;
 
+import groupware.dispatcher.presentationmodel.util.OrderPM;
 import groupware.dispatcher.service.OrderService;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
-
-import java.util.List;
 import java.util.Map;
 
 public class OrderListView extends ListView<String> implements ViewMixin {
     private Map<String, OrderDescriptiveInfo> orders;
     private OrderService orderService;
+    public static final ObservableList<OrderPM> data =
+            FXCollections.observableArrayList();
 
     public OrderListView(){
         init();
@@ -32,13 +33,12 @@ public class OrderListView extends ListView<String> implements ViewMixin {
 
     @Override
     public void initializeParts() {
-        ListView<String> list = new ListView<String>();
+        ListView<OrderPM> list = new ListView<>();
         for(String each : orders.keySet()){
-            System.out.println("The dispatcher part has received info about the order: "+each);
+            System.out.println("The dispatcher part has received info about the order: "+ each);
         }
-        ObservableList<String> items = FXCollections.observableArrayList (
-                "Single", "Double", "Suite", "Family App");
-        list.setItems(items);
+
+        list.setItems(data);
     }
 
     @Override

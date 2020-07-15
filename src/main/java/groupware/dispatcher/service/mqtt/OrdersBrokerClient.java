@@ -130,7 +130,7 @@ public class OrdersBrokerClient extends BrokerClient {
                     if(mqtt3Publish.getPayload().isPresent()){
                         OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(mqtt3Publish.getPayload().toString());
                         if (order != null) {
-                            OrderService.saveOrderInMemory(order.getOrderId(), order);
+                            OrderService.saveOrderInMemory(orderId, order);
                         } else {
                             logger.warning("OrderId "+orderId + " order is null");
                         }
