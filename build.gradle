@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.7'
+    id 'application'
 }
 
 group 'ch.fhnw.ip6'
@@ -37,7 +39,12 @@ dependencies {
     testImplementation('org.junit.jupiter:junit-jupiter:5.6.0')
 }
 
+javafx {
+    modules= ['javafx.controls']
+    version = '11.0.2'
+}
 
+mainClassName = "groupware.dispatcher.AppStarter"
 test {
     useJUnitPlatform()
     testLogging {
