@@ -16,7 +16,7 @@ public class AppStarter extends Application {
         Scene scene = new Scene(rootPanel);
 
         primaryStage.setTitle("Dispatcher GUI");
-        BrokerConnection connection= new BrokerConnection();
+        //BrokerConnection connection= new BrokerConnection();
         primaryStage.setScene(scene);
         primaryStage.show();
 
