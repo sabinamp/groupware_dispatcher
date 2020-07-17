@@ -40,8 +40,7 @@ public class ModelObjManager {
     }
 
    public static OrderInfo convert(String jsonString){
-       JsonNode node= null;
-       try {
+    try {
            return objectMapper.readValue(jsonString, OrderInfo.class);
        } catch (Exception e) {
            e.printStackTrace();
@@ -50,13 +49,10 @@ public class ModelObjManager {
    }
 
     public static OrderDescriptiveInfo convertJsonToOrderDescriptiveInfo(String jsonString) {
-        //JsonNode node= null;
+
         try {
-            //JsonParser parser = objectMapper.getFactory().createParser(jsonString);
-            if(jsonString != null && !jsonString.isEmpty() && jsonString.startsWith("OR")){
-                OrderDescriptiveInfo orderInfo = objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
-                //OrderDescriptiveInfo orderInfo = objectMapper.readValue(parser, OrderDescriptiveInfo.class);
-                return orderInfo;
+            if(jsonString != null && !jsonString.isEmpty()){
+              return objectMapper.readValue(jsonString, OrderDescriptiveInfo.class);
             }
         }
         catch (Exception e) {
@@ -76,6 +72,9 @@ public class ModelObjManager {
             if(jsonString != null && !jsonString.isEmpty()) {
                 return objectMapper.readValue(jsonString, TaskRequest.class);
             }
+        } catch (JsonParseException | JsonMappingException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -83,11 +82,9 @@ public class ModelObjManager {
     }
 
     public static Courier convertJsonToCourier(String jsonString) {
-        JsonNode node= null;
         try {
-            if(jsonString != null && !jsonString.isEmpty() && jsonString.startsWith("C")){
-                Courier courier = objectMapper.readValue(jsonString, Courier.class);
-                return courier;
+            if(jsonString != null && !jsonString.isEmpty()){
+              return objectMapper.readValue(jsonString, Courier.class);
             }
         }catch (JsonParseException | JsonMappingException e) {
             e.printStackTrace();

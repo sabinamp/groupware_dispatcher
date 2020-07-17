@@ -34,6 +34,8 @@ public class TaskRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
     private LocalDateTime  sentWhen = null;
 
+    @JsonProperty("confirmed")
+    private boolean confirmed = false;
 
     public TaskRequest dueOn(LocalDateTime dueOn) {
         this.dueOn = dueOn;
@@ -148,8 +150,7 @@ public class TaskRequest {
         this.addressLine = addressLine;
     }
 
-    @JsonProperty("confirmed")
-    private boolean confirmed = false;
+
 
 
     @Override

@@ -10,8 +10,10 @@ import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.OrderService;
 import groupware.dispatcher.service.model.Courier;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
+import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -68,7 +70,7 @@ public class CourierBrokerClient extends BrokerClient{
                 .applyWillPublish()
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToGetCourierByIdResponse(courierId))
+                .thenComposeAsync(v -> subscribeToGetCourierById(courierId))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -82,7 +84,7 @@ public class CourierBrokerClient extends BrokerClient{
                 });
     }
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToGetCourierByIdResponse(String courierId){
+    private CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(String courierId){
         String topicName = "couriers/info/get/"+ courierId +"/response";
         System.out.println("entering subscribeToGetCourierByIdResponse for the topic "+topicName);
 
@@ -90,7 +92,8 @@ public class CourierBrokerClient extends BrokerClient{
                 .topicFilter(topicName)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
-                        Courier courier = ModelObjManager.convertJsonToCourier(mqtt3Publish.getPayload().toString());
+                        String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
+                        Courier courier = ModelObjManager.convertJsonToCourier(received);
                         courierService.saveCourierInMemory(courierId, courier);
                     }
                 } ).send()

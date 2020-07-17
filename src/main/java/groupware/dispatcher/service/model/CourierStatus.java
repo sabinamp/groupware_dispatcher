@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum CourierStatus {
 
-    AVAILABLE("Available for new order delivery"),
+    AVAILABLE("Available"),
 
     NOT_AVAILABLE_SICK("Not available. On sick leave."),
 

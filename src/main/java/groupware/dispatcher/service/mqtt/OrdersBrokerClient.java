@@ -10,8 +10,10 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.Mqtt3Subscribe;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
+import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -46,13 +48,8 @@ public class OrdersBrokerClient extends BrokerClient {
     public void connectToBrokerAndSubscribeToNewOrders(){
         System.out.println("connecting to Broker");
         this.client2.connectWith()
-                .keepAlive(60)
+                .keepAlive(180)
                 .cleanSession(false)
-                .willPublish()
-                .topic("orders/hello")
-                .qos(MqttQos.EXACTLY_ONCE)
-                .payload("hello".getBytes())
-                .applyWillPublish()
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
                 .thenComposeAsync(v -> subscribeToNewOrders())
@@ -77,7 +74,9 @@ public class OrdersBrokerClient extends BrokerClient {
             .topicFilter("orders/new")
             .callback(mqtt3Publish -> {
                 if(mqtt3Publish.getPayload().isPresent()){
-                   OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(mqtt3Publish.getPayload().toString());
+                    String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
+                    System.out.println("new order received " +received);
+                   OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                    if(order != null) {
                        OrderService.saveOrderInMemory(order.getOrderId(), order);
                    }
@@ -128,7 +127,9 @@ public class OrdersBrokerClient extends BrokerClient {
                 .topicFilter(topic)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
-                        OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(mqtt3Publish.getPayload().toString());
+                        String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
+                        System.out.println("an order has been received " +received);
+                        OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                         if (order != null) {
                             OrderService.saveOrderInMemory(orderId, order);
                         } else {
