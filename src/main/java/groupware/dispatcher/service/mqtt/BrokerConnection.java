@@ -1,4 +1,4 @@
-package groupware.dispatcher.service;
+package groupware.dispatcher.service.mqtt;
 
 import groupware.dispatcher.service.mqtt.CourierBrokerClient;
 import groupware.dispatcher.service.mqtt.OrdersBrokerClient;
@@ -10,6 +10,7 @@ public class BrokerConnection {
     public BrokerConnection(){
         courierBrokerClient = new CourierBrokerClient();
         courierBrokerClient.subscribeToCouriers();
+        courierBrokerClient.connectToBrokerAndSubscribeToCourierUpdates();
         ordersBrokerClient = new OrdersBrokerClient();
         connectOrderServiceToBroker();
         System.out.println("BrokerConnection - connected to broker");

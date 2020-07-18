@@ -1,48 +1,27 @@
 package groupware.dispatcher.service;
 
+import groupware.dispatcher.service.model.ContactInfo;
 import groupware.dispatcher.service.model.DeliveryStep;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
-import groupware.dispatcher.service.model.TaskRequest;
-import groupware.dispatcher.service.mqtt.OrdersBrokerClient;
-import groupware.dispatcher.service.util.ModelObjManager;
+import groupware.dispatcher.service.model.OrderInfo;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-public class OrderService {
+public interface OrderService {
+    OrderDescriptiveInfo getOrder(String orderId);
+    boolean updateOrder(String id, OrderDescriptiveInfo order);
+    boolean setParcelCollectionDate(String orderId, String scheduledParcelCollectionWhen);
+    boolean setDeliveryDate(String orderId, String scheduledDeliveryWhen);
+    boolean updateOrderAllInfo(String orderId, String allinfo);
+    boolean updateOrderInfo(String orderId, String info);
+    boolean updateOrderAssignee(String orderId, String courierId);
 
-    private static Map<String, OrderDescriptiveInfo> orders;
-    static{
-        orders= new HashMap<>();
-    }
-
-    public OrderService(){
-
-    }
-
-
-    public OrderDescriptiveInfo getOrder(String orderId){
-        return orders.get(orderId);
-    }
-
-    public static void saveOrderInMemory(String id, OrderDescriptiveInfo order){
-        orders.put(id, order);
-    }
-
-    public OrderDescriptiveInfo convertJsonToOrderDescriptiveInfo(String json) {
-        return ModelObjManager.convertJsonToOrderDescriptiveInfo(json);
-    }
-
-    public TaskRequest convertJsonToTaskRequest(String taskJson){
-        return ModelObjManager.convertJsonToTaskRequest(taskJson);
-    }
-
-    public DeliveryStep convertJsonToDeliveryStep(String jsonString){
-        return ModelObjManager.convertDeliveryStepData(jsonString);
-    }
-
-    public Map<String, OrderDescriptiveInfo> getOrders() {
-        return orders;
-    }
-
+    OrderInfo getOrderInfo(String orderId);
+    List<ContactInfo> getOrderCustomerContactInfos(String orderId);
+    List<ContactInfo> getOrderDestinationContactInfos(String orderId);
+    LinkedList<DeliveryStep> getOrderDeliveryInfos(String orderId);
+    boolean updateOrderStatus(String orderId, String deliveryStep);
+    Set<String> getAllOrderIds();
 }

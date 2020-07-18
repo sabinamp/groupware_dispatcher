@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -94,5 +95,29 @@ public class ModelObjManager {
             e.printStackTrace();
         }
         return  null;
+    }
+
+    public static CourierInfo convertJsonToCourierInfo(String jsonString) {
+        try {
+            if(jsonString != null && !jsonString.isEmpty()){
+                return objectMapper.readValue(jsonString, CourierInfo.class);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            logger.log(Level.WARNING, e.getMessage());
+        }
+        return null;
+    }
+
+    public static OrderInfo convertJsonToOrderInfo(String jsonString) {
+        try {
+            if(jsonString != null && !jsonString.isEmpty()){
+                return objectMapper.readValue(jsonString, OrderInfo.class);
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+            logger.log(Level.WARNING, e.getMessage());
+        }
+        return null;
     }
 }

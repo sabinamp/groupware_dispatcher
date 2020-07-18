@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CourierServiceTest {
-    private CourierService courierService;
+    private CourierServiceImpl courierService;
 
     @BeforeEach
     void setUp(){
-        courierService = new CourierService();
+        courierService = new CourierServiceImpl();
     }
 
     @Test

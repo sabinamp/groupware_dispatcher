@@ -1,7 +1,10 @@
 package groupware.dispatcher.view;
 
-import groupware.dispatcher.presentationmodel.util.OrderPM;
+
+import groupware.dispatcher.service.CourierService;
+import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderService;
+import groupware.dispatcher.service.model.Courier;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.collections.FXCollections;
@@ -9,33 +12,34 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
 import java.util.Map;
 
-public class OrderListView extends ListView<String> implements ViewMixin {
-    private Map<String, OrderDescriptiveInfo> orders;
-    private OrderService orderService;
-    public static final ObservableList<OrderPM> data =
+public class CourierListView extends ListView<String> implements ViewMixin {
+    private Map<String, Courier> courierMap;
+    private CourierService courierService;
+    public static final ObservableList<Courier> data =
             FXCollections.observableArrayList();
 
-    public OrderListView(){
+    public CourierListView(){
         init();
     }
 
     @Override
     public void init() {
-        orderService = new OrderService();
-        orders= orderService.getOrders();
+        courierService= new CourierServiceImpl();
+        courierService.getCouriers();
 
     }
 
     @Override
     public void initializeSelf() {
-        //getStyleClass().add("order-pane");
+
     }
 
     @Override
     public void initializeParts() {
-        ListView<OrderPM> list = new ListView<>();
-        for(String each : orders.keySet()){
-            System.out.println("The dispatcher part has received info about the order: "+ each);
+        ListView<Courier> list = new ListView<>();
+        for(String each : courierMap.keySet()){
+            System.out.println("The dispatcher has received info about the courier: "+ each);
+            data.add(courierMap.get(each));
         }
 
         list.setItems(data);

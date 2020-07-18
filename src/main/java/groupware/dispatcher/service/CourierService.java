@@ -1,48 +1,23 @@
 package groupware.dispatcher.service;
 
-import groupware.dispatcher.service.model.Courier;
-import groupware.dispatcher.service.model.DeliveryStep;
-import groupware.dispatcher.service.model.OrderDescriptiveInfo;
-import groupware.dispatcher.service.model.TaskRequest;
-import groupware.dispatcher.service.mqtt.CourierBrokerClient;
-import groupware.dispatcher.service.util.ModelObjManager;
+import groupware.dispatcher.service.model.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public class CourierService {
+public interface CourierService {
+    boolean updateCourier(String courierId, Courier courier);
+    boolean setConn(String courierId, Conn conn);
+    boolean setStatus(String courierId, CourierStatus status);
+    Conn getConn(String courierId);
+    CourierStatus getStatus(String courierId);
+    Courier getCourier(String courierId);
+    CourierInfo getCourierInfo(String courierId);
+    List<ContactInfo> getContactInfos(String courierId);
 
-    private Map<String, Courier> couriers;
-
-
-    public CourierService(){
-        couriers = new HashMap<>();
-    }
-
-    public Courier getCourier(String id){
-        return couriers.get(id);
-    }
-
-    public void saveCourierInMemory(String id, Courier courier){
-        couriers.put(courier.getCourierId(), courier);
-    }
-
-    public Courier convertJsonToCourier(String json) {
-        return ModelObjManager.convertJsonToCourier(json);
-    }
-
-    TaskRequest convertJsonToTaskRequest(String taskJson){
-        return ModelObjManager.convertJsonToTaskRequest(taskJson);
-    }
-
-    public DeliveryStep convertJsonToDeliveryStep(String jsonString){
-        return ModelObjManager.convertDeliveryStepData(jsonString);
-    }
-
-    public Map<String, Courier> getCouriers() {
-        return couriers;
-    }
-
+    Set<String> getAssignedOrders(String courierId);
+    boolean updateAssignedOrders(String courierId, String addedOrderId);
+    Map<String,Courier> getCouriers();
+    boolean updateCourierInfo(String courierId, CourierInfo receivedString);
 }

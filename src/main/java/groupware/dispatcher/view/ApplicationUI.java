@@ -32,7 +32,7 @@ public class ApplicationUI extends VBox implements ViewMixin {
 
         VBox vbLeft= new VBox();
         vbLeft.setSpacing(10);
-        vbLeft.getChildren().add(new OrderListView());
+        vbLeft.getChildren().add(new CourierListView());
 
         vbLeft.setPrefSize(550,700);
         VBox vboxOnTheRight= new VBox();

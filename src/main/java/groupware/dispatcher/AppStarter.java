@@ -1,6 +1,6 @@
 package groupware.dispatcher;
 
-import groupware.dispatcher.service.BrokerConnection;
+import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.ApplicationUI;
 import javafx.application.Application;
 import javafx.scene.Parent;

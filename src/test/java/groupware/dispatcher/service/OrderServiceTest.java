@@ -13,11 +13,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class OrderServiceTest {
-    private OrderService orderService;
+    private OrderServiceImpl orderService;
 
     @BeforeEach
     void setUp(){
-        orderService = new OrderService();
+        orderService = new OrderServiceImpl();
     }
 
     @Test
@@ -44,7 +44,7 @@ public class OrderServiceTest {
         order.setContactInfos(contactInfos);
 
         //when
-        orderService.saveOrderInMemory("OR1133", order);
+        OrderServiceImpl.saveOrderInMemory("OR1133", order);
         //then
         OrderDescriptiveInfo savedOrder= orderService.getOrder("OR1133");
         assertNotNull(savedOrder);
