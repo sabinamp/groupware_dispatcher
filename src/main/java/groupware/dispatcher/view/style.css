@@ -1,25 +1,27 @@
 .root_pane {
     -fx-font-family: 'Roboto Regular';
     -fx-font-size: 1em;
-    -fx-basic-color   : #8ea6b4;
+    -fx-basic-color   : #8eb6b4;
     -fx-spacing    : 4px;
-    -fx-background-color: #38556a ;
+    -fx-background-color: #273952;
     -fx-text-fill: white;
 }
 .main-header {
     -fx-background-color: -fx-basic-color;
-    -fx-pref-height: 50px;
+    -fx-pref-height: 40px;
     -fx-pref-width: 100%;
     -fx-font-family: 'Roboto Bold';
     -fx-font-size: 1.35em;
-    -fx-text-fill: #333;
+    -fx-border-color: #273952;
+    -fx-border-width: 2;
+    -fx-border-style: solid;
 }
 .order_pane {
-    -fx-font-family: 'Roboto Regular';
-    -fx-lighter-color : derive(-fx-basic-color, 80%);
-    -fx-padding    : 5px,10px,5px,10px;
+    -fx-font-family: 'Roboto Bold';
+    -fx-lighter-color : derive(-fx-basic-color, 85%);
+    -fx-padding    : 4px,10px,4px,10px;
     -fx-spacing    : 10px;
-    -fx-background-color:#273952 ;
+    -fx-background-color: black ;
     -fx-text-fill: white;
 }
 
@@ -29,12 +31,7 @@
 .invalid {
     -fx-border-color: derive(red,30%);
 }
-.dirty .text {
-    -fx-stroke: darkolivegreen;
-}
-.dirty{
-    -fx-border-color: derive(darkolivegreen,70%)
-}
+
 .mandatory{
     -fx-background-color: white;
     -fx-background-insets: 0, 2;

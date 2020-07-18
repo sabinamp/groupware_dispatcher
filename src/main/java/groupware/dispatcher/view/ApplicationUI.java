@@ -1,13 +1,16 @@
 package groupware.dispatcher.view;
 
 import groupware.dispatcher.view.util.ViewMixin;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-public class ApplicationUI extends VBox implements ViewMixin {
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 
-        private Node header;
+public class ApplicationUI extends BorderPane implements ViewMixin {
+
+        public MainHeader header;
 
         public ApplicationUI() {
                 init();
@@ -22,29 +25,29 @@ public class ApplicationUI extends VBox implements ViewMixin {
         @Override
         public void initializeParts() {
                 header = new MainHeader();
+
         }
 
         @Override
         public void layoutParts() {
 
-        HBox hb1= new HBox();
-        hb1.setSpacing(10);
+                this.setRight(new Text("Right "));
+                this.setCenter(new Text("Center"));
+                this.setBottom(new Text(" Bottom"));
+                this.setLeft(new Text(" Left"));
 
-        VBox vbLeft= new VBox();
-        vbLeft.setSpacing(10);
-        vbLeft.getChildren().add(new CourierListView());
+                //to be added: the orders view and the detailed order view
+                this.setTop(header);
+                BorderPane.setAlignment(header, Pos.CENTER);
 
-        vbLeft.setPrefSize(550,700);
-        VBox vboxOnTheRight= new VBox();
-        vboxOnTheRight.setPrefSize(550,700);
-
-        hb1.getChildren().addAll(vbLeft,vboxOnTheRight);
-        getChildren().addAll(header, hb1);
-        setVgrow(hb1, Priority.ALWAYS);
         }
 
         @Override
         public void setupBindings() {
 
+        }
+
+        public void addClockToHeader(Text txtTimer){
+                header.addClockDemoToHeader(txtTimer);
         }
 }
