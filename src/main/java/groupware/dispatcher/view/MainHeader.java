@@ -4,6 +4,7 @@ import groupware.dispatcher.view.util.ViewMixin;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -40,12 +41,12 @@ public class MainHeader extends HBox implements ViewMixin {
 
         Text title= new Text("City Courier Services");
         // gradient fill, see details few sections below
-        Stop[] stops = new Stop[]{new Stop(0, Color.DODGERBLUE), new Stop(1, Color.DARKGRAY), new Stop(0.5, Color.ALICEBLUE)};
+        Stop[] stops = new Stop[]{new Stop(0, Color.DARKSLATEGRAY), new Stop(1, Color.DARKGRAY), new Stop(0.5, Color.ALICEBLUE)};
         LinearGradient gradient = new LinearGradient(50, 50, 250, 50, false, CycleMethod.NO_CYCLE, stops);
         title.setFill(gradient);
 
         timerBox = new HBox();
-        timerBox.setSpacing(5);
+        timerBox.setSpacing(8);
 
         tilePane.getChildren().add(timerBox);
         topBanner.getChildren().addAll(title, tilePane);
@@ -68,4 +69,7 @@ public class MainHeader extends HBox implements ViewMixin {
     }
 
 
+    public void addExitBtn(Button exitBtn) {
+        topBanner.getChildren().add(exitBtn);
+    }
 }

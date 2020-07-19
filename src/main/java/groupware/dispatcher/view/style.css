@@ -10,11 +10,13 @@
     -fx-background-color: -fx-basic-color;
     -fx-pref-height: 40px;
     -fx-pref-width: 100%;
+    -fx-min-width: 600px;
     -fx-font-family: 'Roboto Bold';
     -fx-font-size: 1.35em;
     -fx-border-color: #273952;
     -fx-border-width: 2;
     -fx-border-style: solid;
+    -fx-text-fill: green;
 }
 .order_pane {
     -fx-font-family: 'Roboto Bold';
@@ -53,9 +55,11 @@
     -fx-text-fill: #8A8C91;
     -fx-spacing: 20;
 }
-.users-content-pane{
-    -fx-padding: 50;
+.couriers-content-pane{
+    -fx-padding: 20;
     -fx-background-color: -fx-basic-color;
+    -fx-text-fill: #8A8C91;
+    -fx-spacing: 20;
 }
 
 .table-view {

@@ -1,6 +1,8 @@
 package groupware.dispatcher.view;
 
 
+import groupware.dispatcher.presentationmodel.AllCouriersPM;
+import groupware.dispatcher.presentationmodel.CourierPM;
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderService;
@@ -8,24 +10,30 @@ import groupware.dispatcher.service.model.Courier;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.StackPane;
+
 import java.util.Map;
 
-public class CourierListView extends ListView<String> implements ViewMixin {
-    private Map<String, Courier> courierMap;
-    private CourierService courierService;
-    public static final ObservableList<Courier> data =
+public class CourierListView extends StackPane implements ViewMixin {
+
+    public static ObservableList<CourierPM> items =
             FXCollections.observableArrayList();
 
-    public CourierListView(){
+    private  ListView<CourierPM> list;
+
+    public CourierListView(AllCouriersPM data){
+        items = data.getAllCouriers();
         init();
     }
 
     @Override
     public void init() {
-        courierService= new CourierServiceImpl();
-        courierService.getCouriers();
+
+        list = new ListView<>();
+        list.setItems(items);
 
     }
 
@@ -36,13 +44,9 @@ public class CourierListView extends ListView<String> implements ViewMixin {
 
     @Override
     public void initializeParts() {
-        ListView<Courier> list = new ListView<>();
-        for(String each : courierMap.keySet()){
-            System.out.println("The dispatcher has received info about the courier: "+ each);
-            data.add(courierMap.get(each));
-        }
 
-        list.setItems(data);
+     this.getChildren().add(list);
+
     }
 
     @Override

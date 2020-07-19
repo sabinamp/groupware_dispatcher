@@ -1,15 +1,21 @@
 package groupware.dispatcher;
 
+import groupware.dispatcher.service.CourierService;
+import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.ApplicationUI;
 import groupware.dispatcher.view.MainHeader;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -38,13 +44,30 @@ public class AppStarter extends Application {
     });
     @Override
     public void start(Stage primaryStage){
-        ApplicationUI rootPanel = new ApplicationUI();
+        CourierService courierService = new CourierServiceImpl();
+        ApplicationUI rootPanel = new ApplicationUI(courierService);
+        Button exitBtn = new Button("Exit");
+        exitBtn.setTextFill(Color.rgb(50,50,100));
+        exitBtn.setOnAction(e -> {
+            stop();
+           System.exit(0);
+
+        });
         rootPanel.addClockToHeader(txtTime);
+        rootPanel.addExitButton(exitBtn);
         Scene scene = new Scene(rootPanel, 800,500);
 
         primaryStage.setTitle("Dispatcher GUI");
         BrokerConnection connection= new BrokerConnection();
+
         primaryStage.setScene(scene);
+        scene.getWindow().setOnCloseRequest(new EventHandler<>() {
+            @Override
+            public void handle(WindowEvent event) {
+                stop();
+                System.exit(0);
+            }
+        });
         timer.start();
         primaryStage.show();
 
