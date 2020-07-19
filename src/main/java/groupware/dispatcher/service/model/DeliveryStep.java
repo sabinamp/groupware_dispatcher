@@ -2,6 +2,7 @@ package groupware.dispatcher.service.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import groupware.dispatcher.service.OrderService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +12,7 @@ import java.util.Objects;
 public class DeliveryStep {
 
     @JsonProperty("currentStatus")
-    private String currentStatus = null;
+    private OrderStatus currentStatus = null;
 
     @JsonProperty("currentAssignee")
     private String currentAssignee = null;
@@ -21,11 +22,11 @@ public class DeliveryStep {
     private LocalDateTime updatedWhen = null;
 
 
-    public String getCurrentStatus() {
+    public OrderStatus getCurrentStatus() {
         return currentStatus;
     }
 
-    public void setCurrentStatus(String currentStatus) {
+    public void setCurrentStatus(OrderStatus currentStatus) {
         this.currentStatus = currentStatus;
     }
 
@@ -48,7 +49,7 @@ public class DeliveryStep {
 
 
 
-    public DeliveryStep currentStatus(String currentStatus) {
+    public DeliveryStep currentStatus(OrderStatus currentStatus) {
         this.currentStatus = currentStatus;
         return this;
     }

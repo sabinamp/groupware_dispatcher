@@ -4,28 +4,134 @@ import groupware.dispatcher.service.model.ContactInfo;
 import groupware.dispatcher.service.model.DeliveryStep;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.service.model.OrderStatus;
+import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class OrderPM {
-    private String orderId;
-    private String customerName;
-    private LocalDateTime orderPlacedWhen;
-    private LocalDateTime orderUpdatedWhen;
+    private static final String ELLIPSIS = "...";
+
+
+    private final StringProperty orderId = new SimpleStringProperty();
+    private final StringProperty customerName =  new SimpleStringProperty(ELLIPSIS);;
+    private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();;
+
+    private final ObjectProperty<LocalDateTime> scheduledParcelCollectionWhen = new SimpleObjectProperty<>();;
+    private final ObjectProperty<LocalDateTime> orderUpdatedWhen = new SimpleObjectProperty<>();;
     private List<ContactInfo> contactInfos = null;
-    private String orderStatus;
-    private String currentAssignee;
+    private final ObjectProperty<OrderStatus> orderStatus = new SimpleObjectProperty<>();
+    private final StringProperty currentAssignee =  new SimpleStringProperty(ELLIPSIS);;
+    private final DoubleProperty price = new SimpleDoubleProperty(0.0);
 
     public OrderPM(OrderDescriptiveInfo orderDescriptiveInfo){
-        orderId= orderDescriptiveInfo.getOrderId();
-        customerName = orderDescriptiveInfo.getCustomerName();
-        orderPlacedWhen = orderDescriptiveInfo.getOrderInfo().getPlacedWhen();
+        setOrderId(orderDescriptiveInfo.getOrderId());
+        setCustomerName(orderDescriptiveInfo.getCustomerName());
+        setOrderPlacedWhen(orderDescriptiveInfo.getOrderInfo().getPlacedWhen());
         DeliveryStep lastStep= orderDescriptiveInfo.getDeliveryInfos().getLast();
-        orderUpdatedWhen = lastStep.getUpdatedWhen();
-        orderStatus = lastStep.getCurrentStatus();
-        currentAssignee = lastStep.getCurrentAssignee();
+        setOrderUpdatedWhen(lastStep.getUpdatedWhen());
+        setOrderStatus(lastStep.getCurrentStatus());
+        setCurrentAssignee(lastStep.getCurrentAssignee());
+        setScheduledParcelCollectionWhen(orderDescriptiveInfo.getOrderInfo().getScheduledParcelCollectionWhen());
+        setPrice(orderDescriptiveInfo.getOrderInfo().getPrice());
     }
+
+    public String getOrderId() {
+        return orderId.get();
+    }
+
+    public StringProperty orderIdProperty() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId.set(orderId);
+    }
+
+    public String getCustomerName() {
+        return customerName.get();
+    }
+
+    public StringProperty customerNameProperty() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName.set(customerName);
+    }
+
+    public LocalDateTime getOrderPlacedWhen() {
+        return orderPlacedWhen.get();
+    }
+
+    public ObjectProperty<LocalDateTime> orderPlacedWhenProperty() {
+        return orderPlacedWhen;
+    }
+
+    public void setOrderPlacedWhen(LocalDateTime orderPlacedWhen) {
+        this.orderPlacedWhen.set(orderPlacedWhen);
+    }
+
+    public LocalDateTime getScheduledParcelCollectionWhen() {
+        return scheduledParcelCollectionWhen.get();
+    }
+
+    public ObjectProperty<LocalDateTime> scheduledParcelCollectionWhenProperty() {
+        return scheduledParcelCollectionWhen;
+    }
+
+    public void setScheduledParcelCollectionWhen(LocalDateTime scheduledParcelCollectionWhen) {
+        this.scheduledParcelCollectionWhen.set(scheduledParcelCollectionWhen);
+    }
+
+    public LocalDateTime getOrderUpdatedWhen() {
+        return orderUpdatedWhen.get();
+    }
+
+    public ObjectProperty<LocalDateTime> orderUpdatedWhenProperty() {
+        return orderUpdatedWhen;
+    }
+
+    public void setOrderUpdatedWhen(LocalDateTime orderUpdatedWhen) {
+        this.orderUpdatedWhen.set(orderUpdatedWhen);
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus.get();
+    }
+
+    public ObjectProperty<OrderStatus> orderStatusProperty() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus.set(orderStatus);
+    }
+
+    public String getCurrentAssignee() {
+        return currentAssignee.get();
+    }
+
+    public StringProperty currentAssigneeProperty() {
+        return currentAssignee;
+    }
+
+    public void setCurrentAssignee(String currentAssignee) {
+        this.currentAssignee.set(currentAssignee);
+    }
+
+    public double getPrice() {
+        return price.get();
+    }
+
+    public DoubleProperty priceProperty() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price.set(price);
+    }
+
 
 
 
