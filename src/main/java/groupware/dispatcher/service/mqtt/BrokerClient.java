@@ -1,14 +1,9 @@
 package groupware.dispatcher.service.mqtt;
 
-import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.Mqtt3Subscribe;
-import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
-import groupware.dispatcher.service.CourierService;
-import groupware.dispatcher.service.model.Courier;
-import groupware.dispatcher.service.util.ModelObjManager;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;

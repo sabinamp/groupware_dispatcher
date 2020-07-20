@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum CourierStatus {
 
-    AVAILABLE("Available for new order delivery"),
+    AVAILABLE("Available"),
 
     NOT_AVAILABLE_SICK("Not available. On sick leave."),
 
@@ -17,7 +17,7 @@ public enum CourierStatus {
     NOT_AVAILABLE_BREAK("Not available. Having a break"),
 
 
-    NOT_AVAILABLE_OUT_OF_BATTERY("Not available. Running out of battery.");
+    NOT_AVAILABLE_OUT_OF_BATTERY("Not available. Out of battery.");
 
     private String value;
 
@@ -34,7 +34,7 @@ public enum CourierStatus {
     @JsonCreator
     public static CourierStatus fromValue(String text) {
         for (CourierStatus b : CourierStatus.values()) {
-            if (String.valueOf(b.value).equals(text)) {
+            if (String.valueOf(b.value).equalsIgnoreCase(text)) {
                 return b;
             }
         }

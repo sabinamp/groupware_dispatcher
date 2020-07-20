@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class TaskRequest {
+    @JsonProperty("taskId")
+    private String taskId = null;
+
     @JsonProperty("orderId")
     private String orderId = null;
 
@@ -34,6 +37,13 @@ public class TaskRequest {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
     private LocalDateTime  sentWhen = null;
 
+    @JsonProperty("confirmed")
+    private boolean confirmed = false;
+
+    public TaskRequest taskId(String taskId) {
+        this.taskId = taskId;
+        return this;
+    }
 
     public TaskRequest dueOn(LocalDateTime dueOn) {
         this.dueOn = dueOn;
@@ -74,6 +84,14 @@ public class TaskRequest {
         this.addressLine = addressLine;
         return this;
     }
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
     public String getOrderId() {
         return orderId;
     }
@@ -148,9 +166,6 @@ public class TaskRequest {
         this.addressLine = addressLine;
     }
 
-    @JsonProperty("confirmed")
-    private boolean confirmed = false;
-
 
     @Override
     public boolean equals(Object o) {
@@ -161,7 +176,8 @@ public class TaskRequest {
             return false;
         }
         TaskRequest task = (TaskRequest) o;
-        return Objects.equals(this.orderId, task.orderId) &&
+        return  Objects.equals(this.taskId, task.taskId) &&
+                Objects.equals(this.orderId, task.orderId) &&
                 Objects.equals(this.assigneeId, task.assigneeId)&&
                 Objects.equals(this.addressLine, task.addressLine)&&
                 Objects.equals(this.deliveryType, task.deliveryType) &&
@@ -173,7 +189,7 @@ public class TaskRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderId, assigneeId, addressLine,sentWhen, deliveryType, taskType, dueOn,
+        return Objects.hash(taskId, orderId, assigneeId, addressLine,sentWhen, deliveryType, taskType, dueOn,
                 confirmed);
     }
 
@@ -181,6 +197,7 @@ public class TaskRequest {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("class TaskRequest {\n");
+        sb.append("    taskId: ").append(toIndentedString(taskId)).append("\n");
         sb.append("    orderId: ").append(toIndentedString(orderId)).append("\n");
         sb.append("    assigneeId: ").append(toIndentedString(assigneeId)).append("\n");
         sb.append("    addressLine: ").append(toIndentedString(addressLine)).append("\n");

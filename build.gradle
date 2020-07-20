@@ -45,6 +45,7 @@ javafx {
 }
 
 mainClassName = "groupware.dispatcher.AppStarter"
+
 test {
     useJUnitPlatform()
     testLogging {

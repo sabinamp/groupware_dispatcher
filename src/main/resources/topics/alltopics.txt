@@ -1,0 +1,36 @@
+orders/new
+
+orders/all_info/get/id
+orders/all_info/get/id/response
+orders/all_info/update/id
+
+orders/status/get/ id
+orders/status/get/ id/response
+
+
+orders/info/get/id
+orders/info/get/id/response
+orders/info/update/id
+
+orders/delivery_info/get/id
+orders/delivery_info/get/id/response
+orders/delivery_info/update/id
+
+orders/assignee/get/orderId/  QoS 2
+orders/assignee/get/orderId/response  QoS 2
+orders/assignee/update/orderId
+
+
+couriers/info/get/courierId
+couriers/info/get/courierId/response
+couriers/info/update/courierId 
+
+The 2 topics below are used by groupware_dispatcher -
+the dispatcher client and the mobile app . The dispatcher assigns delivery tasks to couriers.
+The couriers accept or deny task requests.
+orders/task/courierId/orderId/request QoS 2 
+orders/task/courierId /orderId/accept QoS 2 
+orders/task/courierId/orderId/deny - QoS 2 
+
+
+

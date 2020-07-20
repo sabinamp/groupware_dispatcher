@@ -3,32 +3,39 @@ package groupware.dispatcher.service.mqtt;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
-import com.hivemq.client.mqtt.mqtt3.message.subscribe.Mqtt3Subscribe;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
-import groupware.dispatcher.service.CourierService;
-import groupware.dispatcher.service.OrderService;
+import groupware.dispatcher.service.CourierServiceImpl;
+import groupware.dispatcher.service.model.Conn;
 import groupware.dispatcher.service.model.Courier;
-import groupware.dispatcher.service.model.OrderDescriptiveInfo;
+import groupware.dispatcher.service.model.CourierStatus;
+import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class CourierBrokerClient extends BrokerClient{
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
     private Mqtt3AsyncClient clientA;
-    private CourierService courierService;
+    private Mqtt3AsyncClient clientCourierUpdates;
+    private CourierServiceImpl courierService;
     private final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
 
 
     public CourierBrokerClient(){
-        courierService= new CourierService();
+        courierService= new CourierServiceImpl();
         clientA = MqttClient.builder()
+                .useMqttVersion3()
+                .identifier(UUID.toString())
+                .serverHost("127.0.0.1")
+                .serverPort(1883)
+                .automaticReconnectWithDefaultConfig()
+                .buildAsync();
+        clientCourierUpdates = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(UUID.toString())
                 .serverHost("127.0.0.1")
@@ -68,7 +75,7 @@ public class CourierBrokerClient extends BrokerClient{
                 .applyWillPublish()
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToGetCourierByIdResponse(courierId))
+                .thenComposeAsync(v -> subscribeToGetCourierById(courierId))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -82,7 +89,7 @@ public class CourierBrokerClient extends BrokerClient{
                 });
     }
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToGetCourierByIdResponse(String courierId){
+    private CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(String courierId){
         String topicName = "couriers/info/get/"+ courierId +"/response";
         System.out.println("entering subscribeToGetCourierByIdResponse for the topic "+topicName);
 
@@ -90,7 +97,8 @@ public class CourierBrokerClient extends BrokerClient{
                 .topicFilter(topicName)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
-                        Courier courier = ModelObjManager.convertJsonToCourier(mqtt3Publish.getPayload().toString());
+                        String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
+                        Courier courier = ModelObjManager.convertJsonToCourier(received);
                         courierService.saveCourierInMemory(courierId, courier);
                     }
                 } ).send()
@@ -106,9 +114,77 @@ public class CourierBrokerClient extends BrokerClient{
                 });
         return subscribesToCourierById;
     }
+    public void connectToBrokerAndSubscribeToCourierUpdates(){
+        System.out.println("connecting to Broker connectToBrokerAndSubscribeToCourierUpdates");
+        this.clientCourierUpdates.connectWith()
+                .keepAlive(180)
+                .cleanSession(false)
+                .send()
+                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
+                .thenComposeAsync(v -> subscribeToCourierUpdates())
+                .whenComplete((connAck, throwable) -> {
+                    if (throwable != null) {
+                        // Handle connection failure
+                        logger.info("The connection to the broker failed."+ throwable.getMessage());
+                        System.out.println("The connection to the broker failed."+ throwable.getMessage());
+                    } else {
+                        System.out.println("successful connection to the broker. The client clientCourierUpdates is connected");
+                        logger.info("successful connection to the broker. The client "+ clientCourierUpdates + " is connected");
 
+                    }
+                });
+    }
 
-    public CourierService getOrderService() {
+    private CompletableFuture<Mqtt3SubAck> subscribeToCourierUpdates(){
+        String topicUpdateInfo="couriers/info/update/#";
+        String topicUpdateStatus="couriers/status/update/#";
+        String topicUpdateConnected="couriers/conn/update/#";
+        String topicUpdateAssignedOrders="couriers/assigned_orders/update/#";
+        String topic = "couriers/+/update/#";
+        System.out.println("entering subscribeToCourierUpdates - subscribe topic : "+topic);
+
+        CompletableFuture<Mqtt3SubAck> mqtt3SubAckCompletableFuture= clientCourierUpdates.subscribeWith()
+                .topicFilter(topic)
+                .callback(publish -> {
+                    // Process the received message
+                    if( publish.getPayload().isPresent()){
+                        String courierId= publish.getTopic().getLevels().get(3);
+                        System.out.println("update received for the courier "+ courierId);
+
+                        String tobeUpdated= publish.getTopic().getLevels().get(1);
+                        String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
+                        if (tobeUpdated.equals("status")){
+                            courierService.setStatus(courierId, CourierStatus.fromValue(receivedString));
+                            System.out.println("update received for the courier "+ receivedString);
+
+                        }else if(tobeUpdated.equals("conn")){
+                            courierService.setConn(courierId, Conn.fromValue(receivedString));
+                            System.out.println("update received for the courier "+ receivedString);
+                        }else if(tobeUpdated.equals("assigned_orders")){
+                            courierService.updateAssignedOrders(courierId, receivedString);
+                            System.out.println("update received for the courier "+ receivedString);
+                        }else if(tobeUpdated.equals("info")){
+                            courierService.updateCourierInfo(courierId, ModelObjManager.convertJsonToCourierInfo(receivedString));
+                            System.out.println("update received for the courier "+ receivedString);
+                        }
+                    }
+                })
+                .send()
+                .whenComplete((mqtt3SubAck, throwable) -> {
+                    if (throwable != null) {
+                        // Handle failure to subscribe
+                        logger.warning("Couldn't subscribe to topic " + topic);
+                        System.out.println(" - could not subscribe to topic " + topic);
+                    } else {
+                        // Handle successful subscription, e.g. logging or incrementing a metric
+                        logger.info(" - subscribed to topic " + topic);
+                        System.out.println(" - subscribed to topic " + topic);
+                    }
+                });
+
+        return mqtt3SubAckCompletableFuture;
+    }
+    public CourierServiceImpl getOrderService() {
         return courierService;
     }
 

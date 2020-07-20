@@ -1,17 +1,15 @@
 package groupware.dispatcher.service.mqtt;
 
-import com.fasterxml.jackson.databind.deser.std.ObjectArrayDeserializer;
-import groupware.dispatcher.service.OrderService;
+import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.model.*;
-import com.hivemq.client.internal.mqtt.message.MqttMessage;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
-import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
-import com.hivemq.client.mqtt.mqtt3.message.subscribe.Mqtt3Subscribe;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
+import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -20,12 +18,12 @@ public class OrdersBrokerClient extends BrokerClient {
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
     Mqtt3AsyncClient client1;
     Mqtt3AsyncClient client2;
-    private OrderService orderService;
+    private OrderServiceImpl orderService;
     private final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
 
 
     public OrdersBrokerClient(){
-        orderService= new OrderService();
+        orderService= new OrderServiceImpl();
         client1 = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(UUID.toString())
@@ -46,13 +44,8 @@ public class OrdersBrokerClient extends BrokerClient {
     public void connectToBrokerAndSubscribeToNewOrders(){
         System.out.println("connecting to Broker");
         this.client2.connectWith()
-                .keepAlive(60)
+                .keepAlive(180)
                 .cleanSession(false)
-                .willPublish()
-                .topic("orders/hello")
-                .qos(MqttQos.EXACTLY_ONCE)
-                .payload("hello".getBytes())
-                .applyWillPublish()
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
                 .thenComposeAsync(v -> subscribeToNewOrders())
@@ -77,9 +70,11 @@ public class OrdersBrokerClient extends BrokerClient {
             .topicFilter("orders/new")
             .callback(mqtt3Publish -> {
                 if(mqtt3Publish.getPayload().isPresent()){
-                   OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(mqtt3Publish.getPayload().toString());
+                    String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
+                    System.out.println("new order received " +received);
+                   OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                    if(order != null) {
-                       OrderService.saveOrderInMemory(order.getOrderId(), order);
+                       OrderServiceImpl.saveOrderInMemory(order.getOrderId(), order);
                    }
                 }
             } ).send()
@@ -128,9 +123,11 @@ public class OrdersBrokerClient extends BrokerClient {
                 .topicFilter(topic)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
-                        OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(mqtt3Publish.getPayload().toString());
+                        String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
+                        System.out.println("an order has been received " +received);
+                        OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                         if (order != null) {
-                            OrderService.saveOrderInMemory(orderId, order);
+                            OrderServiceImpl.saveOrderInMemory(orderId, order);
                         } else {
                             logger.warning("OrderId "+orderId + " order is null");
                         }
@@ -152,7 +149,7 @@ public class OrdersBrokerClient extends BrokerClient {
 
 
 
-    public OrderService getOrderService() {
+    public OrderServiceImpl getOrderService() {
         return orderService;
     }
 

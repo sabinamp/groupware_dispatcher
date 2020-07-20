@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum Conn {
 
-    ONLINE("Not connected"),
+    ONLINE("Online"),
 
     OFFLINE("Offline");
 
