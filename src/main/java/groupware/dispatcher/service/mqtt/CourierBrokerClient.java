@@ -62,6 +62,7 @@ public class CourierBrokerClient extends BrokerClient{
     }
     void stopClientBrokerConnection(){
         clientA.disconnect();
+        clientCourierUpdates.disconnect();
     }
 
    public void connectAndRequestCourier(String courierId){
@@ -99,7 +100,8 @@ public class CourierBrokerClient extends BrokerClient{
                     if(mqtt3Publish.getPayload().isPresent()){
                         String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
                         Courier courier = ModelObjManager.convertJsonToCourier(received);
-                        courierService.saveCourierInMemory(courierId, courier);
+                        System.out.print(received);
+                        courierService.updateCourier(courierId, courier);
                     }
                 } ).send()
                 .whenComplete((mqtt3SubAck, throwable) -> {

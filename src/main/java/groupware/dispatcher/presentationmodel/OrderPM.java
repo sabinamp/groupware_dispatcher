@@ -1,9 +1,6 @@
 package groupware.dispatcher.presentationmodel;
 
-import groupware.dispatcher.service.model.ContactInfo;
-import groupware.dispatcher.service.model.DeliveryStep;
-import groupware.dispatcher.service.model.OrderDescriptiveInfo;
-import groupware.dispatcher.service.model.OrderStatus;
+import groupware.dispatcher.service.model.*;
 import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
@@ -21,13 +18,15 @@ public class OrderPM {
     private List<ContactInfo> contactInfos = null;
     private final ObjectProperty<OrderStatus> orderStatus = new SimpleObjectProperty<>();
     private final StringProperty currentAssignee =  new SimpleStringProperty(ELLIPSIS);
+    private final ObjectProperty<DeliveryStep> orderLastUpdate = new SimpleObjectProperty<>();
     private final DoubleProperty price = new SimpleDoubleProperty(0.0);
 
     public OrderPM(OrderDescriptiveInfo orderDescriptiveInfo){
         setOrderId(orderDescriptiveInfo.getOrderId());
         setCustomerName(orderDescriptiveInfo.getCustomerName());
         setOrderPlacedWhen(orderDescriptiveInfo.getOrderInfo().getPlacedWhen());
-        DeliveryStep lastStep= orderDescriptiveInfo.getDeliveryInfos().getLast();
+        DeliveryStep lastStep = orderDescriptiveInfo.getDeliveryInfos().getLast();
+        setOrderLastUpdate(lastStep);
         setOrderUpdatedWhen(lastStep.getUpdatedWhen());
         setOrderStatus(lastStep.getCurrentStatus());
         setCurrentAssignee(lastStep.getCurrentAssignee());
@@ -131,8 +130,31 @@ public class OrderPM {
         this.price.set(price);
     }
 
+    public DeliveryStep getOrderLastUpdate() {
+        return orderLastUpdate.get();
+    }
 
+    public ObjectProperty<DeliveryStep> orderLastUpdateProperty() {
+        return orderLastUpdate;
+    }
 
+    public void setOrderLastUpdate(DeliveryStep orderLastUpdate) {
+        this.orderLastUpdate.set(orderLastUpdate);
+    }
+
+    @Override
+    public String toString() {
+        return "OrderPM{" +
+                "orderId=" + orderId +
+                ", customerName=" + customerName +
+                ", orderPlacedWhen=" + orderPlacedWhen +
+                ", scheduledParcelCollectionWhen=" + scheduledParcelCollectionWhen +
+                ", orderUpdatedWhen=" + orderUpdatedWhen +
+                ", contactInfos=" + contactInfos +
+                ", orderStatus=" + orderStatus +
+                ", currentAssignee=" + currentAssignee +
+                '}';
+    }
 
 
 }

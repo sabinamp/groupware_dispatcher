@@ -1,7 +1,11 @@
 package groupware.dispatcher;
 
+import groupware.dispatcher.presentationmodel.AllCouriersPM;
+import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
+import groupware.dispatcher.service.OrderService;
+import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.ApplicationUI;
 import groupware.dispatcher.view.MainHeader;
@@ -23,6 +27,7 @@ import java.util.Date;
 
 public class AppStarter extends Application {
 
+
     private volatile boolean enough = false;
     private final Text txtTime = new Text();
     // this is timer thread which will update out time view every second
@@ -42,10 +47,14 @@ public class AppStarter extends Application {
             });
         }
     });
+
+
     @Override
     public void start(Stage primaryStage){
         CourierService courierService = new CourierServiceImpl();
-        ApplicationUI rootPanel = new ApplicationUI(courierService);
+        OrderService orderService = new OrderServiceImpl();
+
+        ApplicationUI rootPanel = new ApplicationUI(courierService, orderService);
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {

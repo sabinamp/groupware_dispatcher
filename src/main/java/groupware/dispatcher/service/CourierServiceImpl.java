@@ -3,6 +3,7 @@ package groupware.dispatcher.service;
 import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.util.ModelObjManager;
 
+
 import java.util.*;
 
 public class CourierServiceImpl implements CourierService {
@@ -16,9 +17,6 @@ public class CourierServiceImpl implements CourierService {
         return couriers.get(id);
     }
 
-    public void saveCourierInMemory(String id, Courier courier){
-        couriers.put(courier.getCourierId(), courier);
-    }
 
     public Courier convertJsonToCourier(String json) {
         return ModelObjManager.convertJsonToCourier(json);

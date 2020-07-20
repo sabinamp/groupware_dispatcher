@@ -61,4 +61,14 @@ public class CourierPM {
     public void setCourierId(String courierId) {
         this.courierId.set(courierId);
     }
+
+    @Override
+    public String toString() {
+        return "CourierPM{" +
+                "name=" + name +
+                ", courierId=" + courierId +
+                ", courierStatus=" + courierStatus +
+                ", courierConnectionStatus=" + courierConnectionStatus +
+                '}';
+    }
 }

@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 public class BrokerClient {
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
-       private final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
+    private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(BrokerClient.class));
 
 
     public BrokerClient(){
