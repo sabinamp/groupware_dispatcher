@@ -32,12 +32,10 @@ public class CourierListView extends StackPane implements ViewMixin {
 
     public CourierListView(AllCouriersPM data){
         ObservableList<String> courierids= data.getAllCourierIDs();
-
         for (String each:   courierids   ) {
             System.out.println("-each courier "+each);
         }
-
-         items.addAll( "C100", "C101", "C102", "C103");
+        items.addAll( "C100", "C101", "C102", "C103");
         //items.addAll(courierids);
         init();
 

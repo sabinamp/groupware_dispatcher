@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 
 public class ByteBufferToStringConversion {
 
-
     public static ByteBuffer string2ByteBuffer(String s, Charset charset) {
         return ByteBuffer.wrap(s.getBytes(charset));
     }

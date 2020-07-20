@@ -19,6 +19,7 @@ public class AllCouriersPM {
     private CourierService courierService;
     private final ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
     private final ObservableList<String> allCourierIDs = FXCollections.observableArrayList();
+
     public AllCouriersPM(CourierService courierService){
         this.courierService = courierService;
         Map<String, Courier> couriersMap = courierService.getCouriers();
@@ -44,8 +45,13 @@ public class AllCouriersPM {
         return allCouriers;
     }
     public ObservableList<String> getAllCourierIDs() {
-        //logger.log(Level.INFO, "AllCouriersPM getAllCouriers() method called");
+        //logger.log(Level.INFO, "AllCouriersPM getAllCourierIDs() method called");
         return allCourierIDs;
+    }
+
+    public void updateAllCouriersPM(CourierPM pm){
+        allCouriers.add(pm);
+        allCourierIDs.add(pm.getCourierId());
     }
 
 }

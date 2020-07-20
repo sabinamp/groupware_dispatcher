@@ -1,5 +1,6 @@
 package groupware.dispatcher.service.mqtt;
 
+import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.model.*;
 import com.hivemq.client.mqtt.MqttClient;
@@ -20,10 +21,11 @@ public class OrdersBrokerClient extends BrokerClient {
     Mqtt3AsyncClient client2;
     private OrderServiceImpl orderService;
     private final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
-
+    private AllOrdersPM allOrdersPM;
 
     public OrdersBrokerClient(){
         orderService= new OrderServiceImpl();
+        allOrdersPM = new AllOrdersPM(orderService);
         client1 = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(UUID.toString())
