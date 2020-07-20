@@ -6,6 +6,7 @@ import groupware.dispatcher.presentationmodel.CourierPM;
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderService;
+import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.model.Courier;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.view.util.ViewMixin;
@@ -19,20 +20,27 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class CourierListView extends StackPane implements ViewMixin {
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
-    public static ObservableList<CourierPM> items =
+public class CourierListView extends StackPane implements ViewMixin {
+    private final static Logger logger = LogManager.getLogManager().getLogger(String.valueOf(CourierListView.class));
+    public static ObservableList<String> items =
             FXCollections.observableArrayList( );
 
-    private  ListView<CourierPM> listView;
+    private  ListView<String> listView;
 
     public CourierListView(AllCouriersPM data){
+        ObservableList<String> courierids= data.getAllCourierIDs();
 
-        System.out.println("AllCouriersPM getAllCouriers() method called");
-      //  items.addAll( data.getAllCouriers());
-        items.addAll(data.getAllCouriers());
+        for (String each:   courierids   ) {
+            System.out.println("-each courier "+each);
+        }
+
+         items.addAll( "C100", "C101", "C102", "C103");
+        //items.addAll(courierids);
         init();
-        /*"Red", "Blue", "Yellow", "Green")*/
+
     }
 
 
@@ -46,16 +54,17 @@ public class CourierListView extends StackPane implements ViewMixin {
 
     @Override
     public void initializeParts() {
-        listView = new ListView<CourierPM>(items);
-        listView.setCellFactory((ListView<CourierPM> param) -> {
+
+        listView = new ListView<>(items);
+        listView.setCellFactory((ListView<String> param) -> {
             return new ListCell<>() {
                 @Override
-                public void updateItem(CourierPM item, boolean empty) {
+                public void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
                     if (! (empty || item == null)) {
                         // adding new item
                         setGraphic(new Rectangle(30, 30, Color.web("Blue")));
-                        setText("Courier ID: "+item.toString());
+                        setText("Courier ID: "+item);
                     } else {
                         setText(null);
                         setGraphic(null);
@@ -87,10 +96,7 @@ public class CourierListView extends StackPane implements ViewMixin {
 
     }
 
-    @Override
-    public void addStylesheetFiles(String... stylesheetFile) {
 
-    }
 
 
 }

@@ -26,7 +26,6 @@ public class MainHeader extends HBox implements ViewMixin {
     HBox timerBox;
 
     public MainHeader(){
-
         init();
     }
 

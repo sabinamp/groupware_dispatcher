@@ -26,7 +26,6 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         public ApplicationUI(CourierService courierService, OrderService orderService) {
                 allCouriersPM = new AllCouriersPM(courierService);
                 allOrdersPM = new AllOrdersPM(orderService);
-
                 init();
         }
 
@@ -48,11 +47,11 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
 
                 this.setRight(new Text("Right "));
                 this.setCenter(couriersPane);
-                this.setBottom(new Text(" Courier Service Dispatcher"));
-                this.setLeft(new Text("Left"));
 
                 //to be added: the orders view and the detailed order view
                 //to be added: the couriers view and the detailed courier view
+                this.setBottom(new Text(" Courier Service Dispatcher"));
+                this.setLeft(new Text("Left"));
                 this.setTop(header);
                 BorderPane.setAlignment(header, Pos.CENTER);
 

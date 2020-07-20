@@ -11,6 +11,9 @@ import javafx.beans.property.StringProperty;
 public class CourierPM {
 
     private static final String ELLIPSIS = "...";
+
+
+
     private final StringProperty name = new SimpleStringProperty(ELLIPSIS);
 
 
@@ -60,6 +63,13 @@ public class CourierPM {
 
     public void setCourierId(String courierId) {
         this.courierId.set(courierId);
+    }
+    public String getName() {
+        return name.get();
+    }
+
+    public StringProperty nameProperty() {
+        return name;
     }
 
     @Override

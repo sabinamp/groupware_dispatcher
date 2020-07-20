@@ -51,10 +51,11 @@ public class AppStarter extends Application {
 
     @Override
     public void start(Stage primaryStage){
+
         CourierService courierService = new CourierServiceImpl();
         OrderService orderService = new OrderServiceImpl();
 
-        ApplicationUI rootPanel = new ApplicationUI(courierService, orderService);
+
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
@@ -62,14 +63,15 @@ public class AppStarter extends Application {
            System.exit(0);
 
         });
+        ApplicationUI rootPanel = new ApplicationUI(courierService, orderService);
         rootPanel.addClockToHeader(txtTime);
         rootPanel.addExitButton(exitBtn);
         Scene scene = new Scene(rootPanel, 800,500);
 
         primaryStage.setTitle("Dispatcher GUI");
-        BrokerConnection connection= new BrokerConnection();
 
         primaryStage.setScene(scene);
+        timer.start();
         scene.getWindow().setOnCloseRequest(new EventHandler<>() {
             @Override
             public void handle(WindowEvent event) {
@@ -77,7 +79,7 @@ public class AppStarter extends Application {
                 System.exit(0);
             }
         });
-        timer.start();
+
         primaryStage.show();
 
     }

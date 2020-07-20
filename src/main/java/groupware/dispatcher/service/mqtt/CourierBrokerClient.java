@@ -23,10 +23,14 @@ public class CourierBrokerClient extends BrokerClient{
     private Mqtt3AsyncClient clientA;
     private Mqtt3AsyncClient clientCourierUpdates;
     private CourierServiceImpl courierService;
-    private final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
+    private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(CourierBrokerClient.class));
 
+
+
+    private List<String> courierIds;
 
     public CourierBrokerClient(){
+
         courierService= new CourierServiceImpl();
         clientA = MqttClient.builder()
                 .useMqttVersion3()
@@ -42,11 +46,7 @@ public class CourierBrokerClient extends BrokerClient{
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
-
-    }
-
-    public void subscribeToCouriers(){
-        List<String> courierIds= new ArrayList<>();
+        courierIds= new ArrayList<>();
         courierIds.add("C100");
         courierIds.add("C101");
         courierIds.add("C102");
@@ -55,10 +55,17 @@ public class CourierBrokerClient extends BrokerClient{
         courierIds.add("C105");
         courierIds.add("C106");
         courierIds.add("C107");
-        for (String id: courierIds){
+    }
+
+    public void subscribeToCouriers(){
+
+        for (String id: this.getCourierIds()){
             connectAndRequestCourier(id);
         }
 
+    }
+    public List<String> getCourierIds() {
+        return courierIds;
     }
     void stopClientBrokerConnection(){
         clientA.disconnect();
@@ -68,8 +75,8 @@ public class CourierBrokerClient extends BrokerClient{
    public void connectAndRequestCourier(String courierId){
         System.out.println("connecting to Broker and subscribing for courier "+courierId);
         this.clientA.connectWith()
-                .keepAlive(30)
-                .cleanSession(true)
+                .keepAlive(120)
+                .cleanSession(false)
                 .willPublish()
                 .topic("couriers/info/get/"+ courierId)
                 .qos(MqttQos.EXACTLY_ONCE)

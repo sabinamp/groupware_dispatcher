@@ -8,10 +8,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class BrokerConnection {
-    private CourierBrokerClient courierBrokerClient;
-    private OrdersBrokerClient ordersBrokerClient;
+    private static CourierBrokerClient courierBrokerClient;
+    private static OrdersBrokerClient ordersBrokerClient;
 
-    Thread brokerConnect = new Thread(() -> {
+   static Thread brokerConnect = new Thread(() -> {
         try {
                 // running "long" operation not on UI thread
                 Thread.sleep(500);
@@ -23,21 +23,25 @@ public class BrokerConnection {
         connectOrderServiceToBroker();
 
     });
-
-    public BrokerConnection(){
+    static {
         courierBrokerClient = new CourierBrokerClient();
         ordersBrokerClient = new OrdersBrokerClient();
-        connectCourierServiceToBroker();
-        connectOrderServiceToBroker();
-        System.out.println("BrokerConnection - connected to broker");
-    }
 
-    private void connectCourierServiceToBroker(){
+    }
+    public static void startBrokerConnection(){
+        brokerConnect.start();
+    }
+  /*  public BrokerConnection(){
+        System.out.println("BrokerConnection constructor called");
+
+    }*/
+
+    private static void connectCourierServiceToBroker(){
         courierBrokerClient.subscribeToCouriers();
         courierBrokerClient.connectToBrokerAndSubscribeToCourierUpdates();
     }
 
-    private void connectOrderServiceToBroker(){
+    private static void connectOrderServiceToBroker(){
         ordersBrokerClient.connectAndRequestExistingOrder("OR1111");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1122");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1123");
