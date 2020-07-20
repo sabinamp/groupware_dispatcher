@@ -12,16 +12,15 @@ import java.util.List;
 public class OrderPM {
     private static final String ELLIPSIS = "...";
 
-
     private final StringProperty orderId = new SimpleStringProperty();
-    private final StringProperty customerName =  new SimpleStringProperty(ELLIPSIS);;
-    private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();;
+    private final StringProperty customerName =  new SimpleStringProperty(ELLIPSIS);
+    private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();
 
-    private final ObjectProperty<LocalDateTime> scheduledParcelCollectionWhen = new SimpleObjectProperty<>();;
-    private final ObjectProperty<LocalDateTime> orderUpdatedWhen = new SimpleObjectProperty<>();;
+    private final ObjectProperty<LocalDateTime> scheduledParcelCollectionWhen = new SimpleObjectProperty<>();
+    private final ObjectProperty<LocalDateTime> orderUpdatedWhen = new SimpleObjectProperty<>();
     private List<ContactInfo> contactInfos = null;
     private final ObjectProperty<OrderStatus> orderStatus = new SimpleObjectProperty<>();
-    private final StringProperty currentAssignee =  new SimpleStringProperty(ELLIPSIS);;
+    private final StringProperty currentAssignee =  new SimpleStringProperty(ELLIPSIS);
     private final DoubleProperty price = new SimpleDoubleProperty(0.0);
 
     public OrderPM(OrderDescriptiveInfo orderDescriptiveInfo){

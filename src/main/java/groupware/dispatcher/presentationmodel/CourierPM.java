@@ -9,15 +9,17 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 public class CourierPM {
-    private String courierId;
+
     private static final String ELLIPSIS = "...";
     private final StringProperty name = new SimpleStringProperty(ELLIPSIS);
 
+
+    private StringProperty courierId = new SimpleStringProperty(ELLIPSIS);
     private final ObjectProperty<CourierStatus> courierStatus = new SimpleObjectProperty<>();
     private final ObjectProperty<Conn> courierConnectionStatus = new SimpleObjectProperty<>();
 
     public CourierPM(Courier courier){
-        courierId= courier.getCourierId();
+        setCourierId(courier.getCourierId());
         setName(courier.getCourierInfo().getCourierName());
         setCourierStatus(courier.getCourierInfo().getStatus());
     }
@@ -46,5 +48,17 @@ public class CourierPM {
     }
     public void setCourierConnectionStatus(Conn courierConnectionStatus) {
         this.courierConnectionStatus.set(courierConnectionStatus);
+    }
+
+    public String getCourierId() {
+        return courierId.get();
+    }
+
+    public StringProperty courierIdProperty() {
+        return courierId;
+    }
+
+    public void setCourierId(String courierId) {
+        this.courierId.set(courierId);
     }
 }
