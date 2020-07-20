@@ -1,9 +1,13 @@
 package groupware.dispatcher.view;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
+import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
+import groupware.dispatcher.service.OrderService;
+import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.util.ViewMixin;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -16,10 +20,12 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
 
         public MainHeader header;
         private StackPane couriersPane;
+        private AllOrdersPM allOrdersPM;
         private AllCouriersPM allCouriersPM;
 
-        public ApplicationUI(CourierService courierService) {
+        public ApplicationUI(CourierService courierService, OrderService orderService) {
                 allCouriersPM = new AllCouriersPM(courierService);
+                allOrdersPM = new AllOrdersPM(orderService);
                 init();
         }
 
@@ -32,7 +38,6 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         @Override
         public void initializeParts() {
                 header = new MainHeader();
-
                 couriersPane = new CourierListView(allCouriersPM);
 
         }
@@ -41,11 +46,12 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         public void layoutParts() {
 
                 this.setRight(new Text("Right "));
-                this.setCenter(new Text("Center"));
-                this.setBottom(new Text(" Courier Service Dispatcher"));
-                this.setLeft(new Text(" Left"));
+                this.setCenter(couriersPane);
 
                 //to be added: the orders view and the detailed order view
+                //to be added: the couriers view and the detailed courier view
+                this.setBottom(new Text(" Courier Service Dispatcher"));
+                this.setLeft(new Text("Left"));
                 this.setTop(header);
                 BorderPane.setAlignment(header, Pos.CENTER);
 

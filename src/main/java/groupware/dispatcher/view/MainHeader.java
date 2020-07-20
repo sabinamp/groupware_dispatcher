@@ -26,7 +26,6 @@ public class MainHeader extends HBox implements ViewMixin {
     HBox timerBox;
 
     public MainHeader(){
-
         init();
     }
 
@@ -64,7 +63,7 @@ public class MainHeader extends HBox implements ViewMixin {
     }
 
     public void addClockDemoToHeader(Text txtTimer){
-        txtTimer.setFill(Color.CORAL);
+        txtTimer.setFill(Color.MIDNIGHTBLUE);
         timerBox.getChildren().add(txtTimer);
     }
 

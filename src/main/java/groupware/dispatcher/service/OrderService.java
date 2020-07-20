@@ -1,12 +1,10 @@
 package groupware.dispatcher.service;
 
-import groupware.dispatcher.service.model.ContactInfo;
-import groupware.dispatcher.service.model.DeliveryStep;
-import groupware.dispatcher.service.model.OrderDescriptiveInfo;
-import groupware.dispatcher.service.model.OrderInfo;
+import groupware.dispatcher.service.model.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface OrderService {
@@ -24,4 +22,6 @@ public interface OrderService {
     LinkedList<DeliveryStep> getOrderDeliveryInfos(String orderId);
     boolean updateOrderStatus(String orderId, String deliveryStep);
     Set<String> getAllOrderIds();
+    Map<String, OrderDescriptiveInfo> getOrders();
+
 }

@@ -55,10 +55,10 @@
     -fx-text-fill: #8A8C91;
     -fx-spacing: 20;
 }
-.couriers-content-pane{
+.couriers-pane{
     -fx-padding: 20;
-    -fx-background-color: -fx-basic-color;
-    -fx-text-fill: #8A8C91;
+    -fx-background-color: #3A3E46;
+    -fx-text-fill: #8A8C95;
     -fx-spacing: 20;
 }
 

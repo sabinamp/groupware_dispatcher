@@ -1,24 +1,31 @@
 package groupware.dispatcher.service;
 
 import groupware.dispatcher.service.model.*;
+import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.service.util.ModelObjManager;
 
+
 import java.util.*;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class CourierServiceImpl implements CourierService {
-    private Map<String, Courier> couriers;
+    private static Map<String, Courier> couriers;
+    private final static Logger logger;
 
-    public CourierServiceImpl(){
+    static{
+        logger = LogManager.getLogManager().getLogger(String.valueOf(OrderServiceImpl.class));
         couriers = new HashMap<>();
+        BrokerConnection.startBrokerConnection();
+    }
+    public CourierServiceImpl(){
+
     }
 
     public Courier getCourier(String id){
         return couriers.get(id);
     }
 
-    public void saveCourierInMemory(String id, Courier courier){
-        couriers.put(courier.getCourierId(), courier);
-    }
 
     public Courier convertJsonToCourier(String json) {
         return ModelObjManager.convertJsonToCourier(json);
