@@ -10,7 +10,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class CourierServiceImpl implements CourierService {
-    private static Map<String, Courier> couriers;
+    private static Map<String, CourierInfo> couriers;
     private final static Logger logger;
 
     static{
@@ -22,36 +22,23 @@ public class CourierServiceImpl implements CourierService {
 
     }
 
-    public Courier getCourier(String id){
-        return couriers.get(id);
-    }
-
-
-    public Courier convertJsonToCourier(String json) {
-        return ModelObjManager.convertJsonToCourier(json);
-    }
-
-    TaskRequest convertJsonToTaskRequest(String taskJson){
-        return ModelObjManager.convertJsonToTaskRequest(taskJson);
-    }
 
     public DeliveryStep convertJsonToDeliveryStep(String jsonString){
         return ModelObjManager.convertDeliveryStepData(jsonString);
     }
 
     @Override
-    public Map<String, Courier> getCouriers() {
+    public Map<String, CourierInfo> getCouriers() {
         return couriers;
     }
 
     @Override
     public boolean setStatus(String courierId, CourierStatus status) {
         boolean successful = false;
-        Courier courier = getCourier(courierId);
-        if(status != null && courier != null){
-            CourierInfo courierInfo= courier.getCourierInfo();
+        CourierInfo courierInfo = getCourierInfo(courierId);
+        if(status != null && courierInfo != null){
             courierInfo.setStatus(status);
-            successful = updateCourierInfo(courierId, courierInfo);
+            successful = updateCourier(courierId, courierInfo);
             if(successful){
                 System.out.println("setStatus()- Successfully updated the courier's status "+status.toString());
             }
@@ -60,7 +47,7 @@ public class CourierServiceImpl implements CourierService {
     }
 
     @Override
-    public boolean updateCourier(String courierId, Courier courier) {
+    public boolean updateCourier(String courierId, CourierInfo courier) {
         if(courier == null ){
             return false;
         }else{
@@ -68,14 +55,14 @@ public class CourierServiceImpl implements CourierService {
             return true;
         }
     }
+
     @Override
     public boolean setConn(String courierId, Conn conn) {
         boolean successful = false;
-        Courier courier = getCourier(courierId);
-        if(courier != null && conn != null){
-            CourierInfo courierInfo= courier.getCourierInfo();
+        CourierInfo courierInfo = getCourierInfo(courierId);
+        if(courierInfo != null && conn != null){
             courierInfo.setConn(conn);
-            successful = updateCourierInfo(courierId, courierInfo);
+            successful = updateCourier(courierId, courierInfo);
             if(successful){
                     System.out.println("Successfully updated the courier's conn : " + conn.toString());
             }
@@ -86,49 +73,45 @@ public class CourierServiceImpl implements CourierService {
     }
     @Override
     public boolean updateAssignedOrders(String courierId, String addedOrderId) {
-        Courier courier = getCourier(courierId);
-        CourierInfo courierInfo = courier.getCourierInfo();
+        CourierInfo courierInfo = getCourierInfo(courierId);
         courierInfo.addAssignedOrder(addedOrderId);
-
-        boolean successful = updateCourierInfo(courierId, courierInfo);
+        boolean successful = updateCourier(courierId, courierInfo);
         System.out.println("Successfully updated the courier's assigned orders : " + successful);
         return successful;
     }
     @Override
     public boolean updateCourierInfo(String courierId, CourierInfo courierInfo) {
-        Courier courier = getCourier(courierId);
-        courier.setCourierInfo(courierInfo);
-        boolean successful = updateCourier(courierId, courier);
+        boolean successful = updateCourier(courierId, courierInfo);
         System.out.println("Successfully updated the courier's info: " + successful);
         return successful;
     }
+
     @Override
     public Conn getConn(String courierId) {
-        Courier courier= getCourier(courierId);
-        return courier.getCourierInfo().getConn();
+        CourierInfo courier= getCourierInfo(courierId);
+        return courier.getConn();
     }
 
     @Override
     public CourierStatus getStatus(String courierId) {
-        Courier courier = getCourier(courierId);
-        return courier.getCourierInfo().getStatus();
+        CourierInfo courier = getCourierInfo(courierId);
+        return courier.getStatus();
     }
     @Override
     public CourierInfo getCourierInfo(String courierId) {
-        Courier courier= getCourier(courierId);
-        return courier.getCourierInfo();
+        return couriers.get(courierId);
     }
 
     @Override
     public List<ContactInfo> getContactInfos(String courierId) {
-        Courier courier= getCourier(courierId);
-        return courier.getCourierInfo().getContactInfos();
+        CourierInfo courier= getCourierInfo(courierId);
+        return courier.getContactInfos();
     }
 
     @Override
     public Set<String> getAssignedOrders(String courierId) {
-        Courier courier= getCourier(courierId);
-        return courier.getCourierInfo().getAssignedOrders();
+        CourierInfo courier= getCourierInfo(courierId);
+        return courier.getAssignedOrders();
     }
 
 }

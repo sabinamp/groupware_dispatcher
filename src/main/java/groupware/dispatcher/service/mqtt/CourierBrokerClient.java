@@ -9,37 +9,46 @@ import groupware.dispatcher.presentationmodel.CourierPM;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.model.Conn;
 import groupware.dispatcher.service.model.Courier;
+import groupware.dispatcher.service.model.CourierInfo;
 import groupware.dispatcher.service.model.CourierStatus;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class CourierBrokerClient extends BrokerClient{
-    private static final java.util.UUID UUID = java.util.UUID.randomUUID();
+    private static final java.util.UUID IDENTIFIER = UUID.randomUUID();
     private Mqtt3AsyncClient clientCourierInfo;
     private Mqtt3AsyncClient clientCourierUpdates;
+    private Mqtt3AsyncClient clientCourierInfoSubscriber;
     private CourierServiceImpl courierService;
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(CourierBrokerClient.class));
 
-    private AllCouriersPM allCouriersPM;
 
     public CourierBrokerClient(){
         courierService= new CourierServiceImpl();
-        allCouriersPM = new AllCouriersPM(courierService);
+
         clientCourierInfo = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(UUID.toString())
+                .identifier(IDENTIFIER.toString())
+                .serverHost("127.0.0.1")
+                .serverPort(1883)
+                .automaticReconnectWithDefaultConfig()
+                .buildAsync();
+        clientCourierInfoSubscriber = MqttClient.builder()
+                .useMqttVersion3()
+                .identifier(UUID.randomUUID().toString())
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientCourierUpdates = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(UUID.toString())
+                .identifier(UUID.randomUUID().toString())
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
@@ -49,20 +58,22 @@ public class CourierBrokerClient extends BrokerClient{
     void stopClientBrokerConnection(){
         clientCourierInfo.disconnect();
         clientCourierUpdates.disconnect();
+        clientCourierInfoSubscriber.disconnect();
     }
 
    public void connectAndRequestCourier(String courierId){
+        String topicName= "couriers/info/get/" + courierId;
         System.out.println("connecting to Broker and subscribing for courier "+courierId);
         this.clientCourierInfo.connectWith()
-                .keepAlive(180)
-                .cleanSession(false)
-                .willPublish()
+                .keepAlive(60)
+                .cleanSession(true)
+              /*  .willPublish()
                 .topic("couriers/info/get/" + courierId)
                 .qos(MqttQos.EXACTLY_ONCE)
-                .applyWillPublish()
+                .applyWillPublish()*/
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToGetCourierById(courierId))
+                .thenComposeAsync(v -> publishToTopic(clientCourierInfo,topicName,null))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -71,29 +82,55 @@ public class CourierBrokerClient extends BrokerClient{
                         System.out.println("connectAndRequestCourier " + courierId + " The connection to the broker failed."+ throwable.getMessage());
                     } else {
                         System.out.println(" - successful connection to the broker. The client clientCourierInfo is connected");
-                        logger.info(" - successful connection to the broker. The client "+ clientCourierInfo + " is connected");
+                        logger.info(" - successful connection to the broker. The client clientCourierInfo is connected");
                     }
                 });
     }
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(String courierId){
-        String topicName = "couriers/info/get/"+ courierId +"/response";
-        System.out.println("entering subscribeToGetCourierByIdResponse for the topic "+topicName);
+    public void connectAndSubscribeForCourierInfoResponse(){
+        System.out.println("connecting to Broker and subscribing for courier info. ");
+        this.clientCourierInfoSubscriber.connectWith()
+                .keepAlive(120)
+                .cleanSession(true)
+                .send()
+                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
+                .thenComposeAsync(v -> subscribeToGetCourierById())
+                .whenComplete((connAck, throwable) -> {
+                    if (throwable != null) {
+                        // Handle connection failure
+                        logger.info("connectAndSubscribeForCourierInfo. The connection to the broker failed."
+                                + throwable.getMessage());
+                        System.out.println("connectAndSubscribeForCourierInfo. The connection to the broker failed."+ throwable.getMessage());
+                    } else {
+                        System.out.println("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
+                        logger.info("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
+                    }
+                });
+    }
+
+     CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(){
+        String topicName = "couriers/info/get/+/response";
+        System.out.println("entering subscribeToGetCourierById for the topic "+topicName);
 
         return this.clientCourierInfo.subscribeWith()
                 .topicFilter(topicName)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
+                        String courierId= mqtt3Publish.getTopic().getLevels().get(3);
                         System.out.println("response related to the courier "+ courierId);
                         String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
-                        Courier courier = ModelObjManager.convertJsonToCourier(received);
-                        System.out.print(received);
-                        if(courier != null){
-                            courierService.updateCourier(courierId, courier);
-                            allCouriersPM.updateAllCouriersPM(new CourierPM(courier));
+
+                        if(received != null && !received.isEmpty()){
+                            System.out.println("the courier info received as json "+received);
+                            CourierInfo courier = ModelObjManager.convertJsonToCourierInfo(received);
+                            if(courier != null){
+                                courierService.updateCourier(courierId, courier);
+                            }else{
+                                System.out.println("the converted courier object is null");
+                            }
                         }
                         else{
-                            System.out.println("courier is null");
+                            System.out.println("the courier info received as json is null");
                         }
                     }
                 } ).send()

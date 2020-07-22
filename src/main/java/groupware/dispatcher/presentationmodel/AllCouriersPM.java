@@ -2,6 +2,7 @@ package groupware.dispatcher.presentationmodel;
 
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.model.Courier;
+import groupware.dispatcher.service.model.CourierInfo;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -22,12 +23,12 @@ public class AllCouriersPM {
 
     public AllCouriersPM(CourierService courierService){
         this.courierService = courierService;
-        Map<String, Courier> couriersMap = courierService.getCouriers();
-        for(Courier each : couriersMap.values()){
-           allCouriers.add(new CourierPM(each));
-           String eachCourierId = each.getCourierId();
-           allCourierIDs.add(eachCourierId);
-           System.out.println("AllCouriersPM - the courier: "+ eachCourierId +" added to the observable list");
+        Map<String, CourierInfo> couriersMap = courierService.getCouriers();
+        for(String each : couriersMap.keySet()){
+           allCouriers.add(new CourierPM(each, couriersMap.get(each)));
+
+           allCourierIDs.add(each);
+           System.out.println("AllCouriersPM - the courier: "+ each +" added to the observable list");
         }
         setupValueChangedListeners();
     }
