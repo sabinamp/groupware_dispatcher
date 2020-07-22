@@ -2,6 +2,7 @@ package groupware.dispatcher.presentationmodel;
 
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.model.Courier;
+import groupware.dispatcher.service.model.CourierInfo;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,14 +20,15 @@ public class AllCouriersPM {
     private CourierService courierService;
     private final ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
     private final ObservableList<String> allCourierIDs = FXCollections.observableArrayList();
+
     public AllCouriersPM(CourierService courierService){
         this.courierService = courierService;
-        Map<String, Courier> couriersMap = courierService.getCouriers();
-        for(Courier each : couriersMap.values()){
-           allCouriers.add(new CourierPM(each));
-           String eachCourierId = each.getCourierId();
-           allCourierIDs.add(eachCourierId);
-           System.out.println("AllCouriersPM - the courier: "+ eachCourierId +" added to the observable list");
+        Map<String, CourierInfo> couriersMap = courierService.getCouriers();
+        for(String each : couriersMap.keySet()){
+           allCouriers.add(new CourierPM(each, couriersMap.get(each)));
+
+           allCourierIDs.add(each);
+           System.out.println("AllCouriersPM - the courier: "+ each +" added to the observable list");
         }
         setupValueChangedListeners();
     }
@@ -44,8 +46,13 @@ public class AllCouriersPM {
         return allCouriers;
     }
     public ObservableList<String> getAllCourierIDs() {
-        //logger.log(Level.INFO, "AllCouriersPM getAllCouriers() method called");
+        //logger.log(Level.INFO, "AllCouriersPM getAllCourierIDs() method called");
         return allCourierIDs;
+    }
+
+    public void updateAllCouriersPM(CourierPM pm){
+        allCouriers.add(pm);
+        allCourierIDs.add(pm.getCourierId());
     }
 
 }

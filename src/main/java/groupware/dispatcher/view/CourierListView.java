@@ -25,20 +25,18 @@ import java.util.logging.Logger;
 
 public class CourierListView extends StackPane implements ViewMixin {
     private final static Logger logger = LogManager.getLogManager().getLogger(String.valueOf(CourierListView.class));
-    public static ObservableList<String> items =
+    public static ObservableList<CourierPM> items =
             FXCollections.observableArrayList( );
 
-    private  ListView<String> listView;
+    private  ListView<CourierPM> listView;
 
     public CourierListView(AllCouriersPM data){
-        ObservableList<String> courierids= data.getAllCourierIDs();
-
-        for (String each:   courierids   ) {
-            System.out.println("-each courier "+each);
+        ObservableList<CourierPM> couriers= data.getAllCouriers();
+        for (CourierPM each:   couriers   ) {
+            System.out.println("CourierListView() constructor called -each courier "+each.getName());
         }
-
-         items.addAll( "C100", "C101", "C102", "C103");
-        //items.addAll(courierids);
+        //items.addAll( "C100", "C101", "C102", "C103");
+        items.addAll(couriers);
         init();
 
     }
@@ -56,15 +54,15 @@ public class CourierListView extends StackPane implements ViewMixin {
     public void initializeParts() {
 
         listView = new ListView<>(items);
-        listView.setCellFactory((ListView<String> param) -> {
+        listView.setCellFactory((ListView<CourierPM> param) -> {
             return new ListCell<>() {
                 @Override
-                public void updateItem(String item, boolean empty) {
+                public void updateItem(CourierPM item, boolean empty) {
                     super.updateItem(item, empty);
                     if (! (empty || item == null)) {
                         // adding new item
                         setGraphic(new Rectangle(30, 30, Color.web("Blue")));
-                        setText("Courier ID: "+item);
+                        setText("Courier Name: "+item.getName() + "Status: " + item.getCourierStatus());
                     } else {
                         setText(null);
                         setGraphic(null);

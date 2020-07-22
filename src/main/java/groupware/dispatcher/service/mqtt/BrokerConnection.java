@@ -21,23 +21,20 @@ public class BrokerConnection {
 
         connectCourierServiceToBroker();
         connectOrderServiceToBroker();
-
     });
+
     static {
         courierBrokerClient = new CourierBrokerClient();
         ordersBrokerClient = new OrdersBrokerClient();
-
     }
+
     public static void startBrokerConnection(){
         brokerConnect.start();
     }
-  /*  public BrokerConnection(){
-        System.out.println("BrokerConnection constructor called");
 
-    }*/
 
     private static void connectCourierServiceToBroker(){
-        courierBrokerClient.subscribeToCouriers();
+        subscribeToCouriers();
         courierBrokerClient.connectToBrokerAndSubscribeToCourierUpdates();
     }
 
@@ -46,6 +43,22 @@ public class BrokerConnection {
         ordersBrokerClient.connectAndRequestExistingOrder("OR1122");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1123");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1124");
+
+        ordersBrokerClient.connectAndSubscribeForExistingOrder();
         ordersBrokerClient.connectToBrokerAndSubscribeToNewOrders();
+    }
+
+    private static void subscribeToCouriers(){
+
+        courierBrokerClient.connectAndRequestCourier("C100");
+        courierBrokerClient.connectAndRequestCourier("C101");
+        courierBrokerClient.connectAndRequestCourier("C102");
+        courierBrokerClient.connectAndRequestCourier("C103");
+        courierBrokerClient.connectAndRequestCourier("C104");
+        courierBrokerClient.connectAndRequestCourier("C105");
+        courierBrokerClient.connectAndRequestCourier("C106");
+        courierBrokerClient.connectAndRequestCourier("C107");
+        courierBrokerClient.connectAndSubscribeForCourierInfoResponse();
+
     }
 }

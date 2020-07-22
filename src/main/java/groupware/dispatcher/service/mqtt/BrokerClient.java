@@ -14,11 +14,7 @@ public class BrokerClient {
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(BrokerClient.class));
 
 
-    public BrokerClient(){
-    }
-
-
-     CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload){
+    CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload){
         CompletableFuture<Mqtt3Publish> mqtt3PublishCompletableFuture = client.publishWith()
                 .topic(myTopic)
                 .retain(true)
@@ -39,12 +35,11 @@ public class BrokerClient {
 
 
     Mqtt3Publish publishMessage(String topic, String myPayload){
-        Mqtt3Publish publishMessage = Mqtt3Publish.builder()
+        return Mqtt3Publish.builder()
                 .topic(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .payload(myPayload == null? null: myPayload.getBytes())
                 .build();
-        return publishMessage;
     }
 
     Mqtt3Subscribe subscribeMessage(String myTopic){

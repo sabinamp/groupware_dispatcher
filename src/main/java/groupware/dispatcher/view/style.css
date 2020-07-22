@@ -120,4 +120,20 @@
     -fx-text-fill: #333;
     -fx-label-padding: 5;
 }
+.footer {
+    -fx-background-color: -fx-basic-color;
+    -fx-text-fill: white;
+    -fx-font-size: 1.15em;
+    -fx-font-family: 'Roboto Bold';
+}
+.footer > .label {
+    -fx-font-family: 'Roboto Bold';
+    -fx-font-size: 1.15em;
+    -fx-text-fill: #333;
+    -fx-label-padding: 5;
 
+}
+.button{
+    -fx-border: 1px #8ea6b4 solid;
+    -fx-padding: 10px;
+}
