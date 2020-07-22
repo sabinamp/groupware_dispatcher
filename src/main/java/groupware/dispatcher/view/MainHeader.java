@@ -2,6 +2,8 @@ package groupware.dispatcher.view;
 
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -24,6 +26,7 @@ public class MainHeader extends HBox implements ViewMixin {
     HBox topBanner;
     TilePane tilePane;
     HBox timerBox;
+
 
     public MainHeader(){
         init();
@@ -68,7 +71,4 @@ public class MainHeader extends HBox implements ViewMixin {
     }
 
 
-    public void addExitBtn(Button exitBtn) {
-        topBanner.getChildren().add(exitBtn);
-    }
-}
+  }

@@ -155,9 +155,10 @@ public class OrdersBrokerClient extends BrokerClient {
                     if(mqtt3Publish.getPayload().isPresent()){
                         String orderId = mqtt3Publish.getTopic().getLevels().get(2);
                         String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
-                        System.out.println("an order has been received " +received);
+
                         OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                         if (order != null) {
+                            System.out.println("an order has been received: " +orderId);
                             OrderServiceImpl.saveOrderInMemory(orderId, order);
                         } else {
                             logger.warning("OrderId "+orderId + " order is null");

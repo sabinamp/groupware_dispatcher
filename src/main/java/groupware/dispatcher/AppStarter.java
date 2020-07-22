@@ -2,6 +2,7 @@ package groupware.dispatcher;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
+import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderService;
@@ -51,20 +52,20 @@ public class AppStarter extends Application {
 
     @Override
     public void start(Stage primaryStage){
-
+        RootPM rootPM = new RootPM();
         CourierService courierService = new CourierServiceImpl();
         OrderService orderService = new OrderServiceImpl();
 
 
+        ApplicationUI rootPanel = new ApplicationUI(rootPM, courierService, orderService);
+        rootPanel.addClockToHeader(txtTime);
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
             stop();
-           System.exit(0);
+            System.exit(0);
 
         });
-        ApplicationUI rootPanel = new ApplicationUI(courierService, orderService);
-        rootPanel.addClockToHeader(txtTime);
         rootPanel.addExitButton(exitBtn);
         Scene scene = new Scene(rootPanel, 800,500);
 
