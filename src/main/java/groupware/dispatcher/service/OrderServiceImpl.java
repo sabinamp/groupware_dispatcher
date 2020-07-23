@@ -12,15 +12,16 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class OrderServiceImpl implements OrderService{
-    private final static Logger logger;
+    private final Logger logger;
     private static Map<String, OrderDescriptiveInfo> orders;
     private AllOrdersPM allOrdersPM;
     static{
-        logger = LogManager.getLogManager().getLogger(String.valueOf(OrderServiceImpl.class));
+
         orders= new HashMap<>();
     }
 
     public OrderServiceImpl(){
+        logger = LogManager.getLogManager().getLogger(String.valueOf(OrderServiceImpl.class));
         allOrdersPM = new AllOrdersPM();
     }
 
@@ -32,12 +33,11 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public boolean updateOrder(String id, OrderDescriptiveInfo order) {
         if(order == null) {
-            //logger.log(Level.INFO, "updateOrder() received arg order- null");
+            logger.info("updateOrder() received arg order- null");
             return false;
         }else {
             orders.put(id, order);
             allOrdersPM.updateAllOrdersPM(OrderPM.ofOrder(order));
-            //logger.log(Level.INFO, "updateOrder() done ");
             return true;
         }
     }
@@ -157,11 +157,6 @@ public class OrderServiceImpl implements OrderService{
         }
         logger.exiting("OrderServiceImpl", "exiting getAllOrderIds()");
         return orderIds;
-    }
-
-
-    public static void saveOrderInMemory(String id, OrderDescriptiveInfo order){
-        orders.put(id, order);
     }
 
 

@@ -66,7 +66,7 @@ public class AllCouriersPM {
     }
 
     public ObservableList<CourierPM> getAllCouriers() {
-        //logger.log(Level.INFO, "AllCouriersPM getAllCouriers() method called");
+
         return allCouriers;
     }
 
