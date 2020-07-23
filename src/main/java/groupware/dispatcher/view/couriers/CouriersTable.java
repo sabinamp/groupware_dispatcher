@@ -10,17 +10,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.util.Arrays;
-import java.util.logging.Logger;
+
 
 public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
     //private final Logger logger;
     private AllCouriersPM couriersPModel;
 
     public CouriersTable(AllCouriersPM allCouriersPM){
-        //super(rootPM.getAllCouriersPM().getAllCouriers());
         super();
-        // logger = LogManager.getLogManager().getLogger(String.valueOf(CouriersPane.class));
-
         this.couriersPModel = allCouriersPM;
         init();
     }
@@ -53,11 +50,17 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         TableViewSelectionModel<CourierPM> tsm = getSelectionModel();
         tsm.setSelectionMode(SelectionMode.SINGLE);
-
+        setItems(couriersPModel.getAllCouriers());
     }
 
     @Override
     public void layoutParts() {
 
     }
+
+    public void setCouriersPModel(AllCouriersPM pm){
+        this.couriersPModel = pm;
+    }
+
+
 }

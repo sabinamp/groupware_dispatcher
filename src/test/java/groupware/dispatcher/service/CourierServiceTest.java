@@ -19,11 +19,11 @@ public class CourierServiceTest {
     void testCourierServiceSaveCourierInMemory(){
         //given a courier
        String courierID="C107";
-        Courier courier= new Courier();
+        CourierInfo courier= new CourierInfo();
         //when
-        courierService.saveCourierInMemory(courierID, courier);
+        courierService.saveCourier(courierID, courier);
         //then
-        Courier courier2= courierService.getCourier(courierID);
+        CourierInfo courier2= courierService.getCourierInfo(courierID);
         assertNotNull(courier2);
 
         //TODO

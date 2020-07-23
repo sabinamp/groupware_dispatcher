@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.util.Map;
 
 
 public class AllCouriersPM {
@@ -25,7 +26,9 @@ public class AllCouriersPM {
 //    private final ObservableList<String> allCourierIDs = FXCollections.observableArrayList();
 
     public AllCouriersPM(/*CourierServiceImpl courierService*/){
-       /* if(courierService != null){
+        setupValueChangedListeners();
+        setupBindings();
+      /*  if(courierService != null){
             Map<String, CourierInfo> couriersMap = CourierServiceImpl.getCouriers();
             for(String each : couriersMap.keySet()){
                 CourierPM currentCourierPM = CourierPM.of(each, couriersMap.get(each));

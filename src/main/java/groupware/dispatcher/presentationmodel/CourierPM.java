@@ -33,6 +33,7 @@ public class CourierPM {
             if( info != null){
                 courierPM.setName(info.getCourierName());
                 courierPM.setCourierStatus(info.getStatus());
+                courierPM.setCourierConnectionStatus(info.getConn());
                 courierPM.setContactInfos(info.getContactInfos());
             } else{
                 System.out.println("Courier info is null");

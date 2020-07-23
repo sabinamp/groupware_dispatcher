@@ -55,14 +55,10 @@ public class AppStarter extends Application {
     Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
-
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
 
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
-
-
-
 
             });
         }
@@ -73,24 +69,10 @@ public class AppStarter extends Application {
         rootPM = new RootPM();
 
         connectToBroker.run();
-        //System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
-        setUp(primaryStage);
-
-    }
-
-    @Override
-    public void stop() {
-        // we need to stop our working thread after closing a window
-        // or our program will not exit
-        enough = true;
-    }
-
-    private void setUp(Stage primaryStage){
         AllCouriersPM allCouriersPM = courierService.getAllCouriersPM();
         AllOrdersPM allOrdersPM = orderService.getAllOrdersPM();
         rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
         rootPanel.addClockToHeader(txtTime);
-
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
@@ -100,6 +82,7 @@ public class AppStarter extends Application {
         });
         rootPanel.addExitButton(exitBtn);
 
+        //System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
         Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");
         primaryStage.setScene(scene);
@@ -112,7 +95,17 @@ public class AppStarter extends Application {
             }
         });
         primaryStage.show();
+
     }
+
+    @Override
+    public void stop() {
+        // we need to stop our working thread after closing a window
+        // or our program will not exit
+        enough = true;
+    }
+
+
 
     public static void main(String[] args) {
         launch(args);
