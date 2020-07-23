@@ -54,10 +54,13 @@ public class AppStarter extends Application {
     Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
+            rootPM = new RootPM(courierService, orderService);
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
+            rootPM.setAllCouriersPM(courierService.getAllCouriersPM());
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
-                rootPM.setAllCouriersPM(courierService.getAllCouriersPM());
+
+
 
             });
         }
@@ -66,13 +69,21 @@ public class AppStarter extends Application {
     @Override
     public void start(Stage primaryStage){
 
-        rootPM = new RootPM(courierService, orderService);
-
         connectToBroker.run();
 
-
         System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
+        setUp(primaryStage);
 
+    }
+
+    @Override
+    public void stop() {
+        // we need to stop our working thread after closing a window
+        // or our program will not exit
+        enough = true;
+    }
+
+    private void setUp(Stage primaryStage){
         rootPanel = new ApplicationUI(rootPM);
 
         rootPanel.addClockToHeader(txtTime);
@@ -97,16 +108,8 @@ public class AppStarter extends Application {
                 System.exit(0);
             }
         });
-
         primaryStage.show();
     }
-    @Override
-    public void stop() {
-        // we need to stop our working thread after closing a window
-        // or our program will not exit
-        enough = true;
-    }
-
     public static void main(String[] args) {
         launch(args);
     }
