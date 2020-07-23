@@ -51,7 +51,7 @@ public class CourierServiceImpl implements CourierService {
         }else{
             couriers.put(courierId, courier);
             CourierPM currentCourierPM = CourierPM.of(courierId, courier);
-            //allCouriersPM.updateAllCouriersPM(currentCourierPM);
+            allCouriersPM.updateAllCouriersPM(currentCourierPM);
             return true;
         }
     }

@@ -105,9 +105,9 @@ public class OrdersBrokerClient extends BrokerClient {
         System.out.println("connecting to Broker and publishing the request for the existing order "+orderId);
         this.orderGetPublisher.connectWith()
                 .keepAlive(80)
-                .cleanSession(false)
+                .cleanSession(true)
                 .willPublish()
-                .topic("orders/get/"+ orderId)
+                .topic("orders/all_info/get/"+ orderId)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .applyWillPublish()
                 .send()
@@ -147,12 +147,12 @@ public class OrdersBrokerClient extends BrokerClient {
     }
 
     private CompletableFuture<Mqtt3SubAck> subscribeToGetOrderByIdResponse(){
-        String topic= "orders/get/+/response";
+        String topic= "orders/all_info/get/+/response";
         return this.orderSubscriber.subscribeWith()
                 .topicFilter(topic)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
-                        String orderId = mqtt3Publish.getTopic().getLevels().get(2);
+                        String orderId = mqtt3Publish.getTopic().getLevels().get(3);
                         String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
                         OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                         if (order != null) {

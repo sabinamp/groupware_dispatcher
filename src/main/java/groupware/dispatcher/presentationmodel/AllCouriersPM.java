@@ -51,18 +51,11 @@ public class AllCouriersPM {
 
     private void setupValueChangedListeners() {
         allCouriers.addListener((ListChangeListener.Change<? extends CourierPM> change) -> {
-            System.out.println("Updated received"+ change.getAddedSize());
-            //allCouriers.stream().forEach(System.out::println);
-                allCouriers.addListener(new ListChangeListener<>() {
-                    @Override
-                    public void onChanged(Change<? extends CourierPM> c) {
-                        if(c.wasAdded()){
-                            AllCouriersPM.this.notifyAll();
-                        }
-                    }
-                });
+            System.out.println("AllCouriersPM Update "+ change);
+
             //todo - notification popup
         });
+
     }
 
     public ObservableList<CourierPM> getAllCouriers() {
