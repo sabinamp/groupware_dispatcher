@@ -1,18 +1,21 @@
 package groupware.dispatcher.view.couriers;
 
 
+import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.RootPM;
+import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 public class CouriersPane extends HBox implements ViewMixin {
-    private RootPM rootPM;
-    private CouriersTable table;
 
-    public CouriersPane(RootPM rootPM){
-        this.rootPM = rootPM;
+    public CouriersTable table;
+    private AllCouriersPM allCouriersPM;
+
+    public CouriersPane( AllCouriersPM allCouriersPM){
+        this.allCouriersPM = allCouriersPM;
         init();
 
     }
@@ -26,7 +29,7 @@ public class CouriersPane extends HBox implements ViewMixin {
 
     @Override
     public void initializeParts() {
-     table = new CouriersTable(rootPM);
+     table = new CouriersTable(allCouriersPM);
     }
 
     @Override

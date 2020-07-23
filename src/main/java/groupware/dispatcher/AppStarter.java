@@ -30,6 +30,7 @@ public class AppStarter extends Application {
     private ApplicationUI rootPanel;
     private RootPM rootPM;
 
+
     private volatile boolean enough = false;
     private final Text txtTime = new Text();
     private final CourierServiceImpl courierService =  new CourierServiceImpl();
@@ -54,11 +55,12 @@ public class AppStarter extends Application {
     Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
-            rootPM = new RootPM(courierService, orderService);
+
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
-            rootPM.setAllCouriersPM(courierService.getAllCouriersPM());
+
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
+
 
 
 
@@ -68,10 +70,10 @@ public class AppStarter extends Application {
 
     @Override
     public void start(Stage primaryStage){
+        rootPM = new RootPM();
 
         connectToBroker.run();
-
-        System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
+        //System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
         setUp(primaryStage);
 
     }
@@ -84,8 +86,9 @@ public class AppStarter extends Application {
     }
 
     private void setUp(Stage primaryStage){
-        rootPanel = new ApplicationUI(rootPM);
-
+        AllCouriersPM allCouriersPM = courierService.getAllCouriersPM();
+        AllOrdersPM allOrdersPM = orderService.getAllOrdersPM();
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
         rootPanel.addClockToHeader(txtTime);
 
         Button exitBtn = new Button("Exit");
@@ -110,6 +113,7 @@ public class AppStarter extends Application {
         });
         primaryStage.show();
     }
+
     public static void main(String[] args) {
         launch(args);
     }

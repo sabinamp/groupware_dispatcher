@@ -21,17 +21,22 @@ public class OrderPM {
     private final ObjectProperty<DeliveryStep> orderLastUpdate = new SimpleObjectProperty<>();
     private final DoubleProperty price = new SimpleDoubleProperty(0.0);
 
-    public OrderPM(OrderDescriptiveInfo orderDescriptiveInfo){
-        setOrderId(orderDescriptiveInfo.getOrderId());
-        setCustomerName(orderDescriptiveInfo.getCustomerName());
-        setOrderPlacedWhen(orderDescriptiveInfo.getOrderInfo().getPlacedWhen());
+    public OrderPM(){
+
+    }
+    public static OrderPM ofOrder(OrderDescriptiveInfo orderDescriptiveInfo){
+        OrderPM orderPM = new OrderPM();
+        orderPM.setOrderId(orderDescriptiveInfo.getOrderId());
+        orderPM.setCustomerName(orderDescriptiveInfo.getCustomerName());
+        orderPM.setOrderPlacedWhen(orderDescriptiveInfo.getOrderInfo().getPlacedWhen());
         DeliveryStep lastStep = orderDescriptiveInfo.getDeliveryInfos().getLast();
-        setOrderLastUpdate(lastStep);
-        setOrderUpdatedWhen(lastStep.getUpdatedWhen());
-        setOrderStatus(lastStep.getCurrentStatus());
-        setCurrentAssignee(lastStep.getCurrentAssignee());
-        setScheduledParcelCollectionWhen(orderDescriptiveInfo.getOrderInfo().getScheduledParcelCollectionWhen());
-        setPrice(orderDescriptiveInfo.getOrderInfo().getPrice());
+        orderPM.setOrderLastUpdate(lastStep);
+        orderPM.setOrderUpdatedWhen(lastStep.getUpdatedWhen());
+        orderPM.setOrderStatus(lastStep.getCurrentStatus());
+        orderPM.setCurrentAssignee(lastStep.getCurrentAssignee());
+        orderPM.setScheduledParcelCollectionWhen(orderDescriptiveInfo.getOrderInfo().getScheduledParcelCollectionWhen());
+        orderPM.setPrice(orderDescriptiveInfo.getOrderInfo().getPrice());
+        return orderPM;
     }
 
     public String getOrderId() {

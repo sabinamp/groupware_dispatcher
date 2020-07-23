@@ -15,14 +15,14 @@ import java.util.logging.Logger;
 public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
     //private final Logger logger;
     private AllCouriersPM couriersPModel;
-    private RootPM rootPM;
 
-    public CouriersTable(RootPM rootPM){
+    public CouriersTable(AllCouriersPM allCouriersPM){
         //super(rootPM.getAllCouriersPM().getAllCouriers());
         super();
         // logger = LogManager.getLogManager().getLogger(String.valueOf(CouriersPane.class));
-        this.rootPM = rootPM;
-        this.couriersPModel = rootPM.getAllCouriersPM();
+
+        this.couriersPModel = allCouriersPM;
+        init();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         TableViewSelectionModel<CourierPM> tsm = getSelectionModel();
         tsm.setSelectionMode(SelectionMode.SINGLE);
-        setItems( rootPM.getAllCouriersPM().getAllCouriers());
+
     }
 
     @Override
