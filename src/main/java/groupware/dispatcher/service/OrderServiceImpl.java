@@ -20,7 +20,7 @@ public class OrderServiceImpl implements OrderService{
     public OrderServiceImpl(){
     }
 
-
+    @Override
     public OrderDescriptiveInfo getOrder(String orderId){
         return orders.get(orderId);
     }
@@ -154,22 +154,14 @@ public class OrderServiceImpl implements OrderService{
         return orderIds;
     }
 
+
     public static void saveOrderInMemory(String id, OrderDescriptiveInfo order){
         orders.put(id, order);
     }
 
-    public OrderDescriptiveInfo convertJsonToOrderDescriptiveInfo(String json) {
-        return ModelObjManager.convertJsonToOrderDescriptiveInfo(json);
-    }
 
-    public TaskRequest convertJsonToTaskRequest(String taskJson){
-        return ModelObjManager.convertJsonToTaskRequest(taskJson);
-    }
 
-    public DeliveryStep convertJsonToDeliveryStep(String jsonString){
-        return ModelObjManager.convertDeliveryStepData(jsonString);
-    }
-
+    @Override
     public Map<String, OrderDescriptiveInfo> getOrders() {
         return orders;
     }

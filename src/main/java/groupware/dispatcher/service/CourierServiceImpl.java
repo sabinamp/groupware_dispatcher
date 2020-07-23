@@ -1,5 +1,7 @@
 package groupware.dispatcher.service;
 
+import groupware.dispatcher.presentationmodel.AllCouriersPM;
+import groupware.dispatcher.presentationmodel.CourierPM;
 import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.service.util.ModelObjManager;
@@ -12,25 +14,22 @@ import java.util.logging.Logger;
 public class CourierServiceImpl implements CourierService {
     private static Map<String, CourierInfo> couriers;
     private final static Logger logger;
+    private AllCouriersPM allCouriersPM;
 
     static{
         logger = LogManager.getLogManager().getLogger(String.valueOf(OrderServiceImpl.class));
         couriers = new HashMap<>();
-        BrokerConnection.startBrokerConnection();
+
     }
     public CourierServiceImpl(){
+        this.allCouriersPM = new AllCouriersPM();
 
     }
 
-
-    public DeliveryStep convertJsonToDeliveryStep(String jsonString){
-        return ModelObjManager.convertDeliveryStepData(jsonString);
-    }
-
-    @Override
-    public Map<String, CourierInfo> getCouriers() {
+    public static Map<String, CourierInfo> getCouriers() {
         return couriers;
     }
+
 
     @Override
     public boolean setStatus(String courierId, CourierStatus status) {
@@ -38,7 +37,7 @@ public class CourierServiceImpl implements CourierService {
         CourierInfo courierInfo = getCourierInfo(courierId);
         if(status != null && courierInfo != null){
             courierInfo.setStatus(status);
-            successful = updateCourier(courierId, courierInfo);
+            successful = saveCourier(courierId, courierInfo);
             if(successful){
                 System.out.println("setStatus()- Successfully updated the courier's status "+status.toString());
             }
@@ -47,11 +46,13 @@ public class CourierServiceImpl implements CourierService {
     }
 
     @Override
-    public boolean updateCourier(String courierId, CourierInfo courier) {
+    public boolean saveCourier(String courierId, CourierInfo courier) {
         if(courier == null ){
             return false;
         }else{
             couriers.put(courierId, courier);
+            CourierPM currentCourierPM = CourierPM.of(courierId, courier);
+            allCouriersPM.updateAllCouriersPM(currentCourierPM);
             return true;
         }
     }
@@ -62,7 +63,7 @@ public class CourierServiceImpl implements CourierService {
         CourierInfo courierInfo = getCourierInfo(courierId);
         if(courierInfo != null && conn != null){
             courierInfo.setConn(conn);
-            successful = updateCourier(courierId, courierInfo);
+            successful = saveCourier(courierId, courierInfo);
             if(successful){
                     System.out.println("Successfully updated the courier's conn : " + conn.toString());
             }
@@ -75,13 +76,13 @@ public class CourierServiceImpl implements CourierService {
     public boolean updateAssignedOrders(String courierId, String addedOrderId) {
         CourierInfo courierInfo = getCourierInfo(courierId);
         courierInfo.addAssignedOrder(addedOrderId);
-        boolean successful = updateCourier(courierId, courierInfo);
+        boolean successful = saveCourier(courierId, courierInfo);
         System.out.println("Successfully updated the courier's assigned orders : " + successful);
         return successful;
     }
     @Override
     public boolean updateCourierInfo(String courierId, CourierInfo courierInfo) {
-        boolean successful = updateCourier(courierId, courierInfo);
+        boolean successful = saveCourier(courierId, courierInfo);
         System.out.println("Successfully updated the courier's info: " + successful);
         return successful;
     }
@@ -114,4 +115,7 @@ public class CourierServiceImpl implements CourierService {
         return courier.getAssignedOrders();
     }
 
+    public AllCouriersPM getAllCouriersPM() {
+        return this.allCouriersPM;
+    }
 }

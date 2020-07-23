@@ -27,10 +27,13 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class AppStarter extends Application {
-
+    private ApplicationUI rootPanel;
+    private RootPM rootPM;
 
     private volatile boolean enough = false;
     private final Text txtTime = new Text();
+    private final CourierServiceImpl courierService =  new CourierServiceImpl();
+    private final  OrderServiceImpl orderService = new OrderServiceImpl();
     // this is timer thread which will update out time view every second
     Thread timer = new Thread(() -> {
         SimpleDateFormat dt = new SimpleDateFormat("hh:mm:ss");
@@ -48,17 +51,32 @@ public class AppStarter extends Application {
             });
         }
     });
+    Runnable connectToBroker = new Runnable() {
+        @Override
+        public void run() {
+            BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
+            Platform.runLater(()-> {
+                // updating live UI object requires JavaFX App Thread
+                rootPM.setAllCouriersPM(courierService.getAllCouriersPM());
 
+            });
+        }
+    };
 
     @Override
     public void start(Stage primaryStage){
-        RootPM rootPM = new RootPM();
-        CourierService courierService = new CourierServiceImpl();
-        OrderService orderService = new OrderServiceImpl();
+
+        rootPM = new RootPM(courierService, orderService);
+
+        connectToBroker.run();
 
 
-        ApplicationUI rootPanel = new ApplicationUI(rootPM, courierService, orderService);
+        System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
+
+        rootPanel = new ApplicationUI(rootPM);
+
         rootPanel.addClockToHeader(txtTime);
+
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
@@ -67,10 +85,9 @@ public class AppStarter extends Application {
 
         });
         rootPanel.addExitButton(exitBtn);
-        Scene scene = new Scene(rootPanel, 800,500);
 
+        Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");
-
         primaryStage.setScene(scene);
         timer.start();
         scene.getWindow().setOnCloseRequest(new EventHandler<>() {
@@ -82,7 +99,6 @@ public class AppStarter extends Application {
         });
 
         primaryStage.show();
-
     }
     @Override
     public void stop() {
@@ -90,6 +106,7 @@ public class AppStarter extends Application {
         // or our program will not exit
         enough = true;
     }
+
     public static void main(String[] args) {
         launch(args);
     }

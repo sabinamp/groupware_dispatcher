@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface CourierService {
-    boolean updateCourier(String courierId, CourierInfo courier);
+    boolean saveCourier(String courierId, CourierInfo courier);
     boolean setConn(String courierId, Conn conn);
     boolean setStatus(String courierId, CourierStatus status);
     Conn getConn(String courierId);
@@ -18,6 +18,6 @@ public interface CourierService {
 
     Set<String> getAssignedOrders(String courierId);
     boolean updateAssignedOrders(String courierId, String addedOrderId);
-    Map<String,CourierInfo> getCouriers();
+
     boolean updateCourierInfo(String courierId, CourierInfo receivedString);
 }
