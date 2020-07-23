@@ -1,6 +1,7 @@
 package groupware.dispatcher.service.mqtt;
 
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
+import groupware.dispatcher.service.OrderService;
 import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.model.*;
 import com.hivemq.client.mqtt.MqttClient;
@@ -20,13 +21,13 @@ public class OrdersBrokerClient extends BrokerClient {
     Mqtt3AsyncClient client1;
     Mqtt3AsyncClient client2;
     Mqtt3AsyncClient orderSubscriber;
-    private OrderServiceImpl orderService;
+    private OrderService orderService;
     private final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
-    private AllOrdersPM allOrdersPM;
+    //private AllOrdersPM allOrdersPM;
 
-    public OrdersBrokerClient(){
-        orderService= new OrderServiceImpl();
-        allOrdersPM = new AllOrdersPM(orderService);
+    public OrdersBrokerClient(OrderService orderServiceImpl){
+        orderService= orderServiceImpl;
+       // allOrdersPM = new AllOrdersPM(orderService);
         client1 = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(UUID.toString())
@@ -113,7 +114,6 @@ public class OrdersBrokerClient extends BrokerClient {
                 .applyWillPublish()
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                //.thenComposeAsync(v -> subscribeToGetOrderByIdResponse(orderId))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -129,7 +129,7 @@ public class OrdersBrokerClient extends BrokerClient {
     public void connectAndSubscribeForExistingOrder() {
         System.out.println("connecting to Broker and subscribing for existing order. ");
         this.orderSubscriber.connectWith()
-                .keepAlive(120)
+                .keepAlive(180)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
@@ -181,7 +181,7 @@ public class OrdersBrokerClient extends BrokerClient {
 
 
 
-    public OrderServiceImpl getOrderService() {
+    public OrderService getOrderService() {
         return orderService;
     }
 

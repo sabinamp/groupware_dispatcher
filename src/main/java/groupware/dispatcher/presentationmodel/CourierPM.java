@@ -20,22 +20,28 @@ public class CourierPM {
     private final ObjectProperty<List<ContactInfo>> contactInfos = new SimpleObjectProperty<>();
     private final ObjectProperty<Set<String>> assignedOrders = new SimpleObjectProperty<>();
 
-    public CourierPM(String courierId, CourierInfo info){
+    public CourierPM(){
+
+    }
+
+    public static CourierPM of(String courierId, CourierInfo info) {
+        CourierPM courierPM= new CourierPM();
+
         if(courierId != null){
-            this.setCourierId(courierId);
+            courierPM.setCourierId(courierId);
 
-           if( info != null){
-               this.setName(info.getCourierName());
-               this.setCourierStatus(info.getStatus());
-               this.setContactInfos(info.getContactInfos());
-
-           } else{
-               System.out.println("Courier info is null");
-           }
+            if( info != null){
+                courierPM.setName(info.getCourierName());
+                courierPM.setCourierStatus(info.getStatus());
+                courierPM.setContactInfos(info.getContactInfos());
+            } else{
+                System.out.println("Courier info is null");
+            }
         }
         else {
             System.out.println("The constructor CourierPM called. The arg courier is null.");
         }
+        return courierPM;
     }
 
     public CourierStatus getCourierStatus() {
@@ -45,6 +51,7 @@ public class CourierPM {
     public ObjectProperty<CourierStatus> courierStatusProperty() {
         return courierStatus;
     }
+
     public void setName(String name) {
         this.name.set(name);
     }

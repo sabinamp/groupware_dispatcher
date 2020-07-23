@@ -91,6 +91,7 @@
     -fx-background-color: #8ea6b4;
     -fx-text-background-color: whitesmoke;
 }
+
 .table-view .cell {
     -fx-cell-size: 2.5em;
     -fx-border-color: transparent;
@@ -134,6 +135,7 @@
 
 }
 .button{
-    -fx-border: 1px #8ea6b4 solid;
+    -fx-border-color: #8ea6b4;
+    -fx-border-width: 1px;
     -fx-padding: 10px;
 }

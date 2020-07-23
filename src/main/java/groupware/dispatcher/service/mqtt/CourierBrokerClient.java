@@ -6,6 +6,7 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.CourierPM;
+import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.model.Conn;
 import groupware.dispatcher.service.model.Courier;
@@ -29,8 +30,8 @@ public class CourierBrokerClient extends BrokerClient{
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(CourierBrokerClient.class));
 
 
-    public CourierBrokerClient(){
-        courierService= new CourierServiceImpl();
+    public CourierBrokerClient(CourierServiceImpl courierService){
+        this.courierService= courierService;
 
         clientCourierInfo = MqttClient.builder()
                 .useMqttVersion3()
@@ -120,11 +121,12 @@ public class CourierBrokerClient extends BrokerClient{
                         System.out.println("response related to the courier "+ courierId);
                         String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
 
-                        if(received != null && !received.isEmpty()){
+                        if( !received.isEmpty()){
                             System.out.println("the courier info received as json "+received);
                             CourierInfo courier = ModelObjManager.convertJsonToCourierInfo(received);
                             if(courier != null){
-                                courierService.updateCourier(courierId, courier);
+                                courierService.saveCourier(courierId, courier);
+
                             }else{
                                 System.out.println("the converted courier object is null");
                             }
