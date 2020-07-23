@@ -55,8 +55,8 @@ public class AppStarter extends Application {
     Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
-            BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
 
+            BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
 
@@ -82,7 +82,6 @@ public class AppStarter extends Application {
         });
         rootPanel.addExitButton(exitBtn);
 
-        //System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
         Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");
         primaryStage.setScene(scene);

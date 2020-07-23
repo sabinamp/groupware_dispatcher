@@ -19,7 +19,7 @@ public class OrderPM {
     private final ObjectProperty<OrderStatus> orderStatus = new SimpleObjectProperty<>();
     private final StringProperty currentAssignee =  new SimpleStringProperty(ELLIPSIS);
     private final ObjectProperty<DeliveryStep> orderLastUpdate = new SimpleObjectProperty<>();
-    private final DoubleProperty price = new SimpleDoubleProperty(0.0);
+    //private final DoubleProperty price = new SimpleDoubleProperty(0.0);
 
     public OrderPM(){
 
@@ -28,14 +28,15 @@ public class OrderPM {
         OrderPM orderPM = new OrderPM();
         orderPM.setOrderId(orderDescriptiveInfo.getOrderId());
         orderPM.setCustomerName(orderDescriptiveInfo.getCustomerName());
-        orderPM.setOrderPlacedWhen(orderDescriptiveInfo.getOrderInfo().getPlacedWhen());
+        OrderInfo orderInfo = orderDescriptiveInfo.getOrderInfo();
+        orderPM.setOrderPlacedWhen(orderInfo.getPlacedWhen());
         DeliveryStep lastStep = orderDescriptiveInfo.getDeliveryInfos().getLast();
         orderPM.setOrderLastUpdate(lastStep);
         orderPM.setOrderUpdatedWhen(lastStep.getUpdatedWhen());
         orderPM.setOrderStatus(lastStep.getCurrentStatus());
         orderPM.setCurrentAssignee(lastStep.getCurrentAssignee());
-        orderPM.setScheduledParcelCollectionWhen(orderDescriptiveInfo.getOrderInfo().getScheduledParcelCollectionWhen());
-        orderPM.setPrice(orderDescriptiveInfo.getOrderInfo().getPrice());
+        orderPM.setScheduledParcelCollectionWhen(orderInfo.getScheduledParcelCollectionWhen());
+//        orderPM.setPrice(orderInfo.getPrice());
         return orderPM;
     }
 
@@ -123,7 +124,7 @@ public class OrderPM {
         this.currentAssignee.set(currentAssignee);
     }
 
-    public double getPrice() {
+ /*   public double getPrice() {
         return price.get();
     }
 
@@ -133,7 +134,7 @@ public class OrderPM {
 
     public void setPrice(double price) {
         this.price.set(price);
-    }
+    }*/
 
     public DeliveryStep getOrderLastUpdate() {
         return orderLastUpdate.get();
