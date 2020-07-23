@@ -5,18 +5,15 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
-import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
 public class IDCell extends TableCell<CourierPM, String> {
-
     private Circle circle;
     private Text txt;
     private static final Insets INSETS = new Insets(1, 5, 1, 12);
 
     public IDCell() {
-
         setContentDisplay(ContentDisplay.LEFT);
         setPadding(INSETS);
         setAlignment(Pos.CENTER_LEFT);
@@ -32,10 +29,7 @@ public class IDCell extends TableCell<CourierPM, String> {
             if (item != null && !empty) {
                 setText(item);
                 txt = new Text(item.substring(0, 2).toUpperCase());
-
             }
-
-
         }
     }
 }
