@@ -23,7 +23,6 @@ public class CourierServiceImpl implements CourierService {
     }
     public CourierServiceImpl(){
         this.allCouriersPM = new AllCouriersPM();
-
     }
 
     public static Map<String, CourierInfo> getCouriers() {
@@ -52,7 +51,7 @@ public class CourierServiceImpl implements CourierService {
         }else{
             couriers.put(courierId, courier);
             CourierPM currentCourierPM = CourierPM.of(courierId, courier);
-            allCouriersPM.updateAllCouriersPM(currentCourierPM);
+            //allCouriersPM.updateAllCouriersPM(currentCourierPM);
             return true;
         }
     }

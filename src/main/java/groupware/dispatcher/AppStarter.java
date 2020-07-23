@@ -30,6 +30,7 @@ public class AppStarter extends Application {
     private ApplicationUI rootPanel;
     private RootPM rootPM;
 
+
     private volatile boolean enough = false;
     private final Text txtTime = new Text();
     private final CourierServiceImpl courierService =  new CourierServiceImpl();
@@ -55,9 +56,9 @@ public class AppStarter extends Application {
         @Override
         public void run() {
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
+
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
-                rootPM.setAllCouriersPM(courierService.getAllCouriersPM());
 
             });
         }
@@ -65,18 +66,13 @@ public class AppStarter extends Application {
 
     @Override
     public void start(Stage primaryStage){
-
-        rootPM = new RootPM(courierService, orderService);
+        rootPM = new RootPM();
 
         connectToBroker.run();
-
-
-        System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
-
-        rootPanel = new ApplicationUI(rootPM);
-
+        AllCouriersPM allCouriersPM = courierService.getAllCouriersPM();
+        AllOrdersPM allOrdersPM = orderService.getAllOrdersPM();
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
         rootPanel.addClockToHeader(txtTime);
-
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
@@ -86,6 +82,7 @@ public class AppStarter extends Application {
         });
         rootPanel.addExitButton(exitBtn);
 
+        //System.out.println("AllCouriersPM list count is : "+rootPM.getAllCouriersPM().getCourierCount() );
         Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");
         primaryStage.setScene(scene);
@@ -97,15 +94,18 @@ public class AppStarter extends Application {
                 System.exit(0);
             }
         });
-
         primaryStage.show();
+
     }
+
     @Override
     public void stop() {
         // we need to stop our working thread after closing a window
         // or our program will not exit
         enough = true;
     }
+
+
 
     public static void main(String[] args) {
         launch(args);

@@ -1,6 +1,7 @@
 package groupware.dispatcher.view;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
+import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.view.couriers.CouriersPane;
 import groupware.dispatcher.view.util.ViewMixin;
@@ -14,13 +15,15 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         public MainHeader header;
         private Footer footer;
         private CouriersPane couriersPane;
-
+        private AllOrdersPM allOrdersPM;
+        private AllCouriersPM allCouriersPM;
 
         private final RootPM rootPM;
 
-        public ApplicationUI(RootPM rootPM) {
+        public ApplicationUI(RootPM rootPM,AllOrdersPM allOrdersPM,AllCouriersPM allCouriersPM ) {
                 this.rootPM = rootPM;
-
+                this.allOrdersPM = allOrdersPM;
+                this.allCouriersPM = allCouriersPM;
                 init();
         }
 
@@ -34,8 +37,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         public void initializeParts() {
                 header = new MainHeader();
                 footer = new Footer(rootPM);
-                couriersPane = new CouriersPane(rootPM);
-
+                couriersPane = new CouriersPane(allCouriersPM);
         }
 
         @Override

@@ -1,5 +1,7 @@
 package groupware.dispatcher.service;
 
+import groupware.dispatcher.presentationmodel.AllOrdersPM;
+import groupware.dispatcher.presentationmodel.OrderPM;
 import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.util.ModelObjManager;
 
@@ -12,12 +14,14 @@ import java.util.logging.Logger;
 public class OrderServiceImpl implements OrderService{
     private final static Logger logger;
     private static Map<String, OrderDescriptiveInfo> orders;
+    private AllOrdersPM allOrdersPM;
     static{
         logger = LogManager.getLogManager().getLogger(String.valueOf(OrderServiceImpl.class));
         orders= new HashMap<>();
     }
 
     public OrderServiceImpl(){
+        allOrdersPM = new AllOrdersPM();
     }
 
     @Override
@@ -32,6 +36,7 @@ public class OrderServiceImpl implements OrderService{
             return false;
         }else {
             orders.put(id, order);
+            allOrdersPM.updateAllOrdersPM(OrderPM.ofOrder(order));
             //logger.log(Level.INFO, "updateOrder() done ");
             return true;
         }
@@ -166,4 +171,7 @@ public class OrderServiceImpl implements OrderService{
         return orders;
     }
 
+    public AllOrdersPM getAllOrdersPM() {
+        return this.allOrdersPM;
+    }
 }
