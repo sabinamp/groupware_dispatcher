@@ -29,7 +29,7 @@ public class AllOrdersPM {
     private void setupValueChangedListeners() {
         allOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
 
-            System.out.println("AllOrdersPM Update"+ change.toString());
+            System.out.println("AllOrdersPM Update"+ change);
 
             //todo - notification popup
         });

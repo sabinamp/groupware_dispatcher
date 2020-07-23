@@ -14,7 +14,7 @@ public enum CourierStatus {
 
     NOT_AVAILABLE_HEAVY_TRAFFIC("Not available. Heavy traffic."),
 
-    NOT_AVAILABLE_BREAK("Not available. Having a break"),
+    NOT_AVAILABLE_BREAK("Not available. Having a break."),
 
 
     NOT_AVAILABLE_OUT_OF_BATTERY("Not available. Out of battery.");
