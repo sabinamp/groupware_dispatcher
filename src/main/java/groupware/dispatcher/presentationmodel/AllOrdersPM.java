@@ -28,9 +28,9 @@ public class AllOrdersPM {
 
     private void setupValueChangedListeners() {
         allOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
-            // this will write something like
-            System.out.println("Update received"+ change);
-            allOrders.stream().forEach(System.out::println);
+
+            System.out.println("AllOrdersPM Update"+ change.toString());
+
             //todo - notification popup
         });
     }
