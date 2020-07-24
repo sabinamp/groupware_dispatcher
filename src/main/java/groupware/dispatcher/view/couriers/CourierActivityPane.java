@@ -55,11 +55,11 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
 
         courierIdL = new Label("Courier ID");
         assignedOrdersL = new Label("Activity");
-        /*currentTaskRequestsL = new Label("Task Requests (Not confirmed)");*/
+
         courierIdTxt = new Text("...");
         courierNameTxt = new Text("...");
         assignedOrdersTxt = new Text("...");
-        //currentTaskRequestsTxt = new Text("...");
+
         courierIdL.setLabelFor(courierIdTxt);
         courierNameL.setLabelFor(courierNameL);
         assignedOrdersL.setLabelFor(assignedOrdersTxt);
@@ -83,11 +83,11 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
 
 
        getColumnConstraints().addAll(firstLabelCol, firstTxtCol);
-        Region spacer = new Region();
 
-      /*  addRow(0, courierIdL, courierIdTxt, spacer );
-        addRow(1, courierNameL, courierNameTxt, spacer);
-        addRow(2, assignedOrdersL, assignedOrdersTxt, spacer);*/
+
+        addRow(1, courierIdL, courierIdTxt);
+        addRow(2, courierNameL, courierNameTxt);
+        addRow(3, assignedOrdersL, assignedOrdersTxt);
     }
 
     @Override
@@ -104,24 +104,30 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
     }
 
     private void updateContent() {
-        add(courierIdTxt,1,0);
-        add(courierNameTxt, 1, 1);
-        add(assignedOrdersTxt,1,2);
+        CourierPM current= getCurrentCourierPM();
+        courierIdTxt = new Text(getCurrentCourierPM().getCourierId());
+        courierNameTxt = new Text(current.getName());
+      //  assignedOrdersTxt = new Text(current.getAssignedOrders().toString());
+
+
+        add(courierIdTxt,1,1);
+        add(courierNameTxt, 1, 2);
+       // add(assignedOrdersTxt,1,3);
     }
 
     private void deleteContent() {
-        getChildren().removeAll( courierIdTxt, courierNameTxt, assignedOrdersTxt);
+        getChildren().removeAll( courierIdTxt, courierNameTxt/*, assignedOrdersTxt*/);
     }
 
     @Override
     public void setupBindings() {
         currentCourierPMProperty().bind(this.pmodel.currentCourierPMProperty());
-       /* CourierPM currentCourierPM = this.getCurrentCourierPM();
-        courierIdL.textProperty().bind(currentCourierPM.courierIdProperty());
-        courierNameL.textProperty().bind(currentCourierPM.nameProperty());
-        assignedOrdersL.textProperty().bind(currentCourierPM.assignedOrdersProperty().asString());
-*/
-
+       CourierPM currentCourierPM = this.getCurrentCourierPM();
+       if(currentCourierPM != null){
+           courierIdTxt.textProperty().bind(currentCourierPM.courierIdProperty());
+           courierNameTxt.textProperty().bind(currentCourierPM.nameProperty());
+           //assignedOrdersTxt.textProperty().bind(currentCourierPM.assignedOrdersProperty().asString());
+       }
 
     }
 
