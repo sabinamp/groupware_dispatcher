@@ -7,12 +7,14 @@ import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-public class CouriersPane extends HBox implements ViewMixin {
+public class CouriersPane extends VBox implements ViewMixin {
 
     public CouriersTable table;
     private AllCouriersPM allCouriersPM;
+    private CourierActivityPane courierActivityPane;
 
     public CouriersPane( AllCouriersPM allCouriersPM){
         this.allCouriersPM = allCouriersPM;
@@ -24,18 +26,19 @@ public class CouriersPane extends HBox implements ViewMixin {
     public void initializeSelf() {
 
         getStyleClass().add("couriers-pane");
-        setPrefWidth(755);
+        setPrefWidth(725);
 
     }
 
     @Override
     public void initializeParts() {
-     table = new CouriersTable(allCouriersPM);
+         table = new CouriersTable(allCouriersPM);
+         courierActivityPane = new CourierActivityPane(allCouriersPM);
     }
 
     @Override
     public void layoutParts() {
-        this.getChildren().add(table);
+        this.getChildren().addAll(table, courierActivityPane);
 
     }
 

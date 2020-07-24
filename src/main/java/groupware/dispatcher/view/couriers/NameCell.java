@@ -34,6 +34,7 @@ public class NameCell extends TableCell<CourierPM, String> {
                 setText(item);
                 circle= new Circle(30,30,13,randomColor());
                 txt= new Text(item.substring(0,2).toUpperCase());
+
                 imageview.getChildren().addAll(circle, txt);
                 setGraphic(imageview);
             }

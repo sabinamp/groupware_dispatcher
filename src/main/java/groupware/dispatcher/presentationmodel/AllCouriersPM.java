@@ -19,6 +19,7 @@ public class AllCouriersPM {
     private ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
     private ObservableList<CourierPM> syncAllCouriers = FXCollections.synchronizedObservableList(allCouriers);
 
+    private CourierPM currentCourierPM;
 
     public AllCouriersPM(){
         setupValueChangedListeners();
@@ -71,4 +72,11 @@ public class AllCouriersPM {
         this.paneTitle.set(paneTitle);
     }
 
+    public void setCurrentCourierPM(CourierPM selectedItem) {
+        this.currentCourierPM = selectedItem;
+    }
+
+    public CourierPM getCurrentCourierPM() {
+        return this.currentCourierPM;
+    }
 }

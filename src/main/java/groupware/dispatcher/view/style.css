@@ -48,16 +48,16 @@
 }
 
 
-.customer-pane{
+.activity-pane{
     -fx-font-family: 'Roboto Regular';
-    -fx-background-color: green;
+    -fx-background-color: #fff;
     -fx-min-width: 600px;
-    -fx-text-fill: #8A8C91;
+    -fx-text-fill: black;
     -fx-spacing: 20;
 }
 .couriers-pane{
     -fx-padding: 5;
-    -fx-background-color: #3A3E46;
+    -fx-background-color: black;
     -fx-text-fill: #8A8C95;
     -fx-spacing: 20;
 }

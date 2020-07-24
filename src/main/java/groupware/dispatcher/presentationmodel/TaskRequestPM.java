@@ -20,6 +20,9 @@ public class TaskRequestPM {
     private final ObjectProperty<LocalDateTime> sentWhen = new SimpleObjectProperty<>();
     private final BooleanProperty accepted= new SimpleBooleanProperty();
 
+
+    private final LongProperty timeoutMinutes = new SimpleLongProperty(5);
+
     public String getName() {
         return name.get();
     }
@@ -154,7 +157,17 @@ public class TaskRequestPM {
         this.accepted.set(accepted);
     }
 
+    public long getTimeoutMinutes() {
+        return timeoutMinutes.get();
+    }
 
+    public LongProperty timeoutMinutesProperty() {
+        return timeoutMinutes;
+    }
 
+    public void setTimeoutMinutes(long timeoutMinutes) {
+        this.timeoutMinutes.set(timeoutMinutes);
+    }
 
+    
 }
