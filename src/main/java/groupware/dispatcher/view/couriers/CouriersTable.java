@@ -108,9 +108,5 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
 
     }
 
-    public void setCouriersPModel(AllCouriersPM pm){
-        this.couriersPModel = pm;
-    }
-
 
 }

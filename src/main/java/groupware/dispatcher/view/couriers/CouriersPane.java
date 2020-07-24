@@ -19,12 +19,10 @@ public class CouriersPane extends VBox implements ViewMixin {
     public CouriersPane( AllCouriersPM allCouriersPM){
         this.allCouriersPM = allCouriersPM;
         init();
-
     }
 
     @Override
     public void initializeSelf() {
-
         getStyleClass().add("couriers-pane");
         setPrefWidth(725);
 

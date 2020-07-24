@@ -22,8 +22,6 @@ public class SimpleTextControl extends StackPane implements ViewMixin{
     public void initializeParts() {
         editableField = new TextField();
         readOnlyLabel = new Label();
-
-
     }
 
     @Override

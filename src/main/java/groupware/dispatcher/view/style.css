@@ -139,3 +139,8 @@
     -fx-border-width: 1px;
     -fx-padding: 10px;
 }
+.spacer {
+    -fx-pref-width: 20;
+    -fx-min-width : 20;
+    -fx-max-width : 20;
+}

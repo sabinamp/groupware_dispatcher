@@ -2,10 +2,7 @@ package groupware.dispatcher.presentationmodel;
 
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.*;
 
 
@@ -19,7 +16,7 @@ public class AllCouriersPM {
     private ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
     private ObservableList<CourierPM> syncAllCouriers = FXCollections.synchronizedObservableList(allCouriers);
 
-    private CourierPM currentCourierPM;
+    private ObjectProperty<CourierPM> currentCourierPM =  new SimpleObjectProperty<>();
 
     public AllCouriersPM(){
         setupValueChangedListeners();
@@ -72,11 +69,16 @@ public class AllCouriersPM {
         this.paneTitle.set(paneTitle);
     }
 
-    public void setCurrentCourierPM(CourierPM selectedItem) {
-        this.currentCourierPM = selectedItem;
-    }
 
     public CourierPM getCurrentCourierPM() {
-        return this.currentCourierPM;
+        return currentCourierPM.get();
+    }
+
+    public ObjectProperty<CourierPM> currentCourierPMProperty() {
+        return currentCourierPM;
+    }
+
+    public void setCurrentCourierPM(CourierPM currentCourierPM) {
+        this.currentCourierPM.set(currentCourierPM);
     }
 }

@@ -18,8 +18,6 @@ public class CourierPM {
     private final ObjectProperty<CourierStatus> courierStatus = new SimpleObjectProperty<>();
     private final ObjectProperty<Conn> courierConnectionStatus = new SimpleObjectProperty<>();
 
-
-
     private final ObjectProperty<Email> courierEmail = new SimpleObjectProperty<>();
     private final ObjectProperty<Set<String>> assignedOrders = new SimpleObjectProperty<>();
     private StringProperty courierPhoneNumber = new SimpleStringProperty(ELLIPSIS);
