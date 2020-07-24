@@ -56,7 +56,7 @@
     -fx-spacing: 20;
 }
 .couriers-pane{
-    -fx-padding: 20;
+    -fx-padding: 5;
     -fx-background-color: #3A3E46;
     -fx-text-fill: #8A8C95;
     -fx-spacing: 20;

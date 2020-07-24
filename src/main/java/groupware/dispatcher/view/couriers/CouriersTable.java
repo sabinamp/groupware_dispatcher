@@ -3,7 +3,9 @@ package groupware.dispatcher.view.couriers;
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.CourierPM;
 import groupware.dispatcher.presentationmodel.RootPM;
+import groupware.dispatcher.service.model.ContactInfo;
 import groupware.dispatcher.service.model.CourierStatus;
+import groupware.dispatcher.service.model.Phone;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -13,7 +15,7 @@ import java.util.Arrays;
 
 
 public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
-    //private final Logger logger;
+
     private AllCouriersPM couriersPModel;
 
     public CouriersTable(AllCouriersPM allCouriersPM){
@@ -24,6 +26,7 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
 
     @Override
     public void initializeSelf() {
+        this.setPrefWidth(750);
 
     }
 
@@ -44,9 +47,14 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
         TableColumn<CourierPM, CourierStatus> columnStatus = new TableColumn<>("Courier Status");
         columnStatus.setCellValueFactory(cell->cell.getValue().courierStatusProperty());
         columnStatus.setCellFactory(cell-> new CourierStatusCell());
-        columnStatus.setMinWidth(150);
+        columnStatus.setMinWidth(200);
 
-        getColumns().addAll(Arrays.asList(columnId, columnName, columnStatus));
+        TableColumn<CourierPM, String> columnPhoneNumber = new TableColumn<>("Phone Number");
+        columnPhoneNumber.setCellValueFactory(cell->cell.getValue().courierPhoneNumberProperty());
+        columnPhoneNumber.setCellFactory(cell -> new PhoneNumberCell());
+        columnPhoneNumber.setMinWidth(200);
+
+        getColumns().addAll(Arrays.asList(columnId, columnName, columnStatus, columnPhoneNumber));
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         TableViewSelectionModel<CourierPM> tsm = getSelectionModel();
         tsm.setSelectionMode(SelectionMode.SINGLE);

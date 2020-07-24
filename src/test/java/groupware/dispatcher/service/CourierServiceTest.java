@@ -26,12 +26,12 @@ public class CourierServiceTest {
         info.setCourierName("John Smith");
         info.setStatus(CourierStatus.AVAILABLE);
         info.setConn(Conn.ONLINE);
-        List<ContactInfo> contactInfos = new ArrayList<>();
+
         ContactInfo contactInfo1 = new ContactInfo();
         Email email1 = new Email(); email1.setEmail("hello@yahoo.com");
         contactInfo1.setEmail(email1);
-        contactInfos.add(contactInfo1);
-        info.setContactInfos(contactInfos);
+
+        info.setContactInfo(contactInfo1);
         //when
         courierService.saveCourier(courierID, info);
         //then

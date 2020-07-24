@@ -24,6 +24,7 @@ public class CouriersPane extends HBox implements ViewMixin {
     public void initializeSelf() {
 
         getStyleClass().add("couriers-pane");
+        setPrefWidth(755);
 
     }
 

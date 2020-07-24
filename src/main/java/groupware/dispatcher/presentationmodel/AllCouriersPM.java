@@ -1,19 +1,13 @@
 package groupware.dispatcher.presentationmodel;
 
-import groupware.dispatcher.service.CourierService;
-import groupware.dispatcher.service.CourierServiceImpl;
-import groupware.dispatcher.service.model.Courier;
-import groupware.dispatcher.service.model.CourierInfo;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.collections.*;
 
-import java.util.Map;
 
 
 public class AllCouriersPM {
@@ -23,29 +17,12 @@ public class AllCouriersPM {
     private final IntegerProperty courierCount = new SimpleIntegerProperty();
 
     private ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
-//    private final ObservableList<String> allCourierIDs = FXCollections.observableArrayList();
+    private ObservableList<CourierPM> syncAllCouriers = FXCollections.synchronizedObservableList(allCouriers);
 
-    public AllCouriersPM(/*CourierServiceImpl courierService*/){
+
+    public AllCouriersPM(){
         setupValueChangedListeners();
         setupBindings();
-      /*  if(courierService != null){
-            Map<String, CourierInfo> couriersMap = CourierServiceImpl.getCouriers();
-            for(String each : couriersMap.keySet()){
-                CourierPM currentCourierPM = CourierPM.of(each, couriersMap.get(each));
-                if(currentCourierPM != null){
-                    allCouriers.add(currentCourierPM);
-                }else{
-                    System.out.println("AllCouriersPM Constructor called. the currentCourierPM is null");
-                }
-                System.out.println("AllCouriersPM - the courier: "+ each +" added to the observable list");
-            }
-
-            setupValueChangedListeners();
-            setupBindings();
-        }
-      else{
-          System.out.println("AllCouriersPM Constructor called but the courier service arg is null.");
-        }*/
 
     }
 
@@ -59,15 +36,12 @@ public class AllCouriersPM {
     }
 
     public ObservableList<CourierPM> getAllCouriers() {
-
-        return allCouriers;
+        return syncAllCouriers;
     }
 
 
     public void updateAllCouriersPM(CourierPM pm){
-        allCouriers.add(pm);
-
-        //allCourierIDs.add(pm.getCourierId());
+        syncAllCouriers.add(pm);
     }
     private void setupBindings() {
         courierCountProperty().bind(Bindings.size(allCouriers));

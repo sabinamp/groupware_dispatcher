@@ -31,13 +31,13 @@ public class CourierStatusCell extends TableCell<CourierPM, CourierStatus> {
             setText(null);
             setGraphic(null);
         } else {
-            if (item != null && !empty ) {
+            if (item != null ) {
                 setText(item.toString());
                 System.out.println(item);
-                if(item.toString().equalsIgnoreCase("Available")){
-                   circle= new Circle(30,30,13, Color.rgb(102, 255, 102));
+                if(item.equals(CourierStatus.fromValue("Available"))){
+                   circle= new Circle(30,30,8, Color.rgb(102, 255, 102));
                 } else {
-                    circle= new Circle(30,30,13,Color.rgb(230, 46, 0));
+                    circle= new Circle(30,30,8, Color.rgb(230, 46, 0));
                 }
                 imageView.getChildren().addAll(circle);
                 setGraphic(imageView);

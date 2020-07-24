@@ -19,12 +19,12 @@ public class CourierPMTest {
         info.setCourierName("John Smith");
         info.setStatus(CourierStatus.AVAILABLE);
         info.setConn(Conn.ONLINE);
-        List<ContactInfo> contactInfos = new ArrayList<>();
+
         ContactInfo contactInfo1 = new ContactInfo();
         Email email1 = new Email(); email1.setEmail("hello@yahoo.com");
         contactInfo1.setEmail(email1);
-        contactInfos.add(contactInfo1);
-        info.setContactInfos(contactInfos);
+
+        info.setContactInfo(contactInfo1);
     }
 
     @Test
@@ -35,7 +35,6 @@ public class CourierPMTest {
         assertEquals("Available", pm.getCourierStatus().toString());
         assertEquals("Online", pm.getCourierConnectionStatus().toString());
         assertEquals("John Smith", pm.getName());
-        assertEquals("hello@yahoo.com", pm.getContactInfos().get(0).getEmail().getEmail());
     }
 
 }

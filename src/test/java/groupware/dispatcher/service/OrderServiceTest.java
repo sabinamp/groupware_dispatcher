@@ -1,12 +1,10 @@
 package groupware.dispatcher.service;
 
-import groupware.dispatcher.service.model.Address;
-import groupware.dispatcher.service.model.ContactInfo;
-import groupware.dispatcher.service.model.Email;
-import groupware.dispatcher.service.model.OrderDescriptiveInfo;
+import groupware.dispatcher.service.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +25,9 @@ public class OrderServiceTest {
         order.setCustomerName("Anastasia G.");
         order.setCurrencyCode("CHF");
         order.setOrderId("OR1133");
+        OrderInfo orderInfo = new OrderInfo();
+        orderInfo.setPlacedWhen( LocalDateTime.of(2020, 7, 23, 11,23, 10));
+        order.setOrderInfo(orderInfo);
         ContactInfo contactInfo = new ContactInfo();
         contactInfo.setCompanyName("C Company");
         Email emailAddress = new Email();
@@ -44,12 +45,12 @@ public class OrderServiceTest {
         order.setContactInfos(contactInfos);
 
         //when
-        OrderServiceImpl.saveOrderInMemory("OR1133", order);
+        orderService.updateOrder("OR1133", order);
         //then
         OrderDescriptiveInfo savedOrder= orderService.getOrder("OR1133");
         assertNotNull(savedOrder);
 
         assertEquals( "OR1133", savedOrder.getOrderId());
-        //TODO
+       assertEquals("anastasia@gmail.com", savedOrder.getContactInfos().get(0).getEmail().getEmail());
     }
 }

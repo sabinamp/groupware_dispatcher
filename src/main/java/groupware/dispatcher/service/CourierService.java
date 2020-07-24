@@ -14,7 +14,7 @@ public interface CourierService {
     CourierStatus getStatus(String courierId);
 
     CourierInfo getCourierInfo(String courierId);
-    List<ContactInfo> getContactInfos(String courierId);
+    ContactInfo getContactInfo(String courierId);
 
     Set<String> getAssignedOrders(String courierId);
     boolean updateAssignedOrders(String courierId, String addedOrderId);

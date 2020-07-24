@@ -92,7 +92,7 @@ public class CourierBrokerClient extends BrokerClient{
         System.out.println("connecting to Broker and subscribing for courier info. ");
         this.clientCourierInfoSubscriber.connectWith()
                 .keepAlive(120)
-                .cleanSession(true)
+                .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
                 .thenComposeAsync(v -> subscribeToGetCourierById())
@@ -177,7 +177,7 @@ public class CourierBrokerClient extends BrokerClient{
         String topic = "couriers/+/update/#";
         System.out.println("entering subscribeToCourierUpdates - subscribe topic : "+topic);
 
-        CompletableFuture<Mqtt3SubAck> mqtt3SubAckCompletableFuture= clientCourierUpdates.subscribeWith()
+       return clientCourierUpdates.subscribeWith()
                 .topicFilter(topic)
                 .callback(publish -> {
                     // Process the received message
@@ -216,7 +216,7 @@ public class CourierBrokerClient extends BrokerClient{
                     }
                 });
 
-        return mqtt3SubAckCompletableFuture;
+
     }
     public CourierServiceImpl getOrderService() {
         return courierService;

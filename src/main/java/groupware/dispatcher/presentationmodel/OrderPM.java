@@ -4,6 +4,7 @@ import groupware.dispatcher.service.model.*;
 import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 public class OrderPM {
@@ -30,11 +31,18 @@ public class OrderPM {
         orderPM.setCustomerName(orderDescriptiveInfo.getCustomerName());
         OrderInfo orderInfo = orderDescriptiveInfo.getOrderInfo();
         orderPM.setOrderPlacedWhen(orderInfo.getPlacedWhen());
-        DeliveryStep lastStep = orderDescriptiveInfo.getDeliveryInfos().getLast();
-        orderPM.setOrderLastUpdate(lastStep);
-        orderPM.setOrderUpdatedWhen(lastStep.getUpdatedWhen());
-        orderPM.setOrderStatus(lastStep.getCurrentStatus());
-        orderPM.setCurrentAssignee(lastStep.getCurrentAssignee());
+        LinkedList<DeliveryStep> deliveryInfos = orderDescriptiveInfo.getDeliveryInfos();
+        DeliveryStep lastStep = null;
+       if(deliveryInfos != null){
+           lastStep = deliveryInfos.getLast();
+       }
+        if(lastStep != null){
+            orderPM.setOrderLastUpdate(lastStep);
+            orderPM.setOrderUpdatedWhen(lastStep.getUpdatedWhen());
+            orderPM.setOrderStatus(lastStep.getCurrentStatus());
+            orderPM.setCurrentAssignee(lastStep.getCurrentAssignee());
+        }
+
         orderPM.setScheduledParcelCollectionWhen(orderInfo.getScheduledParcelCollectionWhen());
 //        orderPM.setPrice(orderInfo.getPrice());
         return orderPM;

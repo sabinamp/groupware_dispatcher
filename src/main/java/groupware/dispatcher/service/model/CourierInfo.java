@@ -2,7 +2,9 @@ package groupware.dispatcher.service.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class CourierInfo {
 
@@ -24,8 +26,8 @@ public class CourierInfo {
     @JsonProperty("avatarImage")
     private AvatarImage avatarImage = null;
 
-    @JsonProperty("contactInfos")
-    private List<ContactInfo> contactInfos = null;
+    @JsonProperty("contactInfo")
+    private ContactInfo contactInfo = null;
 
 
     @JsonProperty("assignedOrders")
@@ -60,18 +62,12 @@ public class CourierInfo {
         this.location= location;
         return this;
     }*/
-    public CourierInfo contactInfos(List<ContactInfo> contactInfos) {
-        this.contactInfos = contactInfos;
+    public CourierInfo contactInfos(ContactInfo contactInfo) {
+        this.contactInfo = contactInfo;
         return this;
     }
 
-    public CourierInfo addContactInfosItem(ContactInfo contactInfosItem) {
-        if (this.contactInfos == null) {
-            this.contactInfos = new ArrayList<>();
-        }
-        this.contactInfos.add(contactInfosItem);
-        return this;
-    }
+
 
     public String getCourierName() {
         return courierName;
@@ -123,12 +119,12 @@ public class CourierInfo {
         this.avatarImage = avatarImage;
     }
 
-    public List<ContactInfo> getContactInfos() {
-        return contactInfos;
+    public ContactInfo getContactInfo() {
+        return contactInfo;
     }
 
-    public void setContactInfos(List<ContactInfo> contactInfos) {
-        this.contactInfos = contactInfos;
+    public void setContactInfo(ContactInfo contactInfo) {
+        this.contactInfo = contactInfo;
     }
 
     public Set<String> getAssignedOrders() {
@@ -161,13 +157,13 @@ public class CourierInfo {
                 Objects.equals(this.conn, courierInfo.conn) &&
                 Objects.equals(this.status, courierInfo.status) &&
                 Objects.equals(this.avatarImage, courierInfo.avatarImage) &&
-                Objects.equals(this.contactInfos, courierInfo.contactInfos) &&
+                Objects.equals(this.contactInfo, courierInfo.contactInfo) &&
                 Objects.equals(this.assignedOrders, courierInfo.assignedOrders) ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(courierName, deviceName, conn, status, avatarImage, contactInfos,assignedOrders);
+        return Objects.hash(courierName, deviceName, conn, status, avatarImage, contactInfo,assignedOrders);
     }
 
     @Override
@@ -179,7 +175,7 @@ public class CourierInfo {
                 ", status='" + status + '\'' +
                 ", avatarImage='" + avatarImage + '\'' +
                 ", assignedOrders='" + assignedOrders + '\'' +
-                ", contactInfos=" + contactInfos +
+                ", contactInfo=" + contactInfo +
                 '}';
     }
 

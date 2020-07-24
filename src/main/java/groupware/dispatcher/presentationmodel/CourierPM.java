@@ -17,8 +17,9 @@ public class CourierPM {
     private StringProperty courierId = new SimpleStringProperty(ELLIPSIS);
     private final ObjectProperty<CourierStatus> courierStatus = new SimpleObjectProperty<>();
     private final ObjectProperty<Conn> courierConnectionStatus = new SimpleObjectProperty<>();
-    private final ObjectProperty<List<ContactInfo>> contactInfos = new SimpleObjectProperty<>();
+
     private final ObjectProperty<Set<String>> assignedOrders = new SimpleObjectProperty<>();
+    private StringProperty courierPhoneNumber = new SimpleStringProperty(ELLIPSIS);
 
     public CourierPM(){
 
@@ -34,14 +35,30 @@ public class CourierPM {
                 courierPM.setName(info.getCourierName());
                 courierPM.setCourierStatus(info.getStatus());
                 courierPM.setCourierConnectionStatus(info.getConn());
-                courierPM.setContactInfos(info.getContactInfos());
-            } else{
-                System.out.println("Courier info is null");
+
+                ContactInfo contactInfo = info.getContactInfo();
+                String phoneNumber= "...";
+                if(contactInfo != null){
+                    List<Phone> phones = contactInfo.getPhones();
+                    if(phones != null){
+                        Phone phone = phones.get(0);
+                        if(phone != null){
+                            phoneNumber = phone.getCountryAccessCode()+phone.getPhoneNumber();
+                        }else{
+                            System.out.println(courierId+" courier phone is null");
+                        }
+                    } else{
+                        System.out.println(courierId +" the list if courier phones is null");
+                    }
+                }
+                courierPM.setCourierPhoneNumber(phoneNumber);
+                 } else{
+                     System.out.println(courierId +" Courier info is null");
+                }
+             }
+            else {
+                System.out.println(courierId + " The constructor CourierPM called. The arg courier info is null.");
             }
-        }
-        else {
-            System.out.println("The constructor CourierPM called. The arg courier is null.");
-        }
         return courierPM;
     }
 
@@ -91,17 +108,7 @@ public class CourierPM {
         return name;
     }
 
-    public List<ContactInfo> getContactInfos() {
-        return contactInfos.get();
-    }
 
-    public ObjectProperty<List<ContactInfo>> contactInfosProperty() {
-        return contactInfos;
-    }
-
-    public void setContactInfos(List<ContactInfo> contactInfos) {
-        this.contactInfos.set(contactInfos);
-    }
 
     @Override
     public String toString() {
@@ -110,8 +117,11 @@ public class CourierPM {
                 ", courierId=" + courierId +
                 ", courierStatus=" + courierStatus +
                 ", courierConnectionStatus=" + courierConnectionStatus +
+                ", courierPhone=" + courierPhoneNumber +
                 '}';
     }
+
+
     public Set<String> getAssignedOrders() {
         return assignedOrders.get();
     }
@@ -123,4 +133,17 @@ public class CourierPM {
     public void setAssignedOrders(Set<String> assignedOrders) {
         this.assignedOrders.set(assignedOrders);
     }
+
+    public String getCourierPhoneNumber() {
+        return courierPhoneNumber.get();
+    }
+
+    public StringProperty courierPhoneNumberProperty() {
+        return courierPhoneNumber;
+    }
+
+    public void setCourierPhoneNumber(String courierPhoneNumber) {
+        this.courierPhoneNumber.set(courierPhoneNumber);
+    }
+
 }

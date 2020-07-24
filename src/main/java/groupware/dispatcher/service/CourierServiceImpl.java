@@ -103,9 +103,9 @@ public class CourierServiceImpl implements CourierService {
     }
 
     @Override
-    public List<ContactInfo> getContactInfos(String courierId) {
+    public ContactInfo getContactInfo(String courierId) {
         CourierInfo courier= getCourierInfo(courierId);
-        return courier.getContactInfos();
+        return courier.getContactInfo();
     }
 
     @Override
