@@ -12,6 +12,7 @@ public class OrderPM {
 
     private final StringProperty orderId = new SimpleStringProperty();
     private final StringProperty customerName =  new SimpleStringProperty(ELLIPSIS);
+    private final ObjectProperty address =  new SimpleObjectProperty(ELLIPSIS);
     private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();
 
     private final ObjectProperty<LocalDateTime> scheduledParcelCollectionWhen = new SimpleObjectProperty<>();
@@ -132,7 +133,18 @@ public class OrderPM {
         this.currentAssignee.set(currentAssignee);
     }
 
- /*   public double getPrice() {
+    public Object getAddress() {
+        return address.get();
+    }
+
+    public ObjectProperty addressProperty() {
+        return address;
+    }
+
+    public void setAddress(Object address) {
+        this.address.set(address);
+    }
+    /*   public double getPrice() {
         return price.get();
     }
 
