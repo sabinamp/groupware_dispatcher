@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.Tooltip;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -36,8 +37,10 @@ public class CourierStatusCell extends TableCell<CourierPM, CourierStatus> {
                 System.out.println(item);
                 if(item.equals(CourierStatus.fromValue("Available"))){
                    circle= new Circle(30,30,8, Color.rgb(102, 255, 102));
+                    circle.setEffect(new DropShadow());
                 } else {
                     circle= new Circle(30,30,8, Color.rgb(230, 46, 0));
+                    circle.setEffect(new DropShadow());
                 }
                 imageView.getChildren().addAll(circle);
                 setGraphic(imageView);

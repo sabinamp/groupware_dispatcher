@@ -4,8 +4,10 @@ import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.view.couriers.CouriersPane;
+import groupware.dispatcher.view.orders.OrdersPane;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
@@ -15,6 +17,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         public MainHeader header;
         private Footer footer;
         private CouriersPane couriersPane;
+        private OrdersPane ordersPane;
         private AllOrdersPM allOrdersPM;
         private AllCouriersPM allCouriersPM;
 
@@ -36,6 +39,9 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         @Override
         public void initializeParts() {
                 header = new MainHeader();
+                header.ordersBtn.setOnAction(event -> setMainContent(ordersPane));
+                header.couriersBtn.setOnAction(event ->
+                        setMainContent(couriersPane));
                 footer = new Footer(rootPM);
                 couriersPane = new CouriersPane(allCouriersPM);
         }
@@ -44,7 +50,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         public void layoutParts() {
 
                 this.setRight(new Text("Right "));
-                this.setCenter(couriersPane);
+                setMainContent(couriersPane);
 
                 this.setBottom(footer);
                 this.setLeft(new Text("Left"));
@@ -67,5 +73,14 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         }
 
 
-
+        public void setMainContent(Node param) {
+                this.setCenter(param);
+                if(param instanceof CouriersPane){
+                        header.couriersBtn.setDisable(true);
+                        header.ordersBtn.setDisable(false);
+                }else{
+                        header.ordersBtn.setDisable(true);
+                        header.couriersBtn.setDisable(false);
+                }
+        }
 }
