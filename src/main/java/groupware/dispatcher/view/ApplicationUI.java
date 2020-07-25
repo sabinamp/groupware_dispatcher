@@ -44,6 +44,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                         setMainContent(couriersPane));
                 footer = new Footer(rootPM);
                 couriersPane = new CouriersPane(allCouriersPM);
+                ordersPane = new OrdersPane(allOrdersPM);
         }
 
         @Override
@@ -78,7 +79,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 if(param instanceof CouriersPane){
                         header.couriersBtn.setDisable(true);
                         header.ordersBtn.setDisable(false);
-                }else{
+                }else if (param instanceof OrdersPane){
                         header.ordersBtn.setDisable(true);
                         header.couriersBtn.setDisable(false);
                 }

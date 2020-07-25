@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 
 public class OrdersPane extends VBox implements ViewMixin {
     private AllOrdersPM allOrdersPM;
+    OrdersTable table;
 
     public OrdersPane(AllOrdersPM allOrdersPM){
         this.allOrdersPM = allOrdersPM;
@@ -16,19 +17,18 @@ public class OrdersPane extends VBox implements ViewMixin {
     }
     @Override
     public void initializeSelf() {
-
         getStyleClass().add("orders_pane");
-
+        setPrefWidth(725);
     }
 
     @Override
     public void initializeParts() {
-        //table = new OrdersTable(allOrdersPM);
+        table = new OrdersTable(allOrdersPM);
     }
 
     @Override
     public void layoutParts() {
-        //this.getChildren().add(table);
+        this.getChildren().add(table);
 
     }
 
