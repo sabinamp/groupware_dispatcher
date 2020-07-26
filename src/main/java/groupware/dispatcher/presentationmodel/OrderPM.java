@@ -12,12 +12,17 @@ public class OrderPM {
 
     private final StringProperty orderId = new SimpleStringProperty();
     private final StringProperty customerName =  new SimpleStringProperty(ELLIPSIS);
-    private final ObjectProperty address =  new SimpleObjectProperty(ELLIPSIS);
+
+
+    //final destination address
+    private final ObjectProperty<ContactInfo> destinationAddress =  new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();
 
     private final ObjectProperty<LocalDateTime> scheduledParcelCollectionWhen = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> orderUpdatedWhen = new SimpleObjectProperty<>();
-    private List<ContactInfo> contactInfos = null;
+
+
+    private ObjectProperty<List<ContactInfo>> contactInfos = new SimpleObjectProperty<>();
     private final ObjectProperty<OrderStatus> orderStatus = new SimpleObjectProperty<>();
     private final StringProperty currentAssignee =  new SimpleStringProperty(ELLIPSIS);
     private final ObjectProperty<DeliveryStep> orderLastUpdate = new SimpleObjectProperty<>();
@@ -30,6 +35,12 @@ public class OrderPM {
         OrderPM orderPM = new OrderPM();
         orderPM.setOrderId(orderDescriptiveInfo.getOrderId());
         orderPM.setCustomerName(orderDescriptiveInfo.getCustomerName());
+        orderPM.setContactInfos(orderDescriptiveInfo.getContactInfos());
+       List<ContactInfo> destinationList = orderDescriptiveInfo.getFinalDestinationContactInfos();
+       if(destinationList != null && !destinationList.isEmpty()){
+           orderPM.setDestinationAddress(destinationList.get(0));
+       }
+
         OrderInfo orderInfo = orderDescriptiveInfo.getOrderInfo();
         orderPM.setOrderPlacedWhen(orderInfo.getPlacedWhen());
         LinkedList<DeliveryStep> deliveryInfos = orderDescriptiveInfo.getDeliveryInfos();
@@ -133,17 +144,8 @@ public class OrderPM {
         this.currentAssignee.set(currentAssignee);
     }
 
-    public Object getAddress() {
-        return address.get();
-    }
 
-    public ObjectProperty addressProperty() {
-        return address;
-    }
 
-    public void setAddress(Object address) {
-        this.address.set(address);
-    }
     /*   public double getPrice() {
         return price.get();
     }
@@ -166,6 +168,31 @@ public class OrderPM {
 
     public void setOrderLastUpdate(DeliveryStep orderLastUpdate) {
         this.orderLastUpdate.set(orderLastUpdate);
+    }
+
+    public List<ContactInfo> getContactInfos() {
+        return contactInfos.get();
+    }
+
+    public ObjectProperty<List<ContactInfo>> contactInfosProperty() {
+        return contactInfos;
+    }
+
+    public void setContactInfos(List<ContactInfo> contactInfos) {
+        this.contactInfos.set(contactInfos);
+    }
+
+
+    public ContactInfo getDestinationAddress() {
+        return destinationAddress.get();
+    }
+
+    public ObjectProperty<ContactInfo> destinationAddressProperty() {
+        return destinationAddress;
+    }
+
+    public void setDestinationAddress(ContactInfo destinationAddress) {
+        this.destinationAddress.set(destinationAddress);
     }
 
     @Override

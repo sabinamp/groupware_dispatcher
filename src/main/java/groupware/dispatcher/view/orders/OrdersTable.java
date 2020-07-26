@@ -1,22 +1,15 @@
 package groupware.dispatcher.view.orders;
 
-import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
-import groupware.dispatcher.presentationmodel.CourierPM;
 import groupware.dispatcher.presentationmodel.OrderPM;
-import groupware.dispatcher.service.model.Address;
-import groupware.dispatcher.service.model.CourierStatus;
-import groupware.dispatcher.service.model.Email;
-import groupware.dispatcher.view.couriers.*;
+import groupware.dispatcher.service.model.ContactInfo;
 import groupware.dispatcher.view.util.ViewMixin;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
 
@@ -44,9 +37,9 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         columnId.setCellFactory(cell -> new OrderIDCell());
         columnId.setMinWidth(100);
 
-        TableColumn<OrderPM, Address> columnAddress = new TableColumn<>("Address");
-        columnAddress.setCellValueFactory(cell -> cell.getValue().addressProperty());
-        columnAddress.setCellFactory(cell -> new AddressCell());
+        TableColumn<OrderPM, ContactInfo> columnAddress = new TableColumn<>("Address");
+        columnAddress.setCellValueFactory(cell -> cell.getValue().destinationAddressProperty());
+        columnAddress.setCellFactory(cell -> new DestinationAddressCell());
         columnAddress.setMinWidth(200);
 
         getColumns().addAll(Arrays.asList(columnId, columnAddress));
