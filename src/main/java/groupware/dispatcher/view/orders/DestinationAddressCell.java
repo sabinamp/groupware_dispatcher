@@ -26,7 +26,13 @@ public class DestinationAddressCell extends TableCell<OrderPM, ContactInfo> {
         } else {
             if (item != null) {
                 Address address = item.getAddress();
-                String wholeAddressText =  item.getCompanyName() +"\n"+ address.getAddressLine()+"\n" +address.getStreetNmbr()+", "+ address.getCityName();
+                String addressLine;
+                if (address == null) {
+                    addressLine = " ";
+                } else {
+                    addressLine = address.getAddressLine() +"\n" +address.getStreetNmbr() +", "+ address.getCityName();
+                }
+                String wholeAddressText =  item.getCompanyName() +"\n"+ addressLine;
                 setText(wholeAddressText);
             }
         }

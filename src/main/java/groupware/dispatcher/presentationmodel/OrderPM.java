@@ -31,6 +31,7 @@ public class OrderPM {
     public OrderPM(){
 
     }
+
     public static OrderPM ofOrder(OrderDescriptiveInfo orderDescriptiveInfo){
         OrderPM orderPM = new OrderPM();
         orderPM.setOrderId(orderDescriptiveInfo.getOrderId());

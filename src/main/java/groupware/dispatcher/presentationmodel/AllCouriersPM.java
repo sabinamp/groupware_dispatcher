@@ -1,10 +1,11 @@
 package groupware.dispatcher.presentationmodel;
 
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.*;
-
+import javafx.scene.control.Alert;
 
 
 public class AllCouriersPM {
@@ -29,6 +30,12 @@ public class AllCouriersPM {
             System.out.println("AllCouriersPM Update "+ change);
 
             //todo - notification popup
+            Platform.runLater(()->{
+                    change.next();
+                    boolean wasUpdated = change.wasUpdated();
+                    if(wasUpdated )
+                    showAlertWithDefaultHeaderText(change);
+            });
         });
 
     }
@@ -80,5 +87,22 @@ public class AllCouriersPM {
 
     public void setCurrentCourierPM(CourierPM currentCourierPM) {
         this.currentCourierPM.set(currentCourierPM);
+    }
+
+    // Show a Information Alert with default header Text
+    private void showAlertWithDefaultHeaderText(ListChangeListener.Change<? extends CourierPM> change) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Courier Update");
+
+         alert.setHeaderText("Courier Update");
+        boolean wasUpdated = change.wasUpdated();
+
+        StringBuilder content= new StringBuilder();
+        if(wasUpdated){
+            content.append("Courier updated");
+        }
+        alert.setContentText(content.toString());
+
+        alert.showAndWait();
     }
 }

@@ -36,11 +36,12 @@ public class CourierStatusCell extends TableCell<CourierPM, CourierStatus> {
                 setText(item.toString());
                 System.out.println(item);
                 if(item.equals(CourierStatus.fromValue("Available"))){
-                   circle= new Circle(30,30,8, Color.rgb(102, 255, 102));
-                    circle.setEffect(new DropShadow());
+                    Color greenAvailable = Color.rgb(102, 255, 102);
+                   circle= new Circle(30,30,8, greenAvailable);
+
                 } else {
                     circle= new Circle(30,30,8, Color.rgb(230, 46, 0));
-                    circle.setEffect(new DropShadow());
+
                 }
                 imageView.getChildren().addAll(circle);
                 setGraphic(imageView);
