@@ -3,6 +3,7 @@ package groupware.dispatcher.presentationmodel;
 
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.service.model.OrderStatus;
+import groupware.dispatcher.service.util.ModelObjManager;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -10,7 +11,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.*;
 import javafx.scene.control.Alert;
+import javafx.scene.text.Text;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AllOrdersPM {
@@ -33,15 +37,21 @@ public class AllOrdersPM {
 
             System.out.println("AllOrdersPM Update"+ change);
             change.next();
+
+            boolean wasUpdated = change.wasUpdated();
+            boolean wasAdded = change.wasAdded();
+            List<OrderPM> listChanges = new ArrayList<>(change.getList());
+
             //todo - notification popup
             Platform.runLater(()->{
-                    int changeNb = change.getList().size();
-                    boolean wasUpdated = change.wasUpdated();
-                    boolean wasAdded = change.wasAdded();
+                int changeNb = change.getList().size();
                     System.out.println("showAlertWithDefaultHeaderText called. The number of updates or new orders " + changeNb);
-
-                        String changedOrder= change.toString();
-                        showAlertWithDefaultHeaderText(wasUpdated,changedOrder);
+                    if(listChanges.size() == changeNb){
+                        while(changeNb > 0){
+                            showAlertWithDefaultHeaderText(wasUpdated, listChanges.get(changeNb-1));
+                            changeNb--;
+                        }
+                    }
                     });
 
         });
@@ -56,37 +66,36 @@ public class AllOrdersPM {
     }
 
     // Show an Info Alert with default header Text
-    private void showAlertWithDefaultHeaderText(boolean updated, String change /*OrderPM changedOrder*/) {
+    private void showAlertWithDefaultHeaderText(boolean updated, OrderPM changedOrder) {
+        final String NotifyICON = "\uf0f3";
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Order Notification");
-        alert.setHeaderText("Order Update");
 
-        String content =change;
+        String headerTxt ="Order Notification";
+        alert.setHeaderText(headerTxt);
+        alert.setResizable(true);
+        StringBuilder content = new StringBuilder(changedOrder.getOrderId());
            // if(changedOrder.getOrderStatus().equals(OrderStatus.PENDING)) {
-          /*  if( !updated) {
-                content = "New order added. " + changedOrder.getOrderId() + " Order Status"
-                        + changedOrder.getOrderStatus() + "\\n Order Placed on " + changedOrder.getOrderPlacedWhen();
-            }else if(updated){
-                content = "Order updated "+ changedOrder.getOrderId() +" Order Status "
-                        +changedOrder.getOrderStatus()+"\\n Assigned to the Courier" +changedOrder.getCurrentAssignee() ;
+           if( updated) {
+               content.append("Order updated "+ changedOrder.getOrderId() )
+                       .append(" Order Status: ")
+                       .append(changedOrder.getOrderStatus())
+                       .append(" Assigned to the Courier " +changedOrder.getCurrentAssignee()
+                       );
+
+            }else{
+               content.append( "New order: ")
+                       .append(changedOrder.getOrderId())
+                       .append(" Order Status ")
+                       .append(changedOrder.getOrderStatus() )
+                       .append(" Order Placed on :")
+                       .append(changedOrder.getOrderPlacedWhen().format(DateTimeFormatter.ofPattern("yyyy-mm-dd"))
+
+                       );
             }
-*/
 
-       /* if( wasAdded) {
-            int changeNb = change.getList().size();
-            System.out.println("showAlertWithDefaultHeaderText called. The number of added orders" + changeNb);
-            for(int i= 0; i < changeNb; i++){
-                OrderPM newOrder= change.getList().get(i);
-                content = "New order added. "+ newOrder.getOrderId() +" Order Status"
-                        +newOrder.getOrderStatus() +"\n Order Placed on " +newOrder.getOrderPlacedWhen();
-            }
 
-        }else if(wasUpdated){
-            content = "Order updated "+ updatedOrder.getOrderId() +" Order Status "
-                    +updatedOrder.getOrderStatus()+ updatedOrder.getCurrentAssignee() ;
-
-        }*/
-        alert.setContentText(content);
+        alert.setContentText(content.toString());
         alert.showAndWait();
     }
 }

@@ -144,3 +144,7 @@
     -fx-min-width : 20;
     -fx-max-width : 20;
 }
+.fontawesome .text {
+    -fx-font-family: "FontAwesome";
+}
+

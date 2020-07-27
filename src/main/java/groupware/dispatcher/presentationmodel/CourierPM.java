@@ -18,7 +18,7 @@ public class CourierPM {
     private final ObjectProperty<CourierStatus> courierStatus = new SimpleObjectProperty<>();
     private final ObjectProperty<Conn> courierConnectionStatus = new SimpleObjectProperty<>();
 
-    private final ObjectProperty<Email> courierEmail = new SimpleObjectProperty<>();
+    private final StringProperty courierEmail = new  SimpleStringProperty(ELLIPSIS);
     private final ObjectProperty<Set<String>> assignedOrders = new SimpleObjectProperty<>();
     private StringProperty courierPhoneNumber = new SimpleStringProperty(ELLIPSIS);
 
@@ -41,7 +41,10 @@ public class CourierPM {
                 String phoneNumber= "...";
                 if(contactInfo != null){
                     Email email = contactInfo.getEmail();
-                    courierPM.setCourierEmail(email);
+                    if(email != null){
+                        courierPM.setCourierEmail(email.getEmail());
+                    }
+
                     List<Phone> phones = contactInfo.getPhones();
                     if(phones != null){
                         Phone phone = phones.get(0);
@@ -111,15 +114,15 @@ public class CourierPM {
         return name;
     }
 
-    public Email getCourierEmail() {
+    public String getCourierEmail() {
         return courierEmail.get();
     }
 
-    public ObjectProperty<Email> courierEmailProperty() {
+    public StringProperty courierEmailProperty() {
         return courierEmail;
     }
 
-    public void setCourierEmail(Email courierEmail) {
+    public void setCourierEmail(String courierEmail) {
         this.courierEmail.set(courierEmail);
     }
 

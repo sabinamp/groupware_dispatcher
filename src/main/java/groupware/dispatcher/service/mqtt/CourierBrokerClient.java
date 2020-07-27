@@ -84,6 +84,7 @@ public class CourierBrokerClient extends BrokerClient{
                     } else {
                         System.out.println(" - successful connection to the broker. The client clientCourierInfo is connected");
                         logger.info(" - successful connection to the broker. The client clientCourierInfo is connected");
+
                     }
                 });
     }
@@ -105,6 +106,7 @@ public class CourierBrokerClient extends BrokerClient{
                     } else {
                         System.out.println("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
                         logger.info("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
+                        clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/+/response").send();
                     }
                 });
     }
@@ -113,7 +115,7 @@ public class CourierBrokerClient extends BrokerClient{
         String topicName = "couriers/info/get/+/response";
         System.out.println("entering subscribeToGetCourierById for the topic "+topicName);
 
-        return this.clientCourierInfo.subscribeWith()
+        return this.clientCourierInfoSubscriber.subscribeWith()
                 .topicFilter(topicName)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
@@ -144,6 +146,7 @@ public class CourierBrokerClient extends BrokerClient{
                     } else {
                         // Handle successful subscription, e.g. logging or incrementing a metric
                         logger.info(" - subscribed to topic "+ topicName);
+
                     }
                 });
 

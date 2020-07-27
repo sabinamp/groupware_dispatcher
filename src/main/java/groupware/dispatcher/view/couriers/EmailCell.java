@@ -6,8 +6,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
+import javafx.scene.layout.StackPane;
 
-public class EmailCell extends TableCell<CourierPM, Email> {
+public class EmailCell extends TableCell<CourierPM, String> {
     private static final Insets INSETS = new Insets(1, 5, 1, 12);
 
     public EmailCell() {
@@ -17,14 +18,14 @@ public class EmailCell extends TableCell<CourierPM, Email> {
     }
 
     @Override
-    protected void updateItem(Email item, boolean empty) {
+    protected void updateItem(String item, boolean empty) {
        // super.updateItem(item, empty);
         if (empty) {
             setText(null);
             setGraphic(null);
         } else {
             if (item != null) {
-                setText(item.getEmail());
+                setText(item);
             }
         }
     }

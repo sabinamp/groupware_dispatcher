@@ -20,7 +20,7 @@ import java.util.List;
 
 
 public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
-
+    private static final String EMAIL_ICON = "\uf0e0";
     private AllCouriersPM couriersPModel;
     private ObservableList<CourierPM> selectedEntries;
     private ObservableList<Integer> selectedEntryIndex;
@@ -61,10 +61,11 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
         columnPhoneNumber.setCellFactory(cell -> new PhoneNumberCell());
         columnPhoneNumber.setMinWidth(180);
 
-        TableColumn<CourierPM, Email> columnEmail = new TableColumn<>("Email");
+        TableColumn<CourierPM, String> columnEmail = new TableColumn<>("Email");
+
         columnEmail.setCellValueFactory(cell->cell.getValue().courierEmailProperty());
         columnEmail.setCellFactory(cell -> new EmailCell());
-        columnEmail.setMinWidth(200);
+        columnEmail.setMinWidth(220);
 
         getColumns().addAll(Arrays.asList(columnId, columnName, columnStatus, columnPhoneNumber, columnEmail));
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
