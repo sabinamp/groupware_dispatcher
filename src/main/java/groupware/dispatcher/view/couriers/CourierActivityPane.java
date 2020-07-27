@@ -14,19 +14,21 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+import java.util.Set;
+
 public class CourierActivityPane extends GridPane implements ViewMixin {
 
     private Text paneTitle;
     private AllCouriersPM pmodel;
     private ObjectProperty<CourierPM> currentCourierPM = new SimpleObjectProperty<>();
 
-    private Label courierIdL /*= new Label("Courier ID")*/;
-    private Label courierNameL /*= new Label("Courier Name")*/;
-    private Label assignedOrdersL /*= new Label("Activity")*/;
+    private Label courierIdL;
+    private Label courierNameL;
+    private Label assignedOrdersL;
    // private Label currentTaskRequestsL;
 
-    private Text courierIdTxt /*= new Text("...")*/;
-    private Text courierNameTxt /*= new Text("...")*/;
+    private Text courierIdTxt ;
+    private Text courierNameTxt;
     private Text assignedOrdersTxt /*= new Text("...")*/;
   //  private Text currentTaskRequestsTxt;
 
@@ -54,7 +56,7 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         courierNameL = new Label("Courier Name");
 
         courierIdL = new Label("Courier ID");
-        assignedOrdersL = new Label("Activity");
+        assignedOrdersL = new Label("Current Orders: ");
 
         courierIdTxt = new Text("...");
         courierNameTxt = new Text("...");
@@ -71,11 +73,11 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         this.getChildren().add(paneTitle);
         ColumnConstraints firstLabelCol = new ColumnConstraints();
         firstLabelCol.setMaxWidth(ConstraintsBase.CONSTRAIN_TO_PREF);
-        firstLabelCol.setMinWidth(130);
-        firstLabelCol.setPrefWidth(130);
+        firstLabelCol.setMinWidth(140);
+        firstLabelCol.setPrefWidth(150);
 
         ColumnConstraints firstTxtCol = new ColumnConstraints();
-        firstTxtCol.setMinWidth(120);
+        firstTxtCol.setMinWidth(140);
         firstTxtCol.setFillWidth(true);
         firstTxtCol.setHgrow(Priority.ALWAYS);
 
@@ -107,16 +109,21 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         CourierPM current= getCurrentCourierPM();
         courierIdTxt = new Text(getCurrentCourierPM().getCourierId());
         courierNameTxt = new Text(current.getName());
-      //  assignedOrdersTxt = new Text(current.getAssignedOrders().toString());
+        Set<String> assignedOrders= current.getAssignedOrders();
+        String assignedOrdersTxtContent= "No assigned orders yet.";
+        if(assignedOrders != null && !assignedOrders.isEmpty()){
+            assignedOrdersTxtContent = assignedOrders.toString();
+        }
+        assignedOrdersTxt = new Text(assignedOrdersTxtContent);
 
 
         add(courierIdTxt,1,1);
         add(courierNameTxt, 1, 2);
-       // add(assignedOrdersTxt,1,3);
+        add(assignedOrdersTxt,1,3);
     }
 
     private void deleteContent() {
-        getChildren().removeAll( courierIdTxt, courierNameTxt/*, assignedOrdersTxt*/);
+        getChildren().removeAll( courierIdTxt, courierNameTxt, assignedOrdersTxt);
     }
 
     @Override

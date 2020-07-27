@@ -31,13 +31,15 @@ public class CourierPM {
 
         if(courierId != null){
             courierPM.setCourierId(courierId);
-
+            String name="Courier name";
+            CourierStatus status = CourierStatus.NOT_AVAILABLE_BREAK;
+            ContactInfo contactInfo;
             if( info != null){
-                courierPM.setName(info.getCourierName());
-                courierPM.setCourierStatus(info.getStatus());
+                name = info.getCourierName();
+                status = info.getStatus();
                 courierPM.setCourierConnectionStatus(info.getConn());
-
-                ContactInfo contactInfo = info.getContactInfo();
+                courierPM.setAssignedOrders(info.getAssignedOrders());
+                contactInfo = info.getContactInfo();
                 String phoneNumber= "...";
                 if(contactInfo != null){
                     Email email = contactInfo.getEmail();
@@ -56,11 +58,15 @@ public class CourierPM {
                     } else{
                         System.out.println(courierId +" the list if courier phones is null");
                     }
+
                 }
+                courierPM.setName(name);
+                courierPM.setCourierStatus(status);
                 courierPM.setCourierPhoneNumber(phoneNumber);
                  } else{
                      System.out.println(courierId +" Courier info is null");
                 }
+
              }
             else {
                 System.out.println(courierId + " The constructor CourierPM called. The arg courier info is null.");

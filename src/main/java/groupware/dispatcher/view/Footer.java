@@ -7,11 +7,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 public class Footer extends BorderPane implements ViewMixin {
 
     private final RootPM rootPM;
-    private Label title;
+    private Text title;
 
     public Footer(RootPM rootPM) {
         this.rootPM = rootPM;
@@ -21,9 +22,10 @@ public class Footer extends BorderPane implements ViewMixin {
 
     @Override
     public void initializeParts() {
-        title = new Label();
-        title.getStyleClass().add("label");
+        title = new Text();
+
         getStyleClass().add("footer");
+        title.getStyleClass().add("text");
     }
 
     @Override

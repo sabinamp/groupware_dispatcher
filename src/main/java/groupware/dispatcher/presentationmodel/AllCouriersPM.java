@@ -28,13 +28,13 @@ public class AllCouriersPM {
     private void setupValueChangedListeners() {
         allCouriers.addListener((ListChangeListener.Change<? extends CourierPM> change) -> {
             System.out.println("AllCouriersPM Update "+ change);
-
+            change.next();
+            boolean wasUpdated = change.wasUpdated();
             //todo - notification popup
             Platform.runLater(()->{
-                    change.next();
-                    boolean wasUpdated = change.wasUpdated();
+
                     if(wasUpdated )
-                    showAlertWithDefaultHeaderText(change);
+                    showAlertWithDefaultHeaderText(wasUpdated, change.toString());
             });
         });
 
@@ -90,16 +90,15 @@ public class AllCouriersPM {
     }
 
     // Show a Information Alert with default header Text
-    private void showAlertWithDefaultHeaderText(ListChangeListener.Change<? extends CourierPM> change) {
+    private void showAlertWithDefaultHeaderText(boolean wasUpdated, String change) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Courier Update");
 
          alert.setHeaderText("Courier Update");
-        boolean wasUpdated = change.wasUpdated();
 
-        StringBuilder content= new StringBuilder();
+        StringBuilder content= new StringBuilder("Courier Notification");
         if(wasUpdated){
-            content.append("Courier updated");
+            content.append("Courier Update.").append(change);
         }
         alert.setContentText(content.toString());
 
