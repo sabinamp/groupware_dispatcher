@@ -22,19 +22,20 @@ public class AllCouriersPM {
     public AllCouriersPM(){
         setupValueChangedListeners();
         setupBindings();
-
     }
 
     private void setupValueChangedListeners() {
-        allCouriers.addListener((ListChangeListener.Change<? extends CourierPM> change) -> {
+        syncAllCouriers.addListener((ListChangeListener.Change<? extends CourierPM> change) -> {
             System.out.println("AllCouriersPM Update "+ change);
             change.next();
             boolean wasUpdated = change.wasUpdated();
             //todo - notification popup
             Platform.runLater(()->{
 
-                    if(wasUpdated )
-                    showAlertWithDefaultHeaderText(wasUpdated, change.toString());
+                    if(wasUpdated ){
+                        showAlertWithDefaultHeaderText(change.toString());
+                    }
+
             });
         });
 
@@ -50,8 +51,8 @@ public class AllCouriersPM {
     }
     private void setupBindings() {
         courierCountProperty().bind(Bindings.size(allCouriers));
-
     }
+
     public int getCourierCount() {
         return courierCount.get();
     }
@@ -90,17 +91,14 @@ public class AllCouriersPM {
     }
 
     // Show a Information Alert with default header Text
-    private void showAlertWithDefaultHeaderText(boolean wasUpdated, String change) {
+    private void showAlertWithDefaultHeaderText( String change) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Courier Update");
-
          alert.setHeaderText("Courier Update");
 
-        StringBuilder content= new StringBuilder("Courier Notification");
-        if(wasUpdated){
-            content.append("Courier Update.").append(change);
-        }
-        alert.setContentText(content.toString());
+        String content= "Courier Update "+change;
+
+        alert.setContentText(content);
 
         alert.showAndWait();
     }

@@ -38,7 +38,7 @@ public class CourierBrokerClient extends BrokerClient{
                 .identifier(IDENTIFIER.toString())
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
-                .automaticReconnectWithDefaultConfig()
+               // .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientCourierInfoSubscriber = MqttClient.builder()
                 .useMqttVersion3()
@@ -66,7 +66,7 @@ public class CourierBrokerClient extends BrokerClient{
         String topicName= "couriers/info/get/" + courierId;
         System.out.println("connecting to Broker and subscribing for courier "+courierId);
         this.clientCourierInfo.connectWith()
-                .keepAlive(60)
+                .keepAlive(100)
                 .cleanSession(true)
               /*  .willPublish()
                 .topic("couriers/info/get/" + courierId)
@@ -92,7 +92,7 @@ public class CourierBrokerClient extends BrokerClient{
     public void connectAndSubscribeForCourierInfoResponse(){
         System.out.println("connecting to Broker and subscribing for courier info. ");
         this.clientCourierInfoSubscriber.connectWith()
-                .keepAlive(180)
+                .keepAlive(100)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
@@ -108,7 +108,7 @@ public class CourierBrokerClient extends BrokerClient{
                         logger.info("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
 
                     }
-                    clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/+/response").send();
+                    //clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/+/response").send();
                 });
     }
 
@@ -147,7 +147,6 @@ public class CourierBrokerClient extends BrokerClient{
                     } else {
                         // Handle successful subscription, e.g. logging or incrementing a metric
                         logger.info(" - subscribed to topic "+ topicName);
-
                     }
                 });
 

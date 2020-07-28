@@ -2,6 +2,7 @@ package groupware.dispatcher;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
+import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
@@ -10,6 +11,7 @@ import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.ApplicationUI;
 import groupware.dispatcher.view.MainHeader;
+import groupware.dispatcher.view.TaskRequestListView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -30,7 +32,8 @@ public class AppStarter extends Application {
     private ApplicationUI rootPanel;
     private RootPM rootPM;
 
-
+    private AllOrdersPM allOrdersPM;
+    private AllCouriersPM allCouriersPM;
     private volatile boolean enough = false;
     private final Text txtTime = new Text();
     private final CourierServiceImpl courierService =  new CourierServiceImpl();
@@ -57,6 +60,7 @@ public class AppStarter extends Application {
         public void run() {
 
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
+
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
 
@@ -69,9 +73,10 @@ public class AppStarter extends Application {
         rootPM = new RootPM();
 
         connectToBroker.run();
-        AllCouriersPM allCouriersPM = courierService.getAllCouriersPM();
-        AllOrdersPM allOrdersPM = orderService.getAllOrdersPM();
-        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
+        allCouriersPM = courierService.getAllCouriersPM();
+        allOrdersPM = orderService.getAllOrdersPM();
+        AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(orderService, courierService);
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, allTaskRequestsPM);
         rootPanel.addClockToHeader(txtTime);
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
@@ -81,6 +86,7 @@ public class AppStarter extends Application {
 
         });
         rootPanel.addExitButton(exitBtn);
+
 
         Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");

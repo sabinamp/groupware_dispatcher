@@ -2,6 +2,7 @@ package groupware.dispatcher.view;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
+import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.view.couriers.CouriersPane;
 import groupware.dispatcher.view.orders.OrdersPane;
@@ -18,15 +19,18 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         private Footer footer;
         private CouriersPane couriersPane;
         private OrdersPane ordersPane;
+        private TaskRequestListView tasksPane;
         private AllOrdersPM allOrdersPM;
         private AllCouriersPM allCouriersPM;
+        private AllTaskRequestsPM allTaskRequestsPM;
 
         private final RootPM rootPM;
 
-        public ApplicationUI(RootPM rootPM,AllOrdersPM allOrdersPM,AllCouriersPM allCouriersPM ) {
+        public ApplicationUI(RootPM rootPM,AllOrdersPM allOrdersPM,AllCouriersPM allCouriersPM, AllTaskRequestsPM allTaskRequestsPM ) {
                 this.rootPM = rootPM;
                 this.allOrdersPM = allOrdersPM;
                 this.allCouriersPM = allCouriersPM;
+                this.allTaskRequestsPM = allTaskRequestsPM;
                 init();
         }
 
@@ -45,18 +49,22 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 footer = new Footer(rootPM);
                 couriersPane = new CouriersPane(allCouriersPM);
                 ordersPane = new OrdersPane(allOrdersPM);
+
+                allTaskRequestsPM.setUpFirstTask();
+                tasksPane = new TaskRequestListView(allTaskRequestsPM);
+
         }
 
         @Override
         public void layoutParts() {
 
-                this.setRight(new Text("Right "));
+                this.setTop(header);
+                BorderPane.setAlignment(header, Pos.CENTER);
                 setMainContent(couriersPane);
 
                 this.setBottom(footer);
                 this.setLeft(new Text("Left"));
-                this.setTop(header);
-                BorderPane.setAlignment(header, Pos.CENTER);
+                this.setRight(tasksPane);
 
         }
 
@@ -84,4 +92,6 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                         header.couriersBtn.setDisable(false);
                 }
         }
+
+
 }

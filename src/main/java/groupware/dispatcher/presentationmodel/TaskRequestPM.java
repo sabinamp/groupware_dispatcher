@@ -2,6 +2,7 @@ package groupware.dispatcher.presentationmodel;
 
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.ShiftType;
+import groupware.dispatcher.service.model.TaskType;
 import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
@@ -14,12 +15,13 @@ public class TaskRequestPM {
     private final StringProperty assigneeId = new SimpleStringProperty();
     private final StringProperty addressLine = new SimpleStringProperty();
     private final ObjectProperty<DeliveryType> deliveryType = new SimpleObjectProperty<>();
-    private final ObjectProperty<DeliveryType> taskType = new SimpleObjectProperty<>();
+
+
+    private final ObjectProperty<TaskType> taskType = new SimpleObjectProperty<>();
     private final ObjectProperty<ShiftType> shiftType = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> dueOn = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> sentWhen = new SimpleObjectProperty<>();
     private final BooleanProperty accepted= new SimpleBooleanProperty();
-
 
     private final LongProperty timeoutMinutes = new SimpleLongProperty(5);
 
@@ -97,17 +99,7 @@ public class TaskRequestPM {
         this.deliveryType.set(deliveryType);
     }
 
-    public DeliveryType getTaskType() {
-        return taskType.get();
-    }
 
-    public ObjectProperty<DeliveryType> taskTypeProperty() {
-        return taskType;
-    }
-
-    public void setTaskType(DeliveryType taskType) {
-        this.taskType.set(taskType);
-    }
 
     public ShiftType getShiftType() {
         return shiftType.get();
@@ -169,5 +161,16 @@ public class TaskRequestPM {
         this.timeoutMinutes.set(timeoutMinutes);
     }
 
+    public TaskType getTaskType() {
+        return taskType.get();
+    }
+
+    public ObjectProperty<TaskType> taskTypeProperty() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType.set(taskType);
+    }
     
 }

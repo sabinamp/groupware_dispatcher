@@ -22,18 +22,26 @@ public class AllOrdersPM {
     private final IntegerProperty orderCount = new SimpleIntegerProperty();
 
     private final ObservableList<OrderPM> allOrders = FXCollections.observableArrayList();
+    private final ObservableMap<String, OrderPM> allOrdersMap = FXCollections.observableHashMap();
 
 
-
+    private final ObservableMap<String, OrderPM> syncAllOrdersMap = FXCollections.synchronizedObservableMap(allOrdersMap);
     private final ObservableList<OrderPM> syncAllOrders = FXCollections.synchronizedObservableList(allOrders);
+
     public AllOrdersPM(){
         setupValueChangedListeners();
 
     }
 
     private void setupValueChangedListeners() {
+        syncAllOrdersMap.addListener(new MapChangeListener<String, OrderPM>() {
+            @Override
+            public void onChanged(Change<? extends String, ? extends OrderPM> change) {
+                System.out.println("syncAllOrdersMap Update"+ change);
+            }
+        });
 
-        allOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
+        syncAllOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
 
             System.out.println("AllOrdersPM Update"+ change);
             change.next();
@@ -59,6 +67,7 @@ public class AllOrdersPM {
 
     public void updateAllOrdersPM(OrderPM orderPM){
         syncAllOrders.add(orderPM);
+        syncAllOrdersMap.put(orderPM.getOrderId(), orderPM);
     }
 
     public ObservableList<OrderPM> getSyncAllOrders() {
@@ -77,11 +86,12 @@ public class AllOrdersPM {
         StringBuilder content = new StringBuilder(changedOrder.getOrderId());
            // if(changedOrder.getOrderStatus().equals(OrderStatus.PENDING)) {
            if( updated) {
-               content.append("Order updated "+ changedOrder.getOrderId() )
+               content.append("Order updated ")
+                       .append( changedOrder.getOrderId() )
                        .append(" Order Status: ")
                        .append(changedOrder.getOrderStatus())
-                       .append(" Assigned to the Courier " +changedOrder.getCurrentAssignee()
-                       );
+                       .append(" Assigned to the Courier ")
+                       .append(changedOrder.getCurrentAssignee());
 
             }else{
                content.append( "New order: ")
@@ -97,5 +107,10 @@ public class AllOrdersPM {
 
         alert.setContentText(content.toString());
         alert.showAndWait();
+    }
+
+
+    public ObservableMap<String, OrderPM> getSyncAllOrdersMap() {
+        return syncAllOrdersMap;
     }
 }

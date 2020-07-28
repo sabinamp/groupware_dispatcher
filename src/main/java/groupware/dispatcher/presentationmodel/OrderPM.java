@@ -18,6 +18,9 @@ public class OrderPM {
     private final ObjectProperty<ContactInfo> destinationAddress =  new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();
 
+
+
+    private final ObjectProperty<DeliveryType> orderType = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> scheduledParcelCollectionWhen = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> orderUpdatedWhen = new SimpleObjectProperty<>();
 
@@ -43,6 +46,7 @@ public class OrderPM {
        }
 
         OrderInfo orderInfo = orderDescriptiveInfo.getOrderInfo();
+        orderPM.setOrderType(orderInfo.getDeliveryType());
         orderPM.setOrderPlacedWhen(orderInfo.getPlacedWhen());
         LinkedList<DeliveryStep> deliveryInfos = orderDescriptiveInfo.getDeliveryInfos();
         DeliveryStep lastStep = null;
@@ -196,6 +200,17 @@ public class OrderPM {
         this.destinationAddress.set(destinationAddress);
     }
 
+    public DeliveryType getOrderType() {
+        return orderType.get();
+    }
+
+    public ObjectProperty<DeliveryType> orderTypeProperty() {
+        return orderType;
+    }
+
+    public void setOrderType(DeliveryType orderType) {
+        this.orderType.set(orderType);
+    }
     @Override
     public String toString() {
         return "OrderPM{" +

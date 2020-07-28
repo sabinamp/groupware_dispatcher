@@ -52,7 +52,7 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         setPadding(new Insets(10, 10,10,8));
         paneTitle= new Text("Courier Activity");
         paneTitle.setFont(Font.font ("Roboto Regular", FontWeight.BOLD, FontPosture.REGULAR, 16));
-
+        paneTitle.setUnderline(true);
         courierNameL = new Label("Courier Name");
 
         courierIdL = new Label("Courier ID");
@@ -108,14 +108,13 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
     private void updateContent() {
         CourierPM current= getCurrentCourierPM();
         courierIdTxt = new Text(getCurrentCourierPM().getCourierId());
-        courierNameTxt = new Text(current.getName());
+        courierNameTxt = new Text(current.getName()+ "     CURRENT STATUS: "+current.getCourierConnectionStatus());
         Set<String> assignedOrders= current.getAssignedOrders();
-        String assignedOrdersTxtContent= "No assigned orders yet.";
+        String assignedOrdersTxtContent = "No assigned orders yet.";
         if(assignedOrders != null && !assignedOrders.isEmpty()){
             assignedOrdersTxtContent = assignedOrders.toString();
         }
         assignedOrdersTxt = new Text(assignedOrdersTxtContent);
-
 
         add(courierIdTxt,1,1);
         add(courierNameTxt, 1, 2);
@@ -133,7 +132,7 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
        if(currentCourierPM != null){
            courierIdTxt.textProperty().bind(currentCourierPM.courierIdProperty());
            courierNameTxt.textProperty().bind(currentCourierPM.nameProperty());
-           //assignedOrdersTxt.textProperty().bind(currentCourierPM.assignedOrdersProperty().asString());
+           assignedOrdersTxt.textProperty().bind(currentCourierPM.assignedOrdersProperty().asString());
        }
 
     }
