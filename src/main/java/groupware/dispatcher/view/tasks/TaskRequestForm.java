@@ -1,4 +1,4 @@
-package groupware.dispatcher.view;
+package groupware.dispatcher.view.tasks;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
@@ -9,8 +9,7 @@ import javafx.scene.layout.GridPane;
 import java.awt.*;
 
 public class TaskRequestForm extends GridPane implements ViewMixin {
-    private AllOrdersPM ordersPM;
-    private AllCouriersPM couriersPM;
+
 
     private Label orderIdLabel;
     private Label courierIdLabel;

@@ -4,28 +4,21 @@ import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.RootPM;
-import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
-import groupware.dispatcher.service.OrderService;
 import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.ApplicationUI;
-import groupware.dispatcher.view.MainHeader;
-import groupware.dispatcher.view.TaskRequestListView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class AppStarter extends Application {
@@ -75,8 +68,8 @@ public class AppStarter extends Application {
         connectToBroker.run();
         allCouriersPM = courierService.getAllCouriersPM();
         allOrdersPM = orderService.getAllOrdersPM();
-        AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(orderService, courierService);
-        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, allTaskRequestsPM);
+        AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
         rootPanel.addClockToHeader(txtTime);
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));

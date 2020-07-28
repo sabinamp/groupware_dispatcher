@@ -22,8 +22,13 @@ public class TaskRequestPM {
     private final ObjectProperty<LocalDateTime> dueOn = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> sentWhen = new SimpleObjectProperty<>();
     private final BooleanProperty accepted= new SimpleBooleanProperty();
+    private final BooleanProperty done= new SimpleBooleanProperty();
 
-    private final LongProperty timeoutMinutes = new SimpleLongProperty(5);
+    private final LongProperty timeoutMinutes = new SimpleLongProperty(15);
+
+    public TaskRequestPM(){
+
+    }
 
     public String getName() {
         return name.get();
@@ -172,5 +177,16 @@ public class TaskRequestPM {
     public void setTaskType(TaskType taskType) {
         this.taskType.set(taskType);
     }
-    
+
+    public boolean isDone() {
+        return done.get();
+    }
+
+    public BooleanProperty doneProperty() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done.set(done);
+    }
 }

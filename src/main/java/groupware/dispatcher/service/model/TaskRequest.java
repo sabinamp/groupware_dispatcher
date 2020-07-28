@@ -40,6 +40,9 @@ public class TaskRequest {
     @JsonProperty("confirmed")
     private boolean confirmed = false;
 
+    @JsonProperty("done")
+    private boolean done = false;
+
     public TaskRequest taskId(String taskId) {
         this.taskId = taskId;
         return this;
@@ -84,6 +87,16 @@ public class TaskRequest {
         this.addressLine = addressLine;
         return this;
     }
+    public TaskRequest confirmed(boolean accepted){
+        this.confirmed = accepted;
+        return this;
+    }
+
+    public TaskRequest done(boolean done){
+        this.done = done;
+        return this;
+    }
+
     public String getTaskId() {
         return taskId;
     }
@@ -166,6 +179,13 @@ public class TaskRequest {
         this.addressLine = addressLine;
     }
 
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -184,13 +204,14 @@ public class TaskRequest {
                 Objects.equals(this.sentWhen, task.sentWhen) &&
                 Objects.equals(this.taskType, task.taskType) &&
                 Objects.equals(this.dueOn, task.dueOn) &&
-                Objects.equals(this.confirmed, task.confirmed);
+                Objects.equals(this.confirmed, task.confirmed)&&
+                Objects.equals(this.done, task.done);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(taskId, orderId, assigneeId, addressLine,sentWhen, deliveryType, taskType, dueOn,
-                confirmed);
+                confirmed, done);
     }
 
     @Override
@@ -206,6 +227,7 @@ public class TaskRequest {
         sb.append("    taskType: ").append(toIndentedString(taskType)).append("\n");
         sb.append("    dueOn: ").append(toIndentedString(dueOn)).append("\n");
         sb.append("    confirmed: ").append(toIndentedString(confirmed)).append("\n");
+        sb.append("    confirmed: ").append(toIndentedString(done)).append("\n");
         sb.append("}");
         return sb.toString();
     }

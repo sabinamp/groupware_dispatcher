@@ -6,6 +6,8 @@ import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.view.couriers.CouriersPane;
 import groupware.dispatcher.view.orders.OrdersPane;
+import groupware.dispatcher.view.tasks.TaskRequestsTable;
+import groupware.dispatcher.view.tasks.TasksPane;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,18 +21,17 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         private Footer footer;
         private CouriersPane couriersPane;
         private OrdersPane ordersPane;
-        private TaskRequestListView tasksPane;
+        private TasksPane tasksPane;
         private AllOrdersPM allOrdersPM;
         private AllCouriersPM allCouriersPM;
-        private AllTaskRequestsPM allTaskRequestsPM;
+
 
         private final RootPM rootPM;
 
-        public ApplicationUI(RootPM rootPM,AllOrdersPM allOrdersPM,AllCouriersPM allCouriersPM, AllTaskRequestsPM allTaskRequestsPM ) {
+        public ApplicationUI(RootPM rootPM,AllOrdersPM allOrdersPM,AllCouriersPM allCouriersPM) {
                 this.rootPM = rootPM;
                 this.allOrdersPM = allOrdersPM;
                 this.allCouriersPM = allCouriersPM;
-                this.allTaskRequestsPM = allTaskRequestsPM;
                 init();
         }
 
@@ -49,9 +50,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 footer = new Footer(rootPM);
                 couriersPane = new CouriersPane(allCouriersPM);
                 ordersPane = new OrdersPane(allOrdersPM);
-
-                allTaskRequestsPM.setUpFirstTask();
-                tasksPane = new TaskRequestListView(allTaskRequestsPM);
+                tasksPane = new TasksPane(allCouriersPM, allOrdersPM);
 
         }
 
@@ -61,10 +60,10 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 this.setTop(header);
                 BorderPane.setAlignment(header, Pos.CENTER);
                 setMainContent(couriersPane);
-
-                this.setBottom(footer);
-                this.setLeft(new Text("Left"));
+               // this.setLeft(new Text("Left"));
                 this.setRight(tasksPane);
+                this.setBottom(footer);
+
 
         }
 
