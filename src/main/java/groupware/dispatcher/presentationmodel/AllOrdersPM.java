@@ -34,7 +34,7 @@ public class AllOrdersPM {
     }
 
     private void setupValueChangedListeners() {
-        syncAllOrdersMap.addListener(new MapChangeListener<String, OrderPM>() {
+        syncAllOrdersMap.addListener(new MapChangeListener<>() {
             @Override
             public void onChanged(Change<? extends String, ? extends OrderPM> change) {
                 System.out.println("syncAllOrdersMap Update"+ change);
@@ -71,9 +71,12 @@ public class AllOrdersPM {
     }
 
     public ObservableList<OrderPM> getSyncAllOrders() {
-        return syncAllOrders;
+        return this.syncAllOrders;
     }
-
+    public ObservableList<OrderPM> getAllOrders()
+    {
+        return this.allOrders;
+    }
     // Show an Info Alert with default header Text
     private void showAlertWithDefaultHeaderText(boolean updated, OrderPM changedOrder) {
         final String NotifyICON = "\uf0f3";

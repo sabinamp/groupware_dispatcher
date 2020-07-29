@@ -24,12 +24,14 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
 
     private Label courierIdL;
     private Label courierNameL;
+    private Label courierPhoneL;
     private Label assignedOrdersL;
    // private Label currentTaskRequestsL;
 
     private Text courierIdTxt ;
     private Text courierNameTxt;
-    private Text assignedOrdersTxt /*= new Text("...")*/;
+    private Text assignedOrdersTxt;
+    private Text courierPhoneTxt;
   //  private Text currentTaskRequestsTxt;
 
 
@@ -54,17 +56,18 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         paneTitle.setFont(Font.font ("Roboto Regular", FontWeight.BOLD, FontPosture.REGULAR, 16));
         paneTitle.setUnderline(true);
         courierNameL = new Label("Courier Name");
-
+        courierPhoneL = new Label("Phone Number");
         courierIdL = new Label("Courier ID");
         assignedOrdersL = new Label("Current Orders: ");
 
         courierIdTxt = new Text("...");
         courierNameTxt = new Text("...");
         assignedOrdersTxt = new Text("...");
-
+        courierPhoneTxt = new Text("...");
         courierIdL.setLabelFor(courierIdTxt);
         courierNameL.setLabelFor(courierNameL);
         assignedOrdersL.setLabelFor(assignedOrdersTxt);
+        courierPhoneL.setLabelFor(courierPhoneTxt);
 
     }
 
@@ -81,15 +84,13 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         firstTxtCol.setFillWidth(true);
         firstTxtCol.setHgrow(Priority.ALWAYS);
 
-
-
-
        getColumnConstraints().addAll(firstLabelCol, firstTxtCol);
 
 
         addRow(1, courierIdL, courierIdTxt);
         addRow(2, courierNameL, courierNameTxt);
         addRow(3, assignedOrdersL, assignedOrdersTxt);
+        addRow(4, courierPhoneL, courierPhoneTxt);
     }
 
     @Override
@@ -108,7 +109,8 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
     private void updateContent() {
         CourierPM current= getCurrentCourierPM();
         courierIdTxt = new Text(getCurrentCourierPM().getCourierId());
-        courierNameTxt = new Text(current.getName()+ "     CURRENT STATUS: "+current.getCourierConnectionStatus());
+        courierNameTxt = new Text(current.getName());
+        String phone= current.getCourierPhoneNumber();
         Set<String> assignedOrders= current.getAssignedOrders();
         String assignedOrdersTxtContent = "No assigned orders yet.";
         if(assignedOrders != null && !assignedOrders.isEmpty()){
@@ -116,13 +118,15 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         }
         assignedOrdersTxt = new Text(assignedOrdersTxtContent);
 
+        courierPhoneTxt= new Text(phone);
         add(courierIdTxt,1,1);
         add(courierNameTxt, 1, 2);
         add(assignedOrdersTxt,1,3);
+        add(courierPhoneTxt, 1, 4);
     }
 
     private void deleteContent() {
-        getChildren().removeAll( courierIdTxt, courierNameTxt, assignedOrdersTxt);
+        getChildren().removeAll( courierIdTxt, courierNameTxt, assignedOrdersTxt, courierPhoneTxt);
     }
 
     @Override
@@ -133,6 +137,7 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
            courierIdTxt.textProperty().bind(currentCourierPM.courierIdProperty());
            courierNameTxt.textProperty().bind(currentCourierPM.nameProperty());
            assignedOrdersTxt.textProperty().bind(currentCourierPM.assignedOrdersProperty().asString());
+           courierPhoneTxt.textProperty().bind(currentCourierPM.courierPhoneNumberProperty());
        }
 
     }

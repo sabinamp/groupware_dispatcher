@@ -56,18 +56,18 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
         columnStatus.setCellFactory(cell-> new CourierStatusCell());
         columnStatus.setMinWidth(200);
 
-        TableColumn<CourierPM, String> columnPhoneNumber = new TableColumn<>("Phone Number");
+       /* TableColumn<CourierPM, String> columnPhoneNumber = new TableColumn<>("Phone Number");
         columnPhoneNumber.setCellValueFactory(cell->cell.getValue().courierPhoneNumberProperty());
         columnPhoneNumber.setCellFactory(cell -> new PhoneNumberCell());
-        columnPhoneNumber.setMinWidth(180);
+        columnPhoneNumber.setMinWidth(150);*/
 
-        TableColumn<CourierPM, String> columnEmail = new TableColumn<>("Email");
+       TableColumn<CourierPM, String> columnEmail = new TableColumn<>("Email");
 
         columnEmail.setCellValueFactory(cell->cell.getValue().courierEmailProperty());
         columnEmail.setCellFactory(cell -> new EmailCell());
-        columnEmail.setMinWidth(220);
+        columnEmail.setMinWidth(200);
 
-        getColumns().addAll(Arrays.asList(columnId, columnName, columnStatus, columnPhoneNumber, columnEmail));
+        getColumns().addAll(Arrays.asList(columnId, columnName, columnStatus, columnEmail));
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         TableViewSelectionModel<CourierPM> tsm = getSelectionModel();
 

@@ -7,10 +7,7 @@ import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.TilePane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -81,6 +78,8 @@ public class MainHeader extends HBox implements ViewMixin {
 
     public void addClockDemoToHeader(Text txtTimer){
         txtTimer.setFill(Color.MIDNIGHTBLUE);
+        timerBox.setSpacing(5);
+        timerBox.setPadding(new Insets(5));
         timerBox.getChildren().add(txtTimer);
     }
 

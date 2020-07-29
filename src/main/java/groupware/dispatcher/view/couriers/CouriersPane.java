@@ -24,7 +24,7 @@ public class CouriersPane extends VBox implements ViewMixin {
     @Override
     public void initializeSelf() {
         getStyleClass().add("couriers-pane");
-        setPrefWidth(725);
+        setPrefWidth(550);
 
     }
 

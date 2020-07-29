@@ -26,6 +26,7 @@ public class AllTaskRequestsPM {
         this.allCouriersPM= allCouriersPM;
         this.allOrdersPM = allOrdersPM;
         setupValueChangedListeners();
+        setUpFirstTask();
     }
 
 
@@ -46,9 +47,9 @@ public class AllTaskRequestsPM {
 
     public void setUpFirstTask(){
         TaskRequestPM task1= new TaskRequestPM();
-        task1.setTaskId("request1");
-        task1.setAssigneeId("C105");
-        task1.setOrderId("OR1125");
+        task1.setTaskId("TaskRequest1");
+        task1.setAssigneeId("C101");
+        task1.setOrderId("OR1111");
         OrderPM order1125 = allOrdersPM.getSyncAllOrdersMap().get("OR1125");
         if(order1125 != null){
 
@@ -57,7 +58,7 @@ public class AllTaskRequestsPM {
                 updateAllTaskRequestsPM(task1);
 
         }else{
-            System.out.println("setUpFirstTask - null order order1125");
+            System.out.println("setUpFirstTask - null order order1111");
         }
 
     }

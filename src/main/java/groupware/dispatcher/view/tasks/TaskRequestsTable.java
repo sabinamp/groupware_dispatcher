@@ -19,21 +19,20 @@ public class TaskRequestsTable extends TableView<TaskRequestPM> implements ViewM
     public static ObservableList<TaskRequestPM> items =
             FXCollections.observableArrayList( );
 
-    private TableView<TaskRequestPM> taskTable;
+
     private ObservableList<TaskRequestPM> selectedEntries;
     private ObservableList<Integer> selectedEntryIndex;
     private  TableViewSelectionModel<TaskRequestPM> tsm;
 
     public TaskRequestsTable(AllTaskRequestsPM pm){
         super();
-      this.pm = pm;
+       this.pm = pm;
         init();
     }
 
     @Override
     public void initializeParts() {
 
-        taskTable = new TableView<>(items);
 
         TableColumn<TaskRequestPM, String> columnId= new TableColumn<>("Task ID");
         columnId.setCellValueFactory(cell->cell.getValue().taskIdProperty());
@@ -62,7 +61,9 @@ public class TaskRequestsTable extends TableView<TaskRequestPM> implements ViewM
 
         getColumns().addAll(Arrays.asList(columnId, columnCourierId, columnOrderID, columnAccepted, columnDone));
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        tsm = taskTable.getSelectionModel();
+        setItems(pm.getSyncAllTasks());
+
+        tsm = getSelectionModel();
 
         tsm.setSelectionMode(SelectionMode.SINGLE);
         setItems( pm.getSyncAllTasks());
@@ -76,7 +77,6 @@ public class TaskRequestsTable extends TableView<TaskRequestPM> implements ViewM
 
     @Override
     public void layoutParts() {
-        this.getChildren().addAll(taskTable);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class TaskRequestsTable extends TableView<TaskRequestPM> implements ViewM
 
             System.out.println("Selected: "+ tsm.getSelectedItems().get(0));
             System.out.println("Focused: " +
-                    taskTable.getFocusModel().getFocusedItem());
+                    getFocusModel().getFocusedItem());
         });
     }
 

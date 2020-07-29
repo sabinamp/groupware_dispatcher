@@ -73,6 +73,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         }
 
         public void addClockToHeader(Text txtTimer){
+
                 header.addClockDemoToHeader(txtTimer);
         }
 
