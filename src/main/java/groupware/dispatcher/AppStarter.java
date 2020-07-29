@@ -70,6 +70,7 @@ public class AppStarter extends Application {
         allOrdersPM = orderService.getAllOrdersPM();
         AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
         rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
+
         rootPanel.addClockToHeader(txtTime);
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
@@ -79,7 +80,6 @@ public class AppStarter extends Application {
 
         });
         rootPanel.addExitButton(exitBtn);
-
 
         Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");

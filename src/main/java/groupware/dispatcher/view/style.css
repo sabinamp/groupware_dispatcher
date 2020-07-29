@@ -5,13 +5,13 @@
     -fx-spacing    : 4px;
     -fx-background-color: #273952;
     -fx-text-fill: white;
-    -fx-min-width: 1000px;
+    -fx-min-width: 900px;
 }
 .main-header {
     -fx-background-color: -fx-basic-color;
     -fx-pref-height: 40px;
     -fx-pref-width: 100%;
-    -fx-min-width: 600px;
+    -fx-min-width: 900px;
     -fx-font-family: 'Roboto Bold';
     -fx-font-size: 1.35em;
     -fx-border-color: #273952;
@@ -26,6 +26,7 @@
     -fx-spacing    : 10px;
     -fx-background-color: black ;
     -fx-text-fill: white;
+    -fx-min-width: 500px;
 }
 
 .invalid .text {
@@ -54,18 +55,21 @@
     -fx-font-size: 1.15em;
     -fx-text-fill: #323438;
     -fx-spacing: 20;
+
 }
 .couriers-pane{
     -fx-padding: 5;
     -fx-background-color: black;
     -fx-text-fill: #8A8C95;
     -fx-spacing: 20;
+    -fx-min-width: 500px;
 }
 .tasks-pane{
     -fx-padding: 5;
     -fx-background-color: transparent;
     -fx-text-fill: black;
     -fx-spacing: 20;
+    -fx-min-width: 500px;
 }
 
 .table-view {

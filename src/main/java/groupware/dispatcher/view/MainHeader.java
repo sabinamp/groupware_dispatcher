@@ -7,6 +7,8 @@ import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Separator;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -26,7 +28,7 @@ public class MainHeader extends HBox implements ViewMixin {
     HBox timerBox;
     Button ordersBtn;
     Button couriersBtn;
-
+    Button tasksBtn;
     public MainHeader(){
         init();
     }
@@ -51,18 +53,22 @@ public class MainHeader extends HBox implements ViewMixin {
         timerBox.setSpacing(8);
         ordersBtn = new Button("Orders");
         couriersBtn = new Button("Couriers");
+        tasksBtn = new Button("Tasks");
         ordersBtn.setMinWidth(100);
         couriersBtn.setMinWidth(100);
-        ordersBtn.setMinWidth(100);
+        tasksBtn.setMinWidth(100);
+        ordersBtn.setMaxWidth(200);
         couriersBtn.setMaxWidth(200);
-        Button btn= new Button("City Courier Services");
-        btn.setDisable(true);
+        tasksBtn.setMaxWidth(200);
+        Text title= new Text("City Courier");
+        //btn.setDisable(true);
 
         setHgrow(tilePane, Priority.ALWAYS);
         setPadding(new Insets(5));
 
-        tilePane.getChildren().addAll(timerBox);
-        topBanner.getChildren().addAll(btn, couriersBtn, ordersBtn,tilePane);
+        tilePane.getChildren().addAll(title,timerBox);
+        //ToolBar toolbar = new ToolBar(couriersBtn, new Separator(), ordersBtn,new Separator(), tasksBtn);
+        topBanner.getChildren().addAll(tilePane,couriersBtn, ordersBtn,  tasksBtn);
 
     }
 

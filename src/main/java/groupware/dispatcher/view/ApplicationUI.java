@@ -12,6 +12,7 @@ import groupware.dispatcher.view.util.ViewMixin;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 
@@ -44,14 +45,15 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         @Override
         public void initializeParts() {
                 header = new MainHeader();
-                header.ordersBtn.setOnAction(event -> setMainContent(ordersPane));
-                header.couriersBtn.setOnAction(event ->
-                        setMainContent(couriersPane));
                 footer = new Footer(rootPM);
                 couriersPane = new CouriersPane(allCouriersPM);
                 ordersPane = new OrdersPane(allOrdersPM);
                 tasksPane = new TasksPane(allCouriersPM, allOrdersPM);
 
+                header.ordersBtn.setOnAction(event -> setMainContent(ordersPane));
+                header.couriersBtn.setOnAction(event ->
+                        setMainContent(couriersPane));
+                header.tasksBtn.setOnAction(e-> setMainContent(tasksPane));
         }
 
         @Override
@@ -60,11 +62,9 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 this.setTop(header);
                 BorderPane.setAlignment(header, Pos.CENTER);
                 setMainContent(couriersPane);
-               // this.setLeft(new Text("Left"));
-                this.setRight(tasksPane);
+                //todo the chat pane
+                this.setRight(new TextArea("Chat"));
                 this.setBottom(footer);
-
-
         }
 
         @Override
@@ -73,7 +73,6 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         }
 
         public void addClockToHeader(Text txtTimer){
-
                 header.addClockDemoToHeader(txtTimer);
         }
 
@@ -87,8 +86,14 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 if(param instanceof CouriersPane){
                         header.couriersBtn.setDisable(true);
                         header.ordersBtn.setDisable(false);
+                        header.tasksBtn.setDisable(false);
                 }else if (param instanceof OrdersPane){
                         header.ordersBtn.setDisable(true);
+                        header.couriersBtn.setDisable(false);
+                        header.tasksBtn.setDisable(false);
+                }else if (param instanceof TasksPane){
+                        header.tasksBtn.setDisable(true);
+                        header.ordersBtn.setDisable(false);
                         header.couriersBtn.setDisable(false);
                 }
         }

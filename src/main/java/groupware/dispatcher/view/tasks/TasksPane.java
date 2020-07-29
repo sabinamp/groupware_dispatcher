@@ -20,6 +20,7 @@ public class TasksPane extends BorderPane implements ViewMixin {
     private TaskRequestsTable taskTable;
     private  HBox hbox;
     private AllTaskRequestsPM allTaskRequestsPM;
+
     private AllOrdersPM allOrdersPM;
     private AllCouriersPM allCouriersPM;
     TabPane tabPaneLeft;
@@ -42,34 +43,23 @@ public class TasksPane extends BorderPane implements ViewMixin {
     public void initializeParts() {
 
         taskTable = new TaskRequestsTable(allTaskRequestsPM);
-        hbox= new HBox();
-        hbox.setSpacing(10);
-        hbox.setPadding(new Insets(5));
-
-         taskForm = new TaskRequestForm();
-        Button addBtn = new Button("New Task");
-        addBtn.setOnAction((e) -> {
-            TaskRequestPM newTask = new TaskRequestPM();
-            // just a way to generate a new task request
-
-            //set task fields
-            //to do add a task AllTaskRequestsPM
-        });
-        ToolBar toolbar = new ToolBar(addBtn, new Separator(), new Button("Edit"));
-        this.hbox.getChildren().addAll(toolbar);
-        TreeItem<String> ti = new TreeItem<>("Orders");
-        Set<String> orderIds = allOrdersPM.getAllOrders().stream().map(o->o.getOrderId()).collect(Collectors.toSet());
+        taskForm = new TaskRequestForm(getAllOrdersPM(), getAllCouriersPM());
+        taskForm.setPrefWidth(300);
+        TreeItem<String> ti = new TreeItem<>("Completed Tasks");
+       /* Set<String> orderIds = allOrdersPM.getSyncAllOrders().stream().map(o->o.getOrderId()).collect(Collectors.toSet());
         orderIds.forEach(o-> {
             System.out.println("current order id in the tree:"+o);
             ti.getChildren().add(new TreeItem<>(o));
-        });
+        });*/
 
         TreeView<String> tv = new TreeView<>(ti);
 
         tabPaneLeft = new TabPane();
-        Tab tab1 = new Tab("Order List");
+        Tab tab1 = new Tab("Completed Tasks");
         tab1.setContent(tv);
-        tabPaneLeft.getTabs().addAll(tab1, new Tab("Chat"));
+        Tab tab3 = new Tab("Task Requests");
+        tab3.setContent(taskTable);
+        tabPaneLeft.getTabs().addAll(tab1, new Tab("Active Tasks"), tab3);
 
 
 
@@ -78,11 +68,19 @@ public class TasksPane extends BorderPane implements ViewMixin {
     @Override
     public void layoutParts() {
 
-        setTop(hbox);
-        setLeft(tabPaneLeft);
-        setCenter(taskTable);
+        setTop(new Text("Task Requests") );
+
+        setCenter(tabPaneLeft);
         setRight(taskForm);
-        setBottom(new Text("Task Requests"));
+
+    }
+
+    public AllOrdersPM getAllOrdersPM() {
+        return allOrdersPM;
+    }
+
+    public AllCouriersPM getAllCouriersPM() {
+        return allCouriersPM;
     }
 
 }
