@@ -8,22 +8,29 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Set;
 
-public class CourierActivityPane extends GridPane implements ViewMixin {
+public class CourierProfilePane extends GridPane implements ViewMixin {
 
     private Text paneTitle;
     private AllCouriersPM pmodel;
     private ObjectProperty<CourierPM> currentCourierPM = new SimpleObjectProperty<>();
-
+    private ImageView courierAvatar;
     private Label courierIdL;
-    private Label courierNameL;
+
     private Label courierPhoneL;
     private Label assignedOrdersL;
    // private Label currentTaskRequestsL;
@@ -36,7 +43,7 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
 
 
 
-    public CourierActivityPane(AllCouriersPM allCouriersPM){
+    public CourierProfilePane(AllCouriersPM allCouriersPM){
         this.pmodel = allCouriersPM;
         setCurrentCourierPM(allCouriersPM.getCurrentCourierPM());
         init();
@@ -46,16 +53,15 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
     @Override
     public void initializeSelf() {
         getStyleClass().add("activity-pane");
-        setPrefWidth(725);
+        setPrefWidth(350);
     }
 
     @Override
     public void initializeParts() {
         setPadding(new Insets(10, 10,10,8));
-        paneTitle= new Text("Courier Activity");
+        paneTitle= new Text("COURIER PROFILE");
         paneTitle.setFont(Font.font ("Roboto Regular", FontWeight.BOLD, FontPosture.REGULAR, 16));
-        paneTitle.setUnderline(true);
-        courierNameL = new Label("Courier Name");
+
         courierPhoneL = new Label("Phone Number");
         courierIdL = new Label("Courier ID");
         assignedOrdersL = new Label("Current Orders: ");
@@ -65,10 +71,13 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         assignedOrdersTxt = new Text("...");
         courierPhoneTxt = new Text("...");
         courierIdL.setLabelFor(courierIdTxt);
-        courierNameL.setLabelFor(courierNameL);
+
         assignedOrdersL.setLabelFor(assignedOrdersTxt);
         courierPhoneL.setLabelFor(courierPhoneTxt);
+        courierAvatar = new ImageView();
 
+        courierAvatar.setFitHeight(50);
+        courierAvatar.setFitWidth(50);
     }
 
     @Override
@@ -86,11 +95,13 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
 
        getColumnConstraints().addAll(firstLabelCol, firstTxtCol);
 
+        Color greenOnline = Color.rgb(102, 255, 102);
+        Circle circle= new Circle(30,30,8, greenOnline);
+        addRow(1, courierAvatar, courierNameTxt);
+        addRow(2, courierIdL, courierIdTxt);
 
-        addRow(1, courierIdL, courierIdTxt);
-        addRow(2, courierNameL, courierNameTxt);
-        addRow(3, assignedOrdersL, assignedOrdersTxt);
-        addRow(4, courierPhoneL, courierPhoneTxt);
+        addRow(4, assignedOrdersL, assignedOrdersTxt);
+        addRow(5, courierPhoneL, courierPhoneTxt);
     }
 
     @Override
@@ -108,6 +119,14 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
 
     private void updateContent() {
         CourierPM current= getCurrentCourierPM();
+        String courierId = current.getCourierId();
+
+
+        //Setting the image view
+        courierAvatar = new ImageView(CourierImage.getImage(courierId));
+
+        //Setting the position of the image
+
         courierIdTxt = new Text(getCurrentCourierPM().getCourierId());
         courierNameTxt = new Text(current.getName());
         String phone= current.getCourierPhoneNumber();
@@ -119,14 +138,15 @@ public class CourierActivityPane extends GridPane implements ViewMixin {
         assignedOrdersTxt = new Text(assignedOrdersTxtContent);
 
         courierPhoneTxt= new Text(phone);
-        add(courierIdTxt,1,1);
-        add(courierNameTxt, 1, 2);
-        add(assignedOrdersTxt,1,3);
-        add(courierPhoneTxt, 1, 4);
+        add(courierAvatar, 0, 1);
+        add(courierIdTxt,1,2);
+        add(courierNameTxt, 1, 1);
+        add(assignedOrdersTxt,1,4);
+        add(courierPhoneTxt, 1, 5);
     }
 
     private void deleteContent() {
-        getChildren().removeAll( courierIdTxt, courierNameTxt, assignedOrdersTxt, courierPhoneTxt);
+        getChildren().removeAll( courierIdTxt, courierNameTxt, assignedOrdersTxt, courierPhoneTxt, courierAvatar);
     }
 
     @Override

@@ -3,8 +3,13 @@ package groupware.dispatcher.view.tasks;
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
+import groupware.dispatcher.service.model.DeliveryType;
+import groupware.dispatcher.service.model.TaskRequest;
+import groupware.dispatcher.service.model.TaskType;
 import groupware.dispatcher.view.util.SimpleTextControl;
 import groupware.dispatcher.view.util.ViewMixin;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
@@ -24,16 +29,23 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
     private Text courierIdLabel;
     private Text orderIdLabel;
     private Text addressLineLabel;
+    private Text deliveryTypeLabel;
+    private Text taskTypeLabel;
 
-    private TextField orderIdField;
-    private TextField courierIdField;
-    private TextField addressLineField;
+    private Text addressLineField;
     private AllOrdersPM allOrdersPM;
     private AllCouriersPM allCouriersPM;
     private DatePicker datePicker;
     private ChoiceBox<String> orderIdChoiceBox;
     private ChoiceBox<String> courierIdChoiceBox;
+    private ChoiceBox<DeliveryType> deliveryTypeChoiceBox;
+    private ChoiceBox<TaskType> taskTypeChoiceBox;
     private javafx.scene.control.Button addBtn;
+
+
+
+
+    private ObjectProperty<TaskRequestPM> currentTask= new SimpleObjectProperty<>();
 
     public TaskRequestForm(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM){
         this.allOrdersPM = allOrdersPM;
@@ -58,7 +70,7 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
 
     @Override
     public void initializeParts() {
-     addBtn = new javafx.scene.control.Button("New Task");
+     addBtn = new javafx.scene.control.Button("Send Task Request");
      addBtn.setOnAction(e -> {
             TaskRequestPM newTask = new TaskRequestPM();
             // just a way to generate a new task request
@@ -73,14 +85,20 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
         taskDueOnLabel = new Text("Due ");
 
         addressLineLabel = new Text("Address Line");
-
+        taskTypeLabel = new Text("Task");
         //date picker to choose date
         datePicker = new DatePicker();
         orderIdChoiceBox = new ChoiceBox<>();
         orderIdChoiceBox.getItems().addAll
                 (allOrdersPM.getSyncAllOrdersMap().keySet());
         courierIdChoiceBox = new ChoiceBox<>();
-        courierIdChoiceBox.getItems().addAll(allCouriersPM.getAllCouriers().stream().map(c->c.getCourierId()).collect(Collectors.toSet()));
+        addressLineField = new Text("...");
+        deliveryTypeLabel = new Text("Delivery Type");
+        deliveryTypeChoiceBox = new ChoiceBox<DeliveryType>();
+        deliveryTypeChoiceBox.getItems().addAll(DeliveryType.STANDARD, DeliveryType.URGENT);
+        taskTypeChoiceBox = new ChoiceBox<>();
+        taskTypeChoiceBox.getItems().addAll(TaskType.DELIVERY_FIRST, TaskType.DELIVERY_SECOND, TaskType.PARCEL_COLLECTION);
+        //courierIdChoiceBox.getItems().addAll(allCouriersPM.getAllCouriers().stream().map(c->c.getCourierId()).collect(Collectors.toSet()));
     }
 
     @Override
@@ -89,10 +107,16 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
          add(orderIdLabel, 1, 2);
          add(taskDueOnLabel, 1, 3);
          add(addressLineLabel, 1, 4);
-        add(courierIdChoiceBox, 2,1);
-         add(orderIdChoiceBox, 2, 2);
+         add(deliveryTypeLabel, 1, 5);
+         add(taskTypeLabel, 1,6);
 
+         add(courierIdChoiceBox, 2,1);
+         add(orderIdChoiceBox, 2, 2);
          add(datePicker, 2, 3);
+         add(addressLineField, 2,4);
+         add(deliveryTypeChoiceBox, 2,5);
+         add(taskTypeChoiceBox,2,6);
+
          add(addBtn,1, 9);
     }
 
@@ -114,5 +138,17 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
     @Override
     public void addStylesheetFiles(String... stylesheetFile) {
 
+    }
+
+    public TaskRequestPM getCurrentTask() {
+        return currentTask.get();
+    }
+
+    public ObjectProperty<TaskRequestPM> currentTaskProperty() {
+        return currentTask;
+    }
+
+    public void setCurrentTask(TaskRequestPM currentTask) {
+        this.currentTask.set(currentTask);
     }
 }

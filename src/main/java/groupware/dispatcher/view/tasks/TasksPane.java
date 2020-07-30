@@ -3,18 +3,12 @@ package groupware.dispatcher.view.tasks;
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
-import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class TasksPane extends BorderPane implements ViewMixin {
     private TaskRequestsTable taskTable;
@@ -24,19 +18,19 @@ public class TasksPane extends BorderPane implements ViewMixin {
     private AllOrdersPM allOrdersPM;
     private AllCouriersPM allCouriersPM;
     TabPane tabPaneLeft;
-    TabPane tabPaneRight;
     TaskRequestForm taskForm;
 
     public TasksPane(AllCouriersPM allCouriersPM, AllOrdersPM allOrdersPM){
         this.allOrdersPM = allOrdersPM;
         this.allCouriersPM = allCouriersPM;
+        this.allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
         init();
     }
 
     @Override
     public void initializeSelf() {
         getStyleClass().add("tasks-pane");
-        this.allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
+
     }
 
     @Override
@@ -66,12 +60,9 @@ public class TasksPane extends BorderPane implements ViewMixin {
 
     @Override
     public void layoutParts() {
-
-        setTop(new Text("Task Requests") );
         setLeft(tabPaneLeft);
         setCenter(taskTable);
         setRight(taskForm);
-
     }
 
     public AllOrdersPM getAllOrdersPM() {

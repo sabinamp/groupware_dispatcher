@@ -92,7 +92,7 @@ public class CourierBrokerClient extends BrokerClient{
     public void connectAndSubscribeForCourierInfoResponse(){
         System.out.println("connecting to Broker and subscribing for courier info. ");
         this.clientCourierInfoSubscriber.connectWith()
-                .keepAlive(100)
+                .keepAlive(120)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
