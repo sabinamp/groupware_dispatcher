@@ -57,9 +57,8 @@ public class TasksPane extends BorderPane implements ViewMixin {
         tabPaneLeft = new TabPane();
         Tab tab1 = new Tab("Completed Tasks");
         tab1.setContent(tv);
-        Tab tab3 = new Tab("Task Requests");
-        tab3.setContent(taskTable);
-        tabPaneLeft.getTabs().addAll(tab1, new Tab("Active Tasks"), tab3);
+
+        tabPaneLeft.getTabs().addAll(tab1, new Tab("Active Tasks"));
 
 
 
@@ -69,8 +68,8 @@ public class TasksPane extends BorderPane implements ViewMixin {
     public void layoutParts() {
 
         setTop(new Text("Task Requests") );
-
-        setCenter(tabPaneLeft);
+        setLeft(tabPaneLeft);
+        setCenter(taskTable);
         setRight(taskForm);
 
     }

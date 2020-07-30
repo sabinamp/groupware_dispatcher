@@ -63,7 +63,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 BorderPane.setAlignment(header, Pos.CENTER);
                 setMainContent(couriersPane);
                 //todo the chat pane
-                this.setRight(new TextArea("Chat"));
+
                 this.setBottom(footer);
         }
 
