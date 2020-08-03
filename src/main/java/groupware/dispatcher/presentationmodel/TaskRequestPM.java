@@ -1,8 +1,6 @@
 package groupware.dispatcher.presentationmodel;
 
-import groupware.dispatcher.service.model.DeliveryType;
-import groupware.dispatcher.service.model.ShiftType;
-import groupware.dispatcher.service.model.TaskType;
+import groupware.dispatcher.service.model.*;
 import javafx.beans.property.*;
 
 import java.time.LocalDateTime;
@@ -13,36 +11,58 @@ public class TaskRequestPM {
     private StringProperty taskId = new SimpleStringProperty(ELLIPSIS);
     private final StringProperty orderId = new SimpleStringProperty();
     private final StringProperty assigneeId = new SimpleStringProperty();
-    private final StringProperty addressLine = new SimpleStringProperty();
     private final ObjectProperty<DeliveryType> deliveryType = new SimpleObjectProperty<>();
-
-
     private final ObjectProperty<TaskType> taskType = new SimpleObjectProperty<>();
-    private final ObjectProperty<ShiftType> shiftType = new SimpleObjectProperty<>();
+
     private final ObjectProperty<LocalDateTime> dueOn = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> sentWhen = new SimpleObjectProperty<>();
     private final BooleanProperty accepted= new SimpleBooleanProperty();
     private final BooleanProperty done= new SimpleBooleanProperty();
 
-    private final LongProperty timeoutMinutes = new SimpleLongProperty(15);
+
 
     public TaskRequestPM(){
 
     }
 
-    public String getName() {
-        return name.get();
+    public void reset() {
+        this.setDone(false);
+        this.setDueOn(null);
+        this.setAccepted(false);
+        this.setAssigneeId("");
+        this.setOrderId("");
+        this.setDeliveryType(null);
+        this.setTaskType(null);
+        this.setTaskId("");
     }
 
-    public StringProperty nameProperty() {
-        return name;
+    public static TaskRequestPM of(TaskRequest taskRequest){
+        TaskRequestPM taskPM= new TaskRequestPM();
+        taskPM.setTaskId(taskRequest.getTaskId());
+        taskPM.setTaskType(taskRequest.getTaskType());
+        taskPM.setDeliveryType(taskRequest.getDeliveryType());
+        taskPM.setOrderId(taskRequest.getOrderId());
+        taskPM.setAssigneeId(taskRequest.getAssigneeId());
+        taskPM.setAccepted(taskRequest.isConfirmed());
+        taskPM.setDone(taskRequest.isDone());
+        taskPM.setDueOn(taskRequest.getDueOn());
+        return taskPM;
     }
 
-    public void setName(String name) {
-        this.name.set(name);
+    public static TaskRequest toTaskRequest(TaskRequestPM taskPM){
+        TaskRequest taskRequest =  new TaskRequest();
+        taskRequest.setTaskId(taskPM.getTaskId());
+        taskRequest.setDone(taskPM.isDone());
+        taskRequest.setDueOn(taskPM.getDueOn());
+        taskRequest.setAssigneeId(taskPM.getAssigneeId());
+        taskRequest.setConfirmed(taskPM.isAccepted());
+        taskRequest.setSentWhen(taskPM.getSentWhen());
+        taskRequest.setDeliveryType(taskPM.getDeliveryType());
+        taskRequest.setTaskType(taskPM.getTaskType());
+        return taskRequest;
+
     }
 
-    private final StringProperty name = new SimpleStringProperty(ELLIPSIS);
 
     public String getTaskId() {
         return taskId.get();
@@ -80,17 +100,7 @@ public class TaskRequestPM {
         this.assigneeId.set(assigneeId);
     }
 
-    public String getAddressLine() {
-        return addressLine.get();
-    }
 
-    public StringProperty addressLineProperty() {
-        return addressLine;
-    }
-
-    public void setAddressLine(String addressLine) {
-        this.addressLine.set(addressLine);
-    }
 
     public DeliveryType getDeliveryType() {
         return deliveryType.get();
@@ -104,19 +114,6 @@ public class TaskRequestPM {
         this.deliveryType.set(deliveryType);
     }
 
-
-
-    public ShiftType getShiftType() {
-        return shiftType.get();
-    }
-
-    public ObjectProperty<ShiftType> shiftTypeProperty() {
-        return shiftType;
-    }
-
-    public void setShiftType(ShiftType shiftType) {
-        this.shiftType.set(shiftType);
-    }
 
     public LocalDateTime getDueOn() {
         return dueOn.get();
@@ -154,17 +151,7 @@ public class TaskRequestPM {
         this.accepted.set(accepted);
     }
 
-    public long getTimeoutMinutes() {
-        return timeoutMinutes.get();
-    }
 
-    public LongProperty timeoutMinutesProperty() {
-        return timeoutMinutes;
-    }
-
-    public void setTimeoutMinutes(long timeoutMinutes) {
-        this.timeoutMinutes.set(timeoutMinutes);
-    }
 
     public TaskType getTaskType() {
         return taskType.get();
@@ -189,4 +176,7 @@ public class TaskRequestPM {
     public void setDone(boolean done) {
         this.done.set(done);
     }
+
+
+
 }

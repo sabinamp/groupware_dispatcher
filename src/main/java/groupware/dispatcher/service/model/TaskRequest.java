@@ -17,9 +17,6 @@ public class TaskRequest {
     @JsonProperty("assigneeId")
     private String assigneeId = null;
 
-    @JsonProperty("addressLine")
-    private String addressLine = null;
-
     @JsonProperty("deliveryType")
     private DeliveryType deliveryType = null;
 
@@ -29,9 +26,6 @@ public class TaskRequest {
     @JsonProperty("dueOn")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
     private LocalDateTime  dueOn = null;
-
-    @JsonProperty("shift")
-    private ShiftType shift = null;
 
     @JsonProperty("sentWhen")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
@@ -58,10 +52,6 @@ public class TaskRequest {
         return this;
     }
 
-    public TaskRequest shift(ShiftType shift) {
-        this.shift = shift;
-        return this;
-    }
 
     public TaskRequest deliveryType(DeliveryType deliveryType) {
         this.deliveryType = deliveryType;
@@ -83,10 +73,6 @@ public class TaskRequest {
         return this;
     }
 
-    public TaskRequest addressLine(String addressLine) {
-        this.addressLine = addressLine;
-        return this;
-    }
     public TaskRequest confirmed(boolean accepted){
         this.confirmed = accepted;
         return this;
@@ -146,13 +132,6 @@ public class TaskRequest {
         this.dueOn = dueOn;
     }
 
-    public ShiftType getShift() {
-        return shift;
-    }
-
-    public void setShift(ShiftType shift) {
-        this.shift = shift;
-    }
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
     public LocalDateTime getSentWhen() {
@@ -169,14 +148,6 @@ public class TaskRequest {
 
     public void setConfirmed(boolean confirmed) {
         this.confirmed = confirmed;
-    }
-
-    public String getAddressLine() {
-        return addressLine;
-    }
-
-    public void setAddressLine(String addressLine) {
-        this.addressLine = addressLine;
     }
 
     public boolean isDone() {
@@ -199,7 +170,6 @@ public class TaskRequest {
         return  Objects.equals(this.taskId, task.taskId) &&
                 Objects.equals(this.orderId, task.orderId) &&
                 Objects.equals(this.assigneeId, task.assigneeId)&&
-                Objects.equals(this.addressLine, task.addressLine)&&
                 Objects.equals(this.deliveryType, task.deliveryType) &&
                 Objects.equals(this.sentWhen, task.sentWhen) &&
                 Objects.equals(this.taskType, task.taskType) &&
@@ -210,7 +180,7 @@ public class TaskRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskId, orderId, assigneeId, addressLine,sentWhen, deliveryType, taskType, dueOn,
+        return Objects.hash(taskId, orderId, assigneeId, sentWhen, deliveryType, taskType, dueOn,
                 confirmed, done);
     }
 
@@ -221,7 +191,6 @@ public class TaskRequest {
         sb.append("    taskId: ").append(toIndentedString(taskId)).append("\n");
         sb.append("    orderId: ").append(toIndentedString(orderId)).append("\n");
         sb.append("    assigneeId: ").append(toIndentedString(assigneeId)).append("\n");
-        sb.append("    addressLine: ").append(toIndentedString(addressLine)).append("\n");
         sb.append("    sentWhen: ").append(toIndentedString(sentWhen)).append("\n");
         sb.append("    deliveryType: ").append(toIndentedString(deliveryType)).append("\n");
         sb.append("    taskType: ").append(toIndentedString(taskType)).append("\n");

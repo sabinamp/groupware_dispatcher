@@ -22,7 +22,6 @@ orders/assignee/update/orderId
 
 
 couriers/info/get/courierId
-couriers/info/get/courierId/response
 couriers/info/update/courierId 
 
 The 2 topics below are used by groupware_dispatcher -

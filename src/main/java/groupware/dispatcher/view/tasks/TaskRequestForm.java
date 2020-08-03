@@ -2,6 +2,7 @@ package groupware.dispatcher.view.tasks;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
+import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.TaskRequest;
@@ -10,6 +11,7 @@ import groupware.dispatcher.view.util.SimpleTextControl;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
@@ -28,13 +30,13 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
     private Text taskDueOnLabel;
     private Text courierIdLabel;
     private Text orderIdLabel;
-    private Text addressLineLabel;
+
     private Text deliveryTypeLabel;
     private Text taskTypeLabel;
 
-    private Text addressLineField;
     private AllOrdersPM allOrdersPM;
     private AllCouriersPM allCouriersPM;
+    private AllTaskRequestsPM allTaskRequestsPM;
     private DatePicker datePicker;
     private ChoiceBox<String> orderIdChoiceBox;
     private ChoiceBox<String> courierIdChoiceBox;
@@ -47,9 +49,11 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
 
     private ObjectProperty<TaskRequestPM> currentTask= new SimpleObjectProperty<>();
 
-    public TaskRequestForm(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM){
+    public TaskRequestForm(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, AllTaskRequestsPM allTasks){
         this.allOrdersPM = allOrdersPM;
         this.allCouriersPM = allCouriersPM;
+        this.allTaskRequestsPM = allTasks;
+        currentTaskProperty().setValue(allTasks.getCurrentTaskRequest());
         init();
     }
 
@@ -70,21 +74,15 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
 
     @Override
     public void initializeParts() {
-     addBtn = new javafx.scene.control.Button("Send Task Request");
-     addBtn.setOnAction(e -> {
-            TaskRequestPM newTask = new TaskRequestPM();
-            // just a way to generate a new task request
-
-            //set task fields
-            //to do add a task AllTaskRequestsPM
-        });
+     addBtn = new javafx.scene.control.Button("Send Request");
+     addBtn.setOnAction(e -> this.send(e));
 
         courierIdLabel = new Text("Courier ID");
         orderIdLabel = new Text("Order ID");
 
         taskDueOnLabel = new Text("Due ");
 
-        addressLineLabel = new Text("Address Line");
+
         taskTypeLabel = new Text("Task");
         //date picker to choose date
         datePicker = new DatePicker();
@@ -92,9 +90,9 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
         orderIdChoiceBox.getItems().addAll
                 (allOrdersPM.getSyncAllOrdersMap().keySet());
         courierIdChoiceBox = new ChoiceBox<>();
-        addressLineField = new Text("...");
+
         deliveryTypeLabel = new Text("Delivery Type");
-        deliveryTypeChoiceBox = new ChoiceBox<DeliveryType>();
+        deliveryTypeChoiceBox = new ChoiceBox<>();
         deliveryTypeChoiceBox.getItems().addAll(DeliveryType.STANDARD, DeliveryType.URGENT);
         taskTypeChoiceBox = new ChoiceBox<>();
         taskTypeChoiceBox.getItems().addAll(TaskType.DELIVERY_FIRST, TaskType.DELIVERY_SECOND, TaskType.PARCEL_COLLECTION);
@@ -106,14 +104,14 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
          add(courierIdLabel, 1, 1);
          add(orderIdLabel, 1, 2);
          add(taskDueOnLabel, 1, 3);
-         add(addressLineLabel, 1, 4);
+
          add(deliveryTypeLabel, 1, 5);
          add(taskTypeLabel, 1,6);
 
          add(courierIdChoiceBox, 2,1);
          add(orderIdChoiceBox, 2, 2);
          add(datePicker, 2, 3);
-         add(addressLineField, 2,4);
+
          add(deliveryTypeChoiceBox, 2,5);
          add(taskTypeChoiceBox,2,6);
 
@@ -138,6 +136,11 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
     @Override
     public void addStylesheetFiles(String... stylesheetFile) {
 
+    }
+
+    private void send(ActionEvent evt) {
+        TaskRequestPM task = new TaskRequestPM();
+        this.allTaskRequestsPM.updateAllTaskRequestsPM(task);
     }
 
     public TaskRequestPM getCurrentTask() {

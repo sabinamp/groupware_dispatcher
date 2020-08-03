@@ -37,7 +37,7 @@ public class TasksPane extends BorderPane implements ViewMixin {
     public void initializeParts() {
 
         taskTable = new TaskRequestsTable(allTaskRequestsPM);
-        taskForm = new TaskRequestForm(getAllOrdersPM(), getAllCouriersPM());
+        taskForm = new TaskRequestForm(getAllOrdersPM(), getAllCouriersPM(), allTaskRequestsPM);
         taskForm.setPrefWidth(300);
         TreeItem<String> ti = new TreeItem<>("Completed Tasks");
        /* Set<String> orderIds = allOrdersPM.getSyncAllOrders().stream().map(o->o.getOrderId()).collect(Collectors.toSet());

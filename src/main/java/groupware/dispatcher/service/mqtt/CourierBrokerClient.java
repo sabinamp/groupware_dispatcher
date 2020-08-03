@@ -113,7 +113,7 @@ public class CourierBrokerClient extends BrokerClient{
     }
 
      CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(){
-        String topicName = "couriers/info/get/+/response";
+        String topicName = "couriers/info/get/#";
         System.out.println("entering subscribeToGetCourierById for the topic "+topicName);
 
         return this.clientCourierInfoSubscriber.subscribeWith()
