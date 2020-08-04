@@ -8,13 +8,13 @@ import groupware.dispatcher.service.TaskRequestServiceImpl;
 public class BrokerConnection {
     private CourierBrokerClient courierBrokerClient;
     private OrdersBrokerClient ordersBrokerClient;
-    //private TaskBrokerClient taskBrokerClient;
+    private TaskBrokerClient taskBrokerClient;
 
 
-    public BrokerConnection(CourierServiceImpl courierService, OrderServiceImpl orderService) {
+    public BrokerConnection(CourierServiceImpl courierService, OrderServiceImpl orderService, TaskRequestServiceImpl taskService) {
         courierBrokerClient = new CourierBrokerClient(courierService);
         ordersBrokerClient = new OrdersBrokerClient(orderService);
-       // taskBrokerClient = new TaskBrokerClient(courierService, taskService);
+        taskBrokerClient = new TaskBrokerClient(courierService, taskService);
         connectCourierServiceToBroker();
         connectOrderServiceToBroker();
     }

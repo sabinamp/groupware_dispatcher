@@ -112,7 +112,7 @@ public class CourierBrokerClient extends BrokerClient{
                         logger.info("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
 
                     }
-                    //clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/+/response").send();
+                    clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/#").send();
                 });
     }
 
