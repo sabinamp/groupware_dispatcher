@@ -3,6 +3,7 @@ package groupware.dispatcher.service;
 
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
+import groupware.dispatcher.service.model.CourierStatus;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ModelObjManager;
 
@@ -34,7 +35,7 @@ public class TaskRequestServiceImpl {
         this.allTaskRequestsPM = new AllTaskRequestsPM(orderService.getAllOrdersPM(), courierService.getAllCouriersPM());
     }
 
-      public TaskRequest getTaskRequestById(String taskId){
+    public TaskRequest getTaskRequestById(String taskId){
             return tasks.get(taskId);
       }
 
@@ -77,6 +78,14 @@ public class TaskRequestServiceImpl {
         return successful;
     }
 
+    public boolean updateTaskRequestAccepted(String taskId, boolean confirmed) {
+        TaskRequest task = getTaskRequestById(taskId);
+        task.setConfirmed(confirmed);
+        boolean successful = updateTaskRequest(taskId, task);
+        System.out.println("Successfully updated the task request : " + successful);
+        return successful;
+    }
+
 
     public AllTaskRequestsPM getAllTaskRequestsPM() {
         return allTaskRequestsPM;
@@ -98,7 +107,12 @@ public class TaskRequestServiceImpl {
     public void setCurrentTaskRequest(TaskRequest currentTaskRequest) {
         this.currentTaskRequest = currentTaskRequest;
     }
+
     public String convertToJson(TaskRequest taskRequest) {
        return ModelObjManager.convertToJSON(taskRequest);
+    }
+
+    public void confirmTask(String taskId, boolean accepted) {
+        updateTaskRequestAccepted(taskId, accepted);
     }
 }

@@ -8,13 +8,13 @@ import groupware.dispatcher.service.TaskRequestServiceImpl;
 public class BrokerConnection {
     private CourierBrokerClient courierBrokerClient;
     private OrdersBrokerClient ordersBrokerClient;
-    private TaskRequestServiceImpl taskRequestService;
+    //private TaskBrokerClient taskBrokerClient;
 
 
-    public BrokerConnection(CourierServiceImpl courierService, OrderServiceImpl orderService, TaskRequestServiceImpl taskService) {
-        courierBrokerClient = new CourierBrokerClient(courierService, taskService);
+    public BrokerConnection(CourierServiceImpl courierService, OrderServiceImpl orderService) {
+        courierBrokerClient = new CourierBrokerClient(courierService);
         ordersBrokerClient = new OrdersBrokerClient(orderService);
-
+       // taskBrokerClient = new TaskBrokerClient(courierService, taskService);
         connectCourierServiceToBroker();
         connectOrderServiceToBroker();
     }
@@ -49,5 +49,8 @@ public class BrokerConnection {
         ordersBrokerClient.connectAndRequestExistingOrder("OR1123");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1124");
         ordersBrokerClient.connectAndSubscribeForExistingOrders();
+
     }
+
+
 }

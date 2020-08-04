@@ -9,10 +9,7 @@ import groupware.dispatcher.presentationmodel.CourierPM;
 import groupware.dispatcher.service.CourierService;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
-import groupware.dispatcher.service.model.Conn;
-import groupware.dispatcher.service.model.Courier;
-import groupware.dispatcher.service.model.CourierInfo;
-import groupware.dispatcher.service.model.CourierStatus;
+import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 
@@ -28,14 +25,15 @@ public class CourierBrokerClient extends BrokerClient{
     private Mqtt3AsyncClient clientCourierUpdates;
     private Mqtt3AsyncClient clientCourierInfoSubscriber;
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
+    private Mqtt3AsyncClient clientTaskSubscriber;
     private CourierServiceImpl courierService;
-    private TaskRequestServiceImpl taskRequestService;
+
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(CourierBrokerClient.class));
 
 
-    public CourierBrokerClient(CourierServiceImpl courierService, TaskRequestServiceImpl taskRequestService){
+    public CourierBrokerClient(CourierServiceImpl courierService){
         this.courierService= courierService;
-        this.taskRequestService = taskRequestService;
+
         clientCourierInfo = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER.toString())
@@ -57,21 +55,15 @@ public class CourierBrokerClient extends BrokerClient{
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
-        clientTaskRequestsPublisher = MqttClient.builder()
-                .useMqttVersion3()
-                .identifier(UUID.randomUUID().toString())
-                .serverHost("127.0.0.1")
-                .serverPort(1883)
-                .automaticReconnectWithDefaultConfig()
-                .buildAsync();
+
     }
 
     void stopClientBrokerConnection(){
         clientCourierInfo.disconnect();
         clientCourierUpdates.disconnect();
         clientCourierInfoSubscriber.disconnect();
-        clientTaskRequestsPublisher.disconnect();
     }
+
 
    public void connectAndRequestCourier(String courierId){
         String topicName= "couriers/info/get/" + courierId;
@@ -99,6 +91,7 @@ public class CourierBrokerClient extends BrokerClient{
                     }
                 });
     }
+
 
     public void connectAndSubscribeForCourierInfoResponse(){
         System.out.println("connecting to Broker and subscribing for courier info. ");
@@ -178,11 +171,12 @@ public class CourierBrokerClient extends BrokerClient{
                         System.out.println("The connection to the broker failed."+ throwable.getMessage());
                     } else {
                         System.out.println("successful connection to the broker. The client clientCourierUpdates is connected");
-                        logger.info("successful connection to the broker. The client "+ clientCourierUpdates + " is connected");
+                        logger.info("successful connection to the broker. The client clientCourierUpdates is connected");
 
                     }
                 });
     }
+
 
     private CompletableFuture<Mqtt3SubAck> subscribeToCourierUpdates(){
         String topicUpdateInfo="couriers/info/update/#";
@@ -231,37 +225,9 @@ public class CourierBrokerClient extends BrokerClient{
                     }
                 });
 
-
     }
 
-    public void connectPublishTaskRequests(String courierId) {
-        String topicNewTaskRequest="orders/task/"+courierId+"/request";
-        this.clientTaskRequestsPublisher.connectWith()
-                .keepAlive(100)
-                .cleanSession(true)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> publishToTopic(clientCourierInfo,
-                        topicNewTaskRequest,
-                        taskRequestService.convertToJson(taskRequestService.getCurrentTaskRequest())) )
-                .whenComplete((connAck, throwable) -> {
-                    if (throwable != null) {
-                        // Handle connection failure
-                        logger.info("connectAndRequestCourier " + courierId + " The connection to the broker failed."
-                                + throwable.getMessage());
-                        System.out.println("connectAndRequestCourier " + courierId + " The connection to the broker failed."+ throwable.getMessage());
-                    } else {
-                        System.out.println(" - successful connection to the broker. The client clientCourierInfo is connected");
-                        logger.info(" - successful connection to the broker. The client clientCourierInfo is connected");
 
-                    }
-                });
-    }
-
- /*   private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates() {
-        String topicUpdateTasks="orders/task/"+courierId+"/#";
-
-    }*/
     public CourierServiceImpl getOrderService() {
         return courierService;
     }
