@@ -4,6 +4,7 @@ package groupware.dispatcher.service;
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.model.TaskRequest;
+import groupware.dispatcher.service.util.ModelObjManager;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -15,6 +16,9 @@ public class TaskRequestServiceImpl {
     private final Logger logger;
     private static Map<String, TaskRequest> tasks;
 
+
+
+    private TaskRequest currentTaskRequest;
     private OrderServiceImpl orderService;
     private CourierServiceImpl courierService;
 
@@ -41,6 +45,7 @@ public class TaskRequestServiceImpl {
         }else {
             tasks.put(id, taskRequest);
             allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
+            setCurrentTaskRequest(taskRequest);
             return true;
         }
     }
@@ -77,4 +82,23 @@ public class TaskRequestServiceImpl {
         return allTaskRequestsPM;
     }
 
+/*    public TaskRequest newTaskRequest(String courierId, TaskRequest taskRequest) {
+        setCurrentTaskRequest(taskRequest);
+        if(taskRequest.getAssigneeId().equalsIgnoreCase(courierId)){
+            return taskRequest;
+        }
+       else return null;
+    }*/
+
+
+    public TaskRequest getCurrentTaskRequest() {
+        return currentTaskRequest;
+    }
+
+    public void setCurrentTaskRequest(TaskRequest currentTaskRequest) {
+        this.currentTaskRequest = currentTaskRequest;
+    }
+    public String convertToJson(TaskRequest taskRequest) {
+       return ModelObjManager.convertToJSON(taskRequest);
+    }
 }

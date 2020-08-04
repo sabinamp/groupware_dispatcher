@@ -6,6 +6,7 @@ import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderServiceImpl;
+import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.ApplicationUI;
 import javafx.application.Application;
@@ -31,6 +32,7 @@ public class AppStarter extends Application {
     private final Text txtTime = new Text();
     private final CourierServiceImpl courierService =  new CourierServiceImpl();
     private final  OrderServiceImpl orderService = new OrderServiceImpl();
+    private final TaskRequestServiceImpl taskRequestService = new TaskRequestServiceImpl(orderService,courierService);
     // this is timer thread which will update out time view every second
     Thread timer = new Thread(() -> {
         SimpleDateFormat dt = new SimpleDateFormat("hh:mm:ss");
@@ -52,7 +54,7 @@ public class AppStarter extends Application {
         @Override
         public void run() {
 
-            BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService);
+            BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
 
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread

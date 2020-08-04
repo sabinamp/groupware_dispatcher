@@ -2,16 +2,19 @@ package groupware.dispatcher.service.mqtt;
 
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderServiceImpl;
+import groupware.dispatcher.service.TaskRequestServiceImpl;
 
 
 public class BrokerConnection {
     private CourierBrokerClient courierBrokerClient;
     private OrdersBrokerClient ordersBrokerClient;
+    private TaskRequestServiceImpl taskRequestService;
 
 
-    public BrokerConnection(CourierServiceImpl courierService, OrderServiceImpl orderService) {
-        courierBrokerClient = new CourierBrokerClient(courierService);
+    public BrokerConnection(CourierServiceImpl courierService, OrderServiceImpl orderService, TaskRequestServiceImpl taskService) {
+        courierBrokerClient = new CourierBrokerClient(courierService, taskService);
         ordersBrokerClient = new OrdersBrokerClient(orderService);
+
         connectCourierServiceToBroker();
         connectOrderServiceToBroker();
     }

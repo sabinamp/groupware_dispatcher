@@ -11,17 +11,16 @@ import javafx.collections.ObservableList;
 
 public class AllTaskRequestsPM {
     private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList();
-   /* private OrderServiceImpl orderService;
-    private CourierServiceImpl courierService;*/
+
     private AllCouriersPM allCouriersPM;
     private AllOrdersPM allOrdersPM;
+
     private final ObservableList<TaskRequestPM> syncAllTasks = FXCollections.synchronizedObservableList(allTasks);
 
     private ObjectProperty<TaskRequestPM> currentTaskRequest = new SimpleObjectProperty<>();
 
     public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM){
-     /*   this.courierService= couriers;
-        this.orderService = orders;*/
+
         this.allCouriersPM= allCouriersPM;
         this.allOrdersPM = allOrdersPM;
         setupValueChangedListeners();
