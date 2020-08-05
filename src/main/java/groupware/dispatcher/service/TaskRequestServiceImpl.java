@@ -33,6 +33,7 @@ public class TaskRequestServiceImpl {
         this.orderService = orderService;
         this.courierService = courierService;
         this.allTaskRequestsPM = new AllTaskRequestsPM(orderService.getAllOrdersPM(), courierService.getAllCouriersPM());
+
     }
 
     public TaskRequest getTaskRequestById(String taskId){
@@ -45,8 +46,9 @@ public class TaskRequestServiceImpl {
             return false;
         }else {
             tasks.put(id, taskRequest);
-            allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
             setCurrentTaskRequest(taskRequest);
+            allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
+
             return true;
         }
     }
@@ -91,13 +93,6 @@ public class TaskRequestServiceImpl {
         return allTaskRequestsPM;
     }
 
-/*    public TaskRequest newTaskRequest(String courierId, TaskRequest taskRequest) {
-        setCurrentTaskRequest(taskRequest);
-        if(taskRequest.getAssigneeId().equalsIgnoreCase(courierId)){
-            return taskRequest;
-        }
-       else return null;
-    }*/
 
 
     public TaskRequest getCurrentTaskRequest() {

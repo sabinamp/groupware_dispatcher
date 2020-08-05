@@ -39,10 +39,10 @@ public class TaskRequestPM {
     public static TaskRequestPM of(TaskRequest taskRequest){
         TaskRequestPM taskPM= new TaskRequestPM();
         taskPM.setTaskId(taskRequest.getTaskId());
-        taskPM.setTaskType(taskRequest.getTaskType());
-        taskPM.setDeliveryType(taskRequest.getDeliveryType());
         taskPM.setOrderId(taskRequest.getOrderId());
         taskPM.setAssigneeId(taskRequest.getAssigneeId());
+        taskPM.setTaskType(taskRequest.getTaskType());
+        taskPM.setDeliveryType(taskRequest.getDeliveryType());
         taskPM.setAccepted(taskRequest.isConfirmed());
         taskPM.setDone(taskRequest.isDone());
         taskPM.setDueOn(taskRequest.getDueOn());

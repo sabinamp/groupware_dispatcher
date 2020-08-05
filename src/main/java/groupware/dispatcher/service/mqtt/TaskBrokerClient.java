@@ -47,7 +47,6 @@ public class TaskBrokerClient extends BrokerClient{
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
-
     }
 
     void stopClientBrokerConnection(){
@@ -59,14 +58,14 @@ public class TaskBrokerClient extends BrokerClient{
     public void connectPublishTaskRequest(TaskRequest taskRequest) {
         String courierId= taskRequest.getAssigneeId();
         String taskId= taskRequest.getTaskId();
-        String topicNewTaskRequest="orders/"+taskId+"/"+courierId+"/request";
+        String topicNewTaskRequestFilter="orders/"+taskId+"/"+courierId+"/request";
         this.clientTaskRequestsPublisher.connectWith()
                 .keepAlive(100)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
                 .thenComposeAsync(v -> publishToTopic(clientTaskRequestsPublisher,
-                        topicNewTaskRequest,
+                        topicNewTaskRequestFilter,
                         taskRequestService.convertToJson(taskRequest)) )
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
@@ -105,7 +104,7 @@ public class TaskBrokerClient extends BrokerClient{
 
 
     private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(String taskId) {
-        String topic="orders/task/"+taskId+"/#";
+        String topic="orders/task/"+taskId+"/+";
         return clientTaskRequestsPublisher.subscribeWith()
                 .topicFilter(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
@@ -121,12 +120,14 @@ public class TaskBrokerClient extends BrokerClient{
                     }else if(topicEnd.equals("timeout")){
                         taskRequestService.confirmTask(taskId, false);
                         System.out.println("task timed out - update received for the task request "+ taskId);
+                    }else if(topicEnd.equals("completed")){
+                        taskRequestService.updateTaskRequestDone(taskId, true);
+                        System.out.println("task completed- update received for the task request "+ taskId);
                     }
-                    if( publish.getPayload().isPresent()){
-
+                   if( publish.getPayload().isPresent()){
                         System.out.println("update received for the task request sent to "+ taskId);
                         String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
-
+                        taskRequestService.updateTaskRequest(taskId, ModelObjManager.convertJsonToTaskRequest(receivedString));
                     }
                 })
                 .send()

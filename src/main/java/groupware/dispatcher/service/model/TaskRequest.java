@@ -37,6 +37,10 @@ public class TaskRequest {
     @JsonProperty("done")
     private boolean done = false;
 
+    @JsonProperty("completedWhen")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
+    private LocalDateTime completedWhen = null;
+
     public TaskRequest taskId(String taskId) {
         this.taskId = taskId;
         return this;
@@ -80,6 +84,11 @@ public class TaskRequest {
 
     public TaskRequest done(boolean done){
         this.done = done;
+        return this;
+    }
+
+    public TaskRequest completedWhen(LocalDateTime completedWhen) {
+        this.completedWhen = completedWhen;
         return this;
     }
 
@@ -142,6 +151,15 @@ public class TaskRequest {
         this.sentWhen = sentWhen;
     }
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
+    public LocalDateTime getCompletedWhen() {
+        return completedWhen;
+    }
+
+    public void setCompletedWhen(LocalDateTime completedWhen) {
+        this.completedWhen = completedWhen;
+    }
+
     public boolean isConfirmed() {
         return confirmed;
     }
@@ -175,13 +193,14 @@ public class TaskRequest {
                 Objects.equals(this.taskType, task.taskType) &&
                 Objects.equals(this.dueOn, task.dueOn) &&
                 Objects.equals(this.confirmed, task.confirmed)&&
-                Objects.equals(this.done, task.done);
+                Objects.equals(this.done, task.done) &&
+                Objects.equals(this.completedWhen, task.completedWhen);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(taskId, orderId, assigneeId, sentWhen, deliveryType, taskType, dueOn,
-                confirmed, done);
+                confirmed, done, completedWhen);
     }
 
     @Override
@@ -196,7 +215,8 @@ public class TaskRequest {
         sb.append("    taskType: ").append(toIndentedString(taskType)).append("\n");
         sb.append("    dueOn: ").append(toIndentedString(dueOn)).append("\n");
         sb.append("    confirmed: ").append(toIndentedString(confirmed)).append("\n");
-        sb.append("    confirmed: ").append(toIndentedString(done)).append("\n");
+        sb.append("    done: ").append(toIndentedString(done)).append("\n");
+        sb.append("    completedWhen: ").append(toIndentedString(completedWhen)).append("\n");
         sb.append("}");
         return sb.toString();
     }

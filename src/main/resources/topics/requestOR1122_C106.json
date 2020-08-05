@@ -1,0 +1,12 @@
+{
+  "taskId": "T01",
+  "orderId": "OR1122",
+  "assigneeId": "C106",
+  "deliveryType": "Urgent",
+  "taskType": "Parcel collection",
+  "dueOn": "29.05.2020 17:00",
+  "confirmed": "false",
+  "sentWhen": "27.05.2020 14:00",
+  "completedWhen": " ",
+  "done": "false"
+}

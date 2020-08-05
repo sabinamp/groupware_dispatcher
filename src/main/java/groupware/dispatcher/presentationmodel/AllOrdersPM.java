@@ -5,10 +5,7 @@ import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.service.model.OrderStatus;
 import groupware.dispatcher.service.util.ModelObjManager;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.scene.control.Alert;
 import javafx.scene.text.Text;
@@ -16,6 +13,8 @@ import javafx.scene.text.Text;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class AllOrdersPM {
     private final StringProperty paneTitle = new SimpleStringProperty("Orders");
@@ -25,11 +24,19 @@ public class AllOrdersPM {
     private final ObservableMap<String, OrderPM> allOrdersMap = FXCollections.observableHashMap();
 
 
+    private final  ObservableList<String> allOrderIDs = FXCollections.observableArrayList(allOrdersMap.keySet());
+
+
     private final ObservableMap<String, OrderPM> syncAllOrdersMap = FXCollections.synchronizedObservableMap(allOrdersMap);
     private final ObservableList<OrderPM> syncAllOrders = FXCollections.synchronizedObservableList(allOrders);
 
+
+
+    private final ObjectProperty<ObservableList<OrderPM>> allOrderEntries = new SimpleObjectProperty<>();
+
     public AllOrdersPM(){
         setupValueChangedListeners();
+        setAllOrderEntries(syncAllOrders);
 
     }
 
@@ -68,6 +75,7 @@ public class AllOrdersPM {
     public void updateAllOrdersPM(OrderPM orderPM){
         syncAllOrders.add(orderPM);
         syncAllOrdersMap.put(orderPM.getOrderId(), orderPM);
+
     }
 
     public ObservableList<OrderPM> getSyncAllOrders() {
@@ -103,7 +111,6 @@ public class AllOrdersPM {
                        .append(changedOrder.getOrderStatus() )
                        .append(" Order Placed on :")
                        .append(changedOrder.getOrderPlacedWhen().format(DateTimeFormatter.ofPattern("yyyy-mm-dd"))
-
                        );
             }
 
@@ -113,7 +120,24 @@ public class AllOrdersPM {
     }
 
 
+    public ObservableList<OrderPM> getAllOrderEntries() {
+        return allOrderEntries.get();
+    }
+
+    public ObjectProperty<ObservableList<OrderPM>> allOrderEntriesProperty() {
+        return allOrderEntries;
+    }
+
+    public void setAllOrderEntries(ObservableList<OrderPM> allOrderEntries) {
+        this.allOrderEntries.set(allOrderEntries);
+    }
+
     public ObservableMap<String, OrderPM> getSyncAllOrdersMap() {
         return syncAllOrdersMap;
     }
+
+
+
+
+
 }

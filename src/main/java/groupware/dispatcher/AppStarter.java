@@ -53,7 +53,6 @@ public class AppStarter extends Application {
     Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
-
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
 
             Platform.runLater(()-> {
@@ -70,10 +69,6 @@ public class AppStarter extends Application {
         connectToBroker.run();
         allCouriersPM = courierService.getAllCouriersPM();
         allOrdersPM = orderService.getAllOrdersPM();
-        AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
-        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
-
-        rootPanel.addClockToHeader(txtTime);
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
@@ -81,6 +76,11 @@ public class AppStarter extends Application {
             System.exit(0);
 
         });
+        AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
+
+        rootPanel.addClockToHeader(txtTime);
+
         rootPanel.addExitButton(exitBtn);
 
         Scene scene = new Scene(rootPanel, 1000,800);

@@ -30,6 +30,7 @@ The couriers accept or deny task requests.
 orders/task/courierId/taskId/request QoS 2 
 orders/task/courierId /taskId/accept QoS 2 
 orders/task/courierId/taskId/deny - QoS 2 
-
+orders/task/courierId/taskId/timeout - QoS 2 
+orders/task/courierId/taskId/completed - QoS 2 
 
 

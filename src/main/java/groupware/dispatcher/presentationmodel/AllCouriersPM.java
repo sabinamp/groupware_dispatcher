@@ -14,14 +14,19 @@ public class AllCouriersPM {
 
     private final IntegerProperty courierCount = new SimpleIntegerProperty();
 
-    private ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
+    private final ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
     private ObservableList<CourierPM> syncAllCouriers = FXCollections.synchronizedObservableList(allCouriers);
 
     private ObjectProperty<CourierPM> currentCourierPM =  new SimpleObjectProperty<>();
 
+
+
+    private final ObjectProperty<ObservableList<CourierPM>> allCourierEntries = new SimpleObjectProperty<>();
+
     public AllCouriersPM(){
         setupValueChangedListeners();
         setupBindings();
+        setAllCourierEntries(syncAllCouriers);
     }
 
     private void setupValueChangedListeners() {
@@ -101,5 +106,17 @@ public class AllCouriersPM {
         alert.setContentText(content);
 
         alert.showAndWait();
+    }
+
+    public ObservableList<CourierPM> getAllCourierEntries() {
+        return allCourierEntries.get();
+    }
+
+    public ObjectProperty<ObservableList<CourierPM>> allCourierEntriesProperty() {
+        return allCourierEntries;
+    }
+
+    public void setAllCourierEntries(ObservableList<CourierPM> allCourierEntries) {
+        this.allCourierEntries.set(allCourierEntries);
     }
 }

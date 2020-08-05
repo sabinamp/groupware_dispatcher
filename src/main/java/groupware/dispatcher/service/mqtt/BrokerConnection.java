@@ -3,6 +3,7 @@ package groupware.dispatcher.service.mqtt;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
+import groupware.dispatcher.service.model.TaskRequest;
 
 
 public class BrokerConnection {
@@ -50,6 +51,10 @@ public class BrokerConnection {
         ordersBrokerClient.connectAndRequestExistingOrder("OR1124");
         ordersBrokerClient.connectAndSubscribeForExistingOrders();
 
+    }
+
+     void connectTaskServiceToBroker(TaskRequest taskReq){
+        taskBrokerClient.connectPublishTaskRequest(taskReq);
     }
 
 

@@ -33,12 +33,12 @@ public class BooleanCell  extends TableCell<TaskRequestPM, Boolean> {
         } else {
 
             if (item ){
-                rectangle = new Rectangle(30, 30, Color.web("Green"));
+                rectangle = new Rectangle(25, 25, Color.web("Green"));
             }else{
-                rectangle = new Rectangle(30,30, Color.web("Orange"));
+                rectangle = new Rectangle(25,25, Color.web("Orange"));
             }
 
-            setText("Task : "+ item.toString());
+            setText( item.toString());
 
 
             setGraphic(rectangle);
