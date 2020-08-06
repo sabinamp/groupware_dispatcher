@@ -48,6 +48,7 @@ public class AllOrdersPM {
             }
         });
 
+
         syncAllOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
 
             System.out.println("AllOrdersPM Update"+ change);
@@ -89,27 +90,27 @@ public class AllOrdersPM {
     private void showAlertWithDefaultHeaderText(boolean updated, OrderPM changedOrder) {
         final String NotifyICON = "\uf0f3";
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Order Notification");
-
-        String headerTxt ="Order Notification";
-        alert.setHeaderText(headerTxt);
+        alert.setHeaderText("Order "+ changedOrder.getOrderId()+ "Notification");
         alert.setResizable(true);
+        String title ="Order Notification";
+        alert.setTitle(title);
+
         StringBuilder content = new StringBuilder(changedOrder.getOrderId());
            // if(changedOrder.getOrderStatus().equals(OrderStatus.PENDING)) {
            if( updated) {
                content.append("Order updated ")
                        .append( changedOrder.getOrderId() )
-                       .append(" Order Status: ")
+                       .append(" \n Order Status: ")
                        .append(changedOrder.getOrderStatus())
-                       .append(" Assigned to the Courier ")
+                       .append(" \n Assigned to the Courier ")
                        .append(changedOrder.getCurrentAssignee());
 
             }else{
                content.append( "New order: ")
                        .append(changedOrder.getOrderId())
-                       .append(" Order Status ")
+                       .append(" \n Order Status ")
                        .append(changedOrder.getOrderStatus() )
-                       .append(" Order Placed on :")
+                       .append(" \n Order Placed on :")
                        .append(changedOrder.getOrderPlacedWhen().format(DateTimeFormatter.ofPattern("yyyy-mm-dd"))
                        );
             }

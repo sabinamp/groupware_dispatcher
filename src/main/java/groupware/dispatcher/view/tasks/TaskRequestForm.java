@@ -1,42 +1,30 @@
 package groupware.dispatcher.view.tasks;
 
 import groupware.dispatcher.presentationmodel.*;
-import groupware.dispatcher.service.model.CourierInfo;
 import groupware.dispatcher.service.model.DeliveryType;
-import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.model.TaskType;
-import groupware.dispatcher.view.util.SimpleTextControl;
 import groupware.dispatcher.view.util.UserEvent;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.*;
 
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.StringConverter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalUnit;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-public class TaskRequestForm extends GridPane implements ViewMixin {
+public class TaskRequestForm extends VBox implements ViewMixin {
     private static int currentTaskIdentifier = 0;
+    private GridPane gp;
     private Text taskDueOnLabel;
     private Text courierIdLabel;
     private Text orderIdLabel;
@@ -52,9 +40,8 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
     private ChoiceBox<CourierPM> courierIdChoiceBox;
     private ChoiceBox<DeliveryType> deliveryTypeChoiceBox;
     private ChoiceBox<TaskType> taskTypeChoiceBox;
-    private javafx.scene.control.Button addBtn;
-
-
+    private javafx.scene.control.Button saveBtn;
+    private Button resetBtn;
 
 
     private ObjectProperty<TaskRequestPM> currentTask= new SimpleObjectProperty<>();
@@ -75,23 +62,22 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
         setStyle("-fx-background-color: WHITE;");
         //Setting the padding
         setPadding(new Insets(10));
-        //Setting the vertical and horizontal gaps between the columns
-        setVgap(5);
-        setHgap(5);
-
         //Setting the Grid alignment
-        setAlignment(Pos.CENTER);
+        setAlignment(Pos.TOP_CENTER);
     }
 
     @Override
     public void initializeParts() {
-     addBtn = new javafx.scene.control.Button("Send Request");
-
+        this.gp = new GridPane();
+        //Setting the vertical and horizontal gaps between the columns
+        gp.setVgap(10);
+        gp.setHgap(5);
+        saveBtn = new javafx.scene.control.Button("Send Request");
+        resetBtn = new Button("Reset");
 
         courierIdLabel = new Text("Courier ID");
         orderIdLabel = new Text("Order ID");
-
-        taskDueOnLabel = new Text("Due ");
+        taskDueOnLabel = new Text("Due Date");
 
         taskTypeLabel = new Text("Task");
         //date picker to choose date
@@ -129,14 +115,7 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
 
     private void initCourierIdChoiceBox() {
         Set<CourierPM> courierInfos= new HashSet<>();
-        /*assets.add("C100");
-        assets.add("C101");
-        assets.add("C102");
-        assets.add("C103");
-        assets.add("C104");
-        assets.add("C105");
-        assets.add("C106");
-        assets.add("C107");*/
+
         System.out.println("initCourierIdChoiceBox - Courier list size: "+courierInfos.size());
         courierIdChoiceBox.setConverter(new StringConverter<>() {
             @Override
@@ -158,27 +137,38 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
     public void layoutParts() {
         initOrderIdChoiceBox();
         initCourierIdChoiceBox();
-         add(courierIdLabel, 1, 1);
-         add(orderIdLabel, 1, 2);
-         add(taskDueOnLabel, 1, 3);
+        gp.add(courierIdLabel, 1, 1);
+        gp.add(orderIdLabel, 1, 2);
+        gp.add(taskDueOnLabel, 1, 3);
 
-         add(deliveryTypeLabel, 1, 5);
-         add(taskTypeLabel, 1,6);
+        gp.add(deliveryTypeLabel, 1, 5);
+        gp.add(taskTypeLabel, 1,6);
 
-         add(courierIdChoiceBox, 2,1);
-         add(orderIdChoiceBox, 2, 2);
-         add(datePicker, 2, 3);
+        gp.add(courierIdChoiceBox, 2,1);
+        gp.add(orderIdChoiceBox, 2, 2);
+        gp.add(datePicker, 2, 3);
 
-         add(deliveryTypeChoiceBox, 2,5);
-         add(taskTypeChoiceBox,2,6);
+        gp.add(deliveryTypeChoiceBox, 2,5);
+        gp.add(taskTypeChoiceBox,2,6);
 
-         add(addBtn,1, 9);
+
+        ButtonBar buttonBar = new ButtonBar();
+        buttonBar.setPadding( new Insets(10) );
+
+        ButtonBar.setButtonData(saveBtn, ButtonBar.ButtonData.OK_DONE);
+        ButtonBar.setButtonData(resetBtn, ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        buttonBar.getButtons().addAll(saveBtn, resetBtn);
+
+        this.getChildren().addAll( gp, buttonBar );
     }
 
     @Override
     public void setupEventHandlers() {
-        addBtn.setOnAction(this::send);
+        saveBtn.setOnAction(this::save);
+        resetBtn.setOnAction(this::reset);
     }
+
 
     @Override
     public void setupValueChangedListeners() {
@@ -196,13 +186,13 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
 
     }
 
-    private void send(ActionEvent evt) {
+    private void save(ActionEvent evt) {
         currentTaskIdentifier++;
-        String relatedOrderId= orderIdChoiceBox.getValue().getOrderId();
-        String assigneeId = courierIdChoiceBox.getValue().getCourierId();
-        System.out.println("TaskRequestForm - Saving " + datePicker.getValue() + taskTypeChoiceBox.getValue()+ deliveryTypeChoiceBox.getValue()
-        + "orderId "+relatedOrderId + "courierID " + assigneeId);
-        if(relatedOrderId != null && assigneeId != null){
+        if(orderIdChoiceBox.getValue() != null && courierIdChoiceBox.getValue() != null && taskTypeChoiceBox.getValue() != null){
+            String relatedOrderId= orderIdChoiceBox.getValue().getOrderId();
+            String assigneeId = courierIdChoiceBox.getValue().getCourierId();
+            System.out.println("TaskRequestForm - Saving " + datePicker.getValue() + taskTypeChoiceBox.getValue()+ deliveryTypeChoiceBox.getValue()
+                    + "orderId "+relatedOrderId + "courierID " + assigneeId);
             TaskRequestPM task = new TaskRequestPM();
             task.setTaskId("T"+currentTaskIdentifier);
             task.setTaskType(taskTypeChoiceBox.getValue());
@@ -218,10 +208,29 @@ public class TaskRequestForm extends GridPane implements ViewMixin {
             this.allTaskRequestsPM.updateAllTaskRequestsPM(task);
             UserEvent taskEvent= new UserEvent(UserEvent.NEW_TASK);
             this.fireEvent(taskEvent);
+            resetFields();
         }else{
-           System.out.println("Please choose an order and a courier id.");
+            showAlertNoCurrentTask();
         }
+    }
 
+    private void reset(ActionEvent e) {
+           resetFields();
+    }
+
+    private void resetFields() {
+        //If the Reset button is pressed after filling in the choice boxes, the form is restored to its original values.
+        courierIdChoiceBox.setValue(null);
+        orderIdChoiceBox.setValue(null);
+        deliveryTypeChoiceBox.setValue(null);
+        taskTypeChoiceBox.setValue(null);
+    }
+
+    private void showAlertNoCurrentTask() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("No current task request filled in.");
+        alert.setContentText("There is no current task. \n Fill in the form first. An Order id and a courier id are required.");
+        alert.showAndWait();
     }
 
     public TaskRequestPM getCurrentTask() {

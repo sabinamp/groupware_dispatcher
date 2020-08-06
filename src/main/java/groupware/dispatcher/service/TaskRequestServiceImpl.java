@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class TaskRequestServiceImpl {
+public class TaskRequestServiceImpl implements TaskEventListener{
     private final Logger logger;
     private static Map<String, TaskRequest> tasks;
 
@@ -33,7 +33,7 @@ public class TaskRequestServiceImpl {
         this.orderService = orderService;
         this.courierService = courierService;
         this.allTaskRequestsPM = new AllTaskRequestsPM(orderService.getAllOrdersPM(), courierService.getAllCouriersPM());
-
+        this.allTaskRequestsPM.setListener(this);
     }
 
     public TaskRequest getTaskRequestById(String taskId){
@@ -47,8 +47,6 @@ public class TaskRequestServiceImpl {
         }else {
             tasks.put(id, taskRequest);
             setCurrentTaskRequest(taskRequest);
-            allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
-
             return true;
         }
     }
@@ -109,5 +107,18 @@ public class TaskRequestServiceImpl {
 
     public void confirmTask(String taskId, boolean accepted) {
         updateTaskRequestAccepted(taskId, accepted);
+    }
+
+    //event sent always by the GUI
+    public void handleNewTaskEvent(TaskRequest taskRequest){
+        updateTaskRequest(taskRequest.getTaskId(), taskRequest);
+        System.out.println("handleNewTaskEvent"+taskRequest.getTaskId());
+    }
+
+    //TaskUpdate event usually sent by the courier
+    @Override
+    public void handleTaskUpdateEvent(TaskRequest taskRequest) {
+        updateTaskRequest(taskRequest.getTaskId(), taskRequest);
+        allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
     }
 }

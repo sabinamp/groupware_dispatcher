@@ -75,7 +75,7 @@ public class OrdersBrokerClient extends BrokerClient {
     private CompletableFuture<Mqtt3SubAck> subscribeToNewOrders(){
         String topicName = "orders/new";
         System.out.println("entering subscribeToNewOrders for the topic "+topicName);
-         CompletableFuture<Mqtt3SubAck> subscribesToNewOrders= this.client2.subscribeWith()
+         return this.client2.subscribeWith()
             .topicFilter("orders/new")
             .callback(mqtt3Publish -> {
                 if(mqtt3Publish.getPayload().isPresent()){
@@ -97,7 +97,6 @@ public class OrdersBrokerClient extends BrokerClient {
                     logger.info(" - subscribed to topic "+topicName);
                 }
             });
-        return subscribesToNewOrders;
     }
 
 

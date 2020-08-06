@@ -1,7 +1,7 @@
 package groupware.dispatcher.presentationmodel;
 
 
-import groupware.dispatcher.service.model.TaskType;
+import groupware.dispatcher.service.TaskEventListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -19,16 +19,13 @@ public class AllTaskRequestsPM {
 
     private ObjectProperty<TaskRequestPM> currentTaskRequest = new SimpleObjectProperty<>();
 
-    public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM){
+    private TaskEventListener listener;
 
+    public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM){
         this.allCouriersPM= allCouriersPM;
         this.allOrdersPM = allOrdersPM;
-
         setupValueChangedListeners();
-
     }
-
-
 
     private void setupValueChangedListeners() {
         syncAllTasks.addListener((ListChangeListener.Change<? extends TaskRequestPM> change) -> {
@@ -42,26 +39,12 @@ public class AllTaskRequestsPM {
 
     public void updateAllTaskRequestsPM(TaskRequestPM task){
         syncAllTasks.add(task);
-
-    }
-
-    private void setUpFirstTask(){
-        TaskRequestPM task1= new TaskRequestPM();
-        task1.setTaskId("T01");
-        task1.setAssigneeId("C101");
-        task1.setOrderId("OR1111");
-        OrderPM order1125 = allOrdersPM.getSyncAllOrdersMap().get("OR1111");
-        if(order1125 != null){
-
-                task1.setDeliveryType(order1125.getOrderType());
-                task1.setTaskType( TaskType.PARCEL_COLLECTION);
-                allTasks.addAll(task1);
-
-        }else{
-            System.out.println("setUpFirstTask - null order order1111");
+        if(this.listener != null){
+            listener.handleNewTaskEvent(TaskRequestPM.toTaskRequest(task));
         }
 
     }
+
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
         return currentTaskRequest;
@@ -73,4 +56,13 @@ public class AllTaskRequestsPM {
     public TaskRequestPM getCurrentTaskRequest() {
         return currentTaskRequest.get();
     }
+
+    public TaskEventListener getListener() {
+        return listener;
+    }
+
+    public void setListener(TaskEventListener listener) {
+        this.listener = listener;
+    }
+
 }
