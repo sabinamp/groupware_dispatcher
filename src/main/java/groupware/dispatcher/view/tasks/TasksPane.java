@@ -1,6 +1,7 @@
 package groupware.dispatcher.view.tasks;
 
 import groupware.dispatcher.presentationmodel.*;
+import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -26,10 +27,10 @@ public class TasksPane extends BorderPane implements ViewMixin {
     private TreeItem<String> ordersRoot;
     private TreeItem<String> tRoot;
 
-    public TasksPane(AllCouriersPM allCouriersPM, AllOrdersPM allOrdersPM){
+    public TasksPane(AllCouriersPM allCouriersPM, AllOrdersPM allOrdersPM, TaskRequestServiceImpl taskRequestService){
         this.allOrdersPM = allOrdersPM;
         this.allCouriersPM = allCouriersPM;
-        this.allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
+        this.allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
         init();
     }
 
@@ -84,7 +85,7 @@ public class TasksPane extends BorderPane implements ViewMixin {
 
     @Override
     public void setupValueChangedListeners() {
-        this.allOrdersPM.getAllOrderEntries().addListener(new ListChangeListener<OrderPM>() {
+        this.allOrdersPM.getAllOrderEntries().addListener(new ListChangeListener<>() {
             @Override
             public void onChanged(Change<? extends OrderPM> c) {
                 int lastIndex = c.getList().size() -1;

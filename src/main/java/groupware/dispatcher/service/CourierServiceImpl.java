@@ -14,7 +14,10 @@ import java.util.logging.Logger;
 public class CourierServiceImpl implements CourierService {
     private static Map<String, CourierInfo> couriers;
     private final static Logger logger;
-    private AllCouriersPM allCouriersPM;
+
+
+
+    private CourierEventListener allCouriersPMListener;
 
     static{
         logger = LogManager.getLogManager().getLogger(String.valueOf(OrderServiceImpl.class));
@@ -22,7 +25,7 @@ public class CourierServiceImpl implements CourierService {
 
     }
     public CourierServiceImpl(){
-        this.allCouriersPM = new AllCouriersPM();
+
     }
 
     public static Map<String, CourierInfo> getCouriers() {
@@ -49,9 +52,15 @@ public class CourierServiceImpl implements CourierService {
         if(courier == null ){
             return false;
         }else{
-            couriers.put(courierId, courier);
-            CourierPM currentCourierPM = CourierPM.of(courierId, courier);
-            allCouriersPM.updateAllCouriersPM(currentCourierPM);
+            if(couriers.get(courierId) != null){
+                couriers.put(courierId, courier);
+                CourierPM currentCourierPM = CourierPM.of(courierId, courier);
+                allCouriersPMListener.handleNewCourierEvent(currentCourierPM);
+            }else{
+                couriers.put(courierId, courier);
+                CourierPM currentCourierPM = CourierPM.of(courierId, courier);
+                allCouriersPMListener.handleCourierUpdateEvent(currentCourierPM);
+            }
             return true;
         }
     }
@@ -114,7 +123,12 @@ public class CourierServiceImpl implements CourierService {
         return courier.getAssignedOrders();
     }
 
-    public AllCouriersPM getAllCouriersPM() {
-        return this.allCouriersPM;
+    public CourierEventListener getAllCouriersPMListener() {
+        return allCouriersPMListener;
     }
+
+    public void setAllCouriersPMListener(CourierEventListener allCouriersPMListener) {
+        this.allCouriersPMListener = allCouriersPMListener;
+    }
+
 }

@@ -1,6 +1,7 @@
 package groupware.dispatcher.presentationmodel;
 
 
+import groupware.dispatcher.service.OrderEventListener;
 import groupware.dispatcher.service.model.OrderDescriptiveInfo;
 import groupware.dispatcher.service.model.OrderStatus;
 import groupware.dispatcher.service.util.ModelObjManager;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class AllOrdersPM {
+public class AllOrdersPM implements OrderEventListener {
     private final StringProperty paneTitle = new SimpleStringProperty("Orders");
     private final IntegerProperty orderCount = new SimpleIntegerProperty();
 
@@ -76,7 +77,15 @@ public class AllOrdersPM {
     public void updateAllOrdersPM(OrderPM orderPM){
         syncAllOrders.add(orderPM);
         syncAllOrdersMap.put(orderPM.getOrderId(), orderPM);
-
+    }
+    public void updateItemInAllOrdersPM(OrderPM orderPM){
+        String id = orderPM.getOrderId();
+        OrderPM existingOrder = syncAllOrdersMap.get(id);
+        if(existingOrder != null){
+            syncAllOrders.remove(existingOrder);
+        }
+        syncAllOrders.add(orderPM);
+        syncAllOrdersMap.put(id, orderPM);
     }
 
     public ObservableList<OrderPM> getSyncAllOrders() {
@@ -138,7 +147,13 @@ public class AllOrdersPM {
     }
 
 
+    @Override
+    public void handleNewOrderEvent(OrderPM order) {
+        updateAllOrdersPM(order);
+    }
 
-
-
+    @Override
+    public void handleOrderUpdateEvent(OrderPM orderPM) {
+        this.updateItemInAllOrdersPM(orderPM);
+    }
 }

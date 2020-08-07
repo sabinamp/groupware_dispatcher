@@ -7,7 +7,7 @@ import groupware.dispatcher.view.util.ViewMixin;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-public class OrdersPane extends VBox implements ViewMixin {
+public class OrdersPane extends HBox implements ViewMixin {
     private AllOrdersPM allOrdersPM;
     OrdersTable table;
 

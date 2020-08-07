@@ -1,6 +1,8 @@
 package groupware.dispatcher.service;
 
 
+import groupware.dispatcher.presentationmodel.AllCouriersPM;
+import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.model.CourierStatus;
@@ -16,24 +18,20 @@ import java.util.logging.Logger;
 public class TaskRequestServiceImpl{
     private final Logger logger;
     private static Map<String, TaskRequest> tasks;
-
-
-
     private TaskRequest currentTaskRequest;
     private OrderServiceImpl orderService;
     private CourierServiceImpl courierService;
 
     private AllTaskRequestsPM allTaskRequestsPM;
+    private TaskEventListener taskEventListener;
     static{
         tasks= new HashMap<>();
     }
 
     public TaskRequestServiceImpl(OrderServiceImpl orderService, CourierServiceImpl courierService){
         logger = LogManager.getLogManager().getLogger(String.valueOf(TaskRequestServiceImpl.class));
-        this.orderService = orderService;
-        this.courierService = courierService;
-        this.allTaskRequestsPM = new AllTaskRequestsPM(orderService.getAllOrdersPM(), courierService.getAllCouriersPM());
-        this.allTaskRequestsPM.setListener(this.taskEventListener);
+      this.orderService = orderService;
+      this.courierService = courierService;
     }
 
     public TaskRequest getTaskRequestById(String taskId){
@@ -45,10 +43,25 @@ public class TaskRequestServiceImpl{
             logger.info("updateTask() received arg taskRequest - null");
             return false;
         }else {
-            tasks.put(id, taskRequest);
-            setCurrentTaskRequest(taskRequest);
-            System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
-                    "The task with id : "+ id+" added or updated.");
+            if(tasks.get(id) != null){
+                tasks.put(id, taskRequest);
+                setCurrentTaskRequest(taskRequest);
+                System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
+                        "The task with id : "+ id+" added or updated.");
+                if(taskEventListener != null){
+                    taskEventListener.handleTaskUpdateEvent(TaskRequestPM.of(taskRequest));
+                }
+
+            }else{
+                tasks.put(id, taskRequest);
+                setCurrentTaskRequest(taskRequest);
+                System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
+                        "The task with id : "+ id+" added or updated.");
+                if(taskEventListener != null){
+                    taskEventListener.handleNewTaskEvent(TaskRequestPM.of(taskRequest));
+                }
+            }
+
             return true;
         }
     }
@@ -111,20 +124,7 @@ public class TaskRequestServiceImpl{
         updateTaskRequestAccepted(taskId, accepted);
     }
 
-   public TaskEventListener taskEventListener = new TaskEventListener() {
-        @Override
-        public void handleNewTaskEvent(TaskRequest taskRequest) {
-            //event sent always by the GUI
-            updateTaskRequest(taskRequest.getTaskId(), taskRequest);
-            System.out.println("handleNewTaskEvent"+taskRequest.getTaskId());
-        }
 
-        @Override
-        public void handleTaskUpdateEvent(TaskRequest taskRequest) {
-            updateTaskRequest(taskRequest.getTaskId(), taskRequest);
-            allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
-        }
-    };
 
    /* @Override
     public void handleNewTaskEvent(TaskRequest taskRequest){
@@ -139,4 +139,12 @@ public class TaskRequestServiceImpl{
         updateTaskRequest(taskRequest.getTaskId(), taskRequest);
         allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
     }*/
+
+    public TaskEventListener getTaskEventListener() {
+        return taskEventListener;
+    }
+
+    public void setTaskEventListener(TaskEventListener taskEventListener) {
+        this.taskEventListener = taskEventListener;
+    }
 }

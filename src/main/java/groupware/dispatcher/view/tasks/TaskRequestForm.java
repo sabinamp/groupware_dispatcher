@@ -207,6 +207,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
             task.setDone(false);
 
             this.allTaskRequestsPM.updateAllTaskRequestsPM(task);
+            this.allTaskRequestsPM.updateTaskRequestService(task);
             TaskEvent taskEvent= new TaskEvent(TaskEvent.NEW_TASK);
             this.fireEvent(taskEvent);
             resetFields();

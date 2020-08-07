@@ -14,7 +14,10 @@ import java.util.logging.Logger;
 public class OrderServiceImpl implements OrderService{
     private final Logger logger;
     private static Map<String, OrderDescriptiveInfo> orders;
-    private AllOrdersPM allOrdersPM;
+
+
+    private OrderEventListener orderEventListener;
+
     static{
 
         orders= new HashMap<>();
@@ -22,7 +25,7 @@ public class OrderServiceImpl implements OrderService{
 
     public OrderServiceImpl(){
         logger = LogManager.getLogManager().getLogger(String.valueOf(OrderServiceImpl.class));
-        allOrdersPM = new AllOrdersPM();
+
     }
 
     @Override
@@ -36,8 +39,14 @@ public class OrderServiceImpl implements OrderService{
             logger.info("updateOrder() received arg order- null");
             return false;
         }else {
-            orders.put(id, order);
-            allOrdersPM.updateAllOrdersPM(OrderPM.ofOrder(order));
+            if(orders.get(id) != null){
+                orders.put(id, order);
+                orderEventListener.handleOrderUpdateEvent(OrderPM.ofOrder(order));
+            }else{
+                orders.put(id, order);
+                orderEventListener.handleNewOrderEvent(OrderPM.ofOrder(order));
+            }
+
             return true;
         }
     }
@@ -166,7 +175,12 @@ public class OrderServiceImpl implements OrderService{
         return orders;
     }
 
-    public AllOrdersPM getAllOrdersPM() {
-        return this.allOrdersPM;
+
+    public OrderEventListener getOrderEventListener() {
+        return orderEventListener;
+    }
+
+    public void setOrderEventListener(OrderEventListener orderEventListener) {
+        this.orderEventListener = orderEventListener;
     }
 }

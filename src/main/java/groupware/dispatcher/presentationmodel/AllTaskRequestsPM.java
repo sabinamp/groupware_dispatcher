@@ -2,6 +2,7 @@ package groupware.dispatcher.presentationmodel;
 
 
 import groupware.dispatcher.service.TaskEventListener;
+import groupware.dispatcher.service.TaskRequestServiceImpl;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -9,11 +10,12 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 
-public class AllTaskRequestsPM {
+public class AllTaskRequestsPM implements TaskEventListener{
     private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList();
 
     private AllCouriersPM allCouriersPM;
     private AllOrdersPM allOrdersPM;
+    private TaskRequestServiceImpl taskRequestService;
 
     private final ObservableList<TaskRequestPM> syncAllTasks = FXCollections.synchronizedObservableList(allTasks);
 
@@ -21,9 +23,10 @@ public class AllTaskRequestsPM {
 
     private TaskEventListener listener;
 
-    public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM){
+    public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, TaskRequestServiceImpl taskRequestService){
         this.allCouriersPM= allCouriersPM;
         this.allOrdersPM = allOrdersPM;
+        this.taskRequestService = taskRequestService;
         setupValueChangedListeners();
     }
 
@@ -39,14 +42,18 @@ public class AllTaskRequestsPM {
 
     public void updateAllTaskRequestsPM(TaskRequestPM task){
         syncAllTasks.add(task);
-        if(this.listener != null){
-            listener.handleNewTaskEvent(TaskRequestPM.toTaskRequest(task));
-        }else{
-            System.out.println("updateAllTaskRequestsPM() called. The new task listener is null.");
-        }
-
+    }
+    public void updateItemInAllTaskRequestsPM(TaskRequestPM task){
+        syncAllTasks.forEach(a->{
+            if(a.getTaskId().equals(task.getTaskId())){
+                removeCurrentItem(a);
+            }
+        });
     }
 
+    private void removeCurrentItem(TaskRequestPM a) {
+        syncAllTasks.remove(a);
+    }
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
         return currentTaskRequest;
@@ -67,4 +74,17 @@ public class AllTaskRequestsPM {
         this.listener = listener;
     }
 
+    @Override
+    public void handleNewTaskEvent(TaskRequestPM task) {
+        updateAllTaskRequestsPM(task);
+    }
+
+    @Override
+    public void handleTaskUpdateEvent(TaskRequestPM taskRequest) {
+        updateItemInAllTaskRequestsPM(taskRequest);
+    }
+
+    public void updateTaskRequestService(TaskRequestPM task) {
+        this.taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
+    }
 }

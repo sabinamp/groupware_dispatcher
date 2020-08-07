@@ -1,6 +1,7 @@
 package groupware.dispatcher.presentationmodel;
 
 
+import groupware.dispatcher.service.CourierEventListener;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -8,12 +9,10 @@ import javafx.collections.*;
 import javafx.scene.control.Alert;
 
 
-public class AllCouriersPM {
+public class AllCouriersPM implements CourierEventListener {
 
     private final StringProperty paneTitle = new SimpleStringProperty("Couriers");
-
     private final IntegerProperty courierCount = new SimpleIntegerProperty();
-
     private final ObservableList<CourierPM> allCouriers = FXCollections.observableArrayList();
     private ObservableList<CourierPM> syncAllCouriers = FXCollections.synchronizedObservableList(allCouriers);
 
@@ -53,6 +52,20 @@ public class AllCouriersPM {
 
     public void updateAllCouriersPM(CourierPM pm){
         syncAllCouriers.add(pm);
+    }
+    public void updateAndReplaceItemInAllCouriersPM(CourierPM pm){
+        String courierID = pm.getCourierId();
+
+        syncAllCouriers.forEach( a-> {
+            if(a.getCourierId().equals(courierID)){
+                removeCourierToBeReplaced(a);
+            }
+        });
+        syncAllCouriers.add(pm);
+    }
+
+    private void removeCourierToBeReplaced(CourierPM c){
+        syncAllCouriers.remove(c);
     }
     private void setupBindings() {
         courierCountProperty().bind(Bindings.size(allCouriers));
@@ -118,5 +131,15 @@ public class AllCouriersPM {
 
     public void setAllCourierEntries(ObservableList<CourierPM> allCourierEntries) {
         this.allCourierEntries.set(allCourierEntries);
+    }
+
+    @Override
+    public void handleNewCourierEvent(CourierPM courierInfo) {
+        updateAllCouriersPM(courierInfo);
+    }
+
+    @Override
+    public void handleCourierUpdateEvent(CourierPM courierInfo) {
+        updateAndReplaceItemInAllCouriersPM(courierInfo);
     }
 }

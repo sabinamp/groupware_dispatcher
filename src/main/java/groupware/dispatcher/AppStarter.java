@@ -28,6 +28,7 @@ public class AppStarter extends Application {
 
     private AllOrdersPM allOrdersPM;
     private AllCouriersPM allCouriersPM;
+    private AllTaskRequestsPM allTaskRequestsPM;
     private volatile boolean enough = false;
     private final Text txtTime = new Text();
     private final CourierServiceImpl courierService =  new CourierServiceImpl();
@@ -65,10 +66,14 @@ public class AppStarter extends Application {
     @Override
     public void start(Stage primaryStage){
         rootPM = new RootPM();
-
+        allCouriersPM =new AllCouriersPM();
+        courierService.setAllCouriersPMListener(allCouriersPM);
         connectToBroker.run();
-        allCouriersPM = courierService.getAllCouriersPM();
-        allOrdersPM = orderService.getAllOrdersPM();
+
+        allOrdersPM = new AllOrdersPM();
+        orderService.setOrderEventListener(allOrdersPM);
+        allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
+        taskRequestService.setTaskEventListener(allTaskRequestsPM);
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
@@ -76,9 +81,9 @@ public class AppStarter extends Application {
             System.exit(0);
 
         });
-        AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
-        allTaskRequestsPM.setListener(taskRequestService.taskEventListener);
-        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
+
+
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, taskRequestService);
 
         rootPanel.addClockToHeader(txtTime);
 
