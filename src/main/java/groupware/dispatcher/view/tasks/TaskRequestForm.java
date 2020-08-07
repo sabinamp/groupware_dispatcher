@@ -3,11 +3,12 @@ package groupware.dispatcher.view.tasks;
 import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.TaskType;
-import groupware.dispatcher.view.util.UserEvent;
+import groupware.dispatcher.view.util.TaskEvent;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -206,7 +207,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
             task.setDone(false);
 
             this.allTaskRequestsPM.updateAllTaskRequestsPM(task);
-            UserEvent taskEvent= new UserEvent(UserEvent.NEW_TASK);
+            TaskEvent taskEvent= new TaskEvent(TaskEvent.NEW_TASK);
             this.fireEvent(taskEvent);
             resetFields();
         }else{

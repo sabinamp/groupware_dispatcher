@@ -39,7 +39,7 @@ public class CourierBrokerClient extends BrokerClient{
                 .identifier(IDENTIFIER.toString())
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
-               // .automaticReconnectWithDefaultConfig()
+                .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientCourierInfoSubscriber = MqttClient.builder()
                 .useMqttVersion3()
@@ -70,7 +70,7 @@ public class CourierBrokerClient extends BrokerClient{
         System.out.println("connecting to Broker and subscribing for courier "+courierId);
         this.clientCourierInfo.connectWith()
                 .keepAlive(100)
-                .cleanSession(true)
+                .cleanSession(false)
                 .willPublish()
                 .topic("couriers/info/get/" + courierId)
                 .qos(MqttQos.EXACTLY_ONCE)

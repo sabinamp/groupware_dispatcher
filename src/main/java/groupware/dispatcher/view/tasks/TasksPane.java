@@ -1,18 +1,15 @@
 package groupware.dispatcher.view.tasks;
 
-import groupware.dispatcher.presentationmodel.AllCouriersPM;
-import groupware.dispatcher.presentationmodel.AllOrdersPM;
-import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
-import groupware.dispatcher.presentationmodel.OrderPM;
+import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.view.util.ViewMixin;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 
 public class TasksPane extends BorderPane implements ViewMixin {
@@ -25,7 +22,9 @@ public class TasksPane extends BorderPane implements ViewMixin {
     TabPane tabPaneLeft;
     TaskRequestForm taskForm;
     TreeView<String> treeView;
-    TreeView<String> tasksTreeView;
+    TreeView<String> courierTreeView;
+    private TreeItem<String> ordersRoot;
+    private TreeItem<String> tRoot;
 
     public TasksPane(AllCouriersPM allCouriersPM, AllOrdersPM allOrdersPM){
         this.allOrdersPM = allOrdersPM;
@@ -46,34 +45,37 @@ public class TasksPane extends BorderPane implements ViewMixin {
         taskTable = new TaskRequestTable(allTaskRequestsPM);
         taskForm = new TaskRequestForm(getAllOrdersPM(), getAllCouriersPM(), allTaskRequestsPM);
         taskForm.setPrefWidth(300);
-        TreeItem<String> ordersRoot = new TreeItem<>("Orders");
+        ordersRoot = new TreeItem<>("Orders");
 
-
-   /*     allOrdersPM.getSyncAllOrders().forEach(o-> {
-            System.out.println("current order id in the tree:"+o.getOrderId());
-            ordersRoot.getChildren().add(new TreeItem<String>(o.getOrderId()));
-        });*/
-
-         treeView = new TreeView<>(ordersRoot);
-            treeView.setEditable(false);
-            treeView.setRoot(ordersRoot);
+        treeView = new TreeView<>(ordersRoot);
+        treeView.setEditable(false);
+        treeView.setRoot(ordersRoot);
 
         tabPaneLeft = new TabPane();
         Tab ordersTab = new Tab(" Orders");
         ordersTab.setContent(treeView);
 
-        Tab tabRight = new Tab("Tasks");
-        TreeItem<String> tasksRoot= new TreeItem<>("Active Tasks");
-        tasksTreeView = new TreeView<>(tasksRoot);
-        tasksTreeView.setRoot(tasksRoot);
-        tasksTreeView.setEditable(false);
-        //tasksRoot.getChildren().addAll(allTaskRequestsPM.getSyncAllTasks().stream().map(o->new TreeItem<String>(o.getTaskId())).collect(Collectors.toList()));
-       tabRight.setContent(tasksTreeView);
+        Tab tabRight = new Tab("Couriers");
+        tRoot= new TreeItem<>("Available Couriers");
+        courierTreeView = new TreeView<>(tRoot);
+        courierTreeView.setRoot(tRoot);
+        courierTreeView.setEditable(false);
 
+
+        Set<TreeItem<String>> tRootChildren = new HashSet<>();
+
+      /*  tasksRootChildren.add( new TreeItem<>("C100"));
+        tasksRootChildren.add( new TreeItem<>("C101"));
+        tasksRootChildren.add(new TreeItem<>("C102"));
+        tasksRootChildren.add(new TreeItem<>("C103"));
+        tasksRootChildren.add(new TreeItem<>("C104"));
+        tasksRootChildren.add(new TreeItem<>("C105"));
+        tasksRootChildren.add(new TreeItem<>("C106"));
+        tasksRootChildren.add(new TreeItem<>("C107"));*/
+
+        //tRoot.getChildren().addAll(tRootChildren);
+        tabRight.setContent(courierTreeView);
         tabPaneLeft.getTabs().addAll(ordersTab, tabRight);
-
-
-
     }
 
     @Override
@@ -81,7 +83,29 @@ public class TasksPane extends BorderPane implements ViewMixin {
            }
 
     @Override
+    public void setupValueChangedListeners() {
+        this.allOrdersPM.getAllOrderEntries().addListener(new ListChangeListener<OrderPM>() {
+            @Override
+            public void onChanged(Change<? extends OrderPM> c) {
+                int lastIndex = c.getList().size() -1;
+                ordersRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getOrderId()));
+            }
+        });
+
+        this.allCouriersPM.getAllCourierEntries().addListener(new ListChangeListener<>() {
+            @Override
+            public void onChanged(Change<? extends CourierPM> c) {
+                int lastIndex = c.getList().size() -1;
+
+                tRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getCourierId() +" "
+                + c.getList().get(lastIndex).getName()));
+            }
+        });
+    }
+
+    @Override
     public void layoutParts() {
+
         setLeft(tabPaneLeft);
         setCenter(taskTable);
         setRight(taskForm);

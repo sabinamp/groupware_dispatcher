@@ -107,6 +107,8 @@ public class CouriersTable extends TableView<CourierPM> implements ViewMixin {
             System.out.println("the current courier id "+couriersPModel.getCurrentCourierPM().getCourierId());
         });
 
+
+
     }
 
 

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class TaskRequestServiceImpl implements TaskEventListener{
+public class TaskRequestServiceImpl{
     private final Logger logger;
     private static Map<String, TaskRequest> tasks;
 
@@ -33,7 +33,7 @@ public class TaskRequestServiceImpl implements TaskEventListener{
         this.orderService = orderService;
         this.courierService = courierService;
         this.allTaskRequestsPM = new AllTaskRequestsPM(orderService.getAllOrdersPM(), courierService.getAllCouriersPM());
-        this.allTaskRequestsPM.setListener(this);
+        this.allTaskRequestsPM.setListener(this.taskEventListener);
     }
 
     public TaskRequest getTaskRequestById(String taskId){
@@ -47,6 +47,8 @@ public class TaskRequestServiceImpl implements TaskEventListener{
         }else {
             tasks.put(id, taskRequest);
             setCurrentTaskRequest(taskRequest);
+            System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
+                    "The task with id : "+ id+" added or updated.");
             return true;
         }
     }
@@ -109,8 +111,24 @@ public class TaskRequestServiceImpl implements TaskEventListener{
         updateTaskRequestAccepted(taskId, accepted);
     }
 
-    //event sent always by the GUI
+   public TaskEventListener taskEventListener = new TaskEventListener() {
+        @Override
+        public void handleNewTaskEvent(TaskRequest taskRequest) {
+            //event sent always by the GUI
+            updateTaskRequest(taskRequest.getTaskId(), taskRequest);
+            System.out.println("handleNewTaskEvent"+taskRequest.getTaskId());
+        }
+
+        @Override
+        public void handleTaskUpdateEvent(TaskRequest taskRequest) {
+            updateTaskRequest(taskRequest.getTaskId(), taskRequest);
+            allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
+        }
+    };
+
+   /* @Override
     public void handleNewTaskEvent(TaskRequest taskRequest){
+        //event sent always by the GUI
         updateTaskRequest(taskRequest.getTaskId(), taskRequest);
         System.out.println("handleNewTaskEvent"+taskRequest.getTaskId());
     }
@@ -120,5 +138,5 @@ public class TaskRequestServiceImpl implements TaskEventListener{
     public void handleTaskUpdateEvent(TaskRequest taskRequest) {
         updateTaskRequest(taskRequest.getTaskId(), taskRequest);
         allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
-    }
+    }*/
 }

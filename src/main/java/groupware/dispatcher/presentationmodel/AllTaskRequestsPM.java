@@ -41,6 +41,8 @@ public class AllTaskRequestsPM {
         syncAllTasks.add(task);
         if(this.listener != null){
             listener.handleNewTaskEvent(TaskRequestPM.toTaskRequest(task));
+        }else{
+            System.out.println("updateAllTaskRequestsPM() called. The new task listener is null.");
         }
 
     }

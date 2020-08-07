@@ -77,7 +77,7 @@ public class AppStarter extends Application {
 
         });
         AllTaskRequestsPM allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM);
-        allTaskRequestsPM.setListener(taskRequestService);
+        allTaskRequestsPM.setListener(taskRequestService.taskEventListener);
         rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM);
 
         rootPanel.addClockToHeader(txtTime);
