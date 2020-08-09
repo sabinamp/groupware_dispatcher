@@ -1,7 +1,7 @@
 package groupware.dispatcher.presentationmodel;
 
 
-import groupware.dispatcher.service.TaskEventListener;
+import groupware.dispatcher.service.TaskRequestPMEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -9,8 +9,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
+import java.util.stream.Collectors;
 
-public class AllTaskRequestsPM implements TaskEventListener{
+
+public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList();
 
     private AllCouriersPM allCouriersPM;
@@ -21,7 +23,7 @@ public class AllTaskRequestsPM implements TaskEventListener{
 
     private ObjectProperty<TaskRequestPM> currentTaskRequest = new SimpleObjectProperty<>();
 
-    private TaskEventListener listener;
+    private TaskRequestPMEventListener listener;
 
     public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, TaskRequestServiceImpl taskRequestService){
         this.allCouriersPM= allCouriersPM;
@@ -43,16 +45,35 @@ public class AllTaskRequestsPM implements TaskEventListener{
     public void updateAllTaskRequestsPM(TaskRequestPM task){
         syncAllTasks.add(task);
     }
+    public void updateAllTaskRequestsPMAndService(TaskRequestPM task){
+        syncAllTasks.add(task);
+        taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
+    }
     public void updateItemInAllTaskRequestsPM(TaskRequestPM task){
-        syncAllTasks.forEach(a->{
-            if(a.getTaskId().equals(task.getTaskId())){
-                removeCurrentItem(a);
-            }
-        });
+       /* synchronized (syncAllTasks ){
+            syncAllTasks.forEach(a->{
+                if(a.getTaskId().equals(task.getTaskId())){
+                    removeCurrentItem(a);
+                    syncAllTasks.notifyAll();
+                }
+            });
+*/
+            syncAllTasks.remove(task);
+            syncAllTasks.add(task);
+            syncAllTasks.notifyAll();
+
+
+    }
+
+    public void updateItemInAllTaskRequestsPMAndTaskService(TaskRequestPM task){
+        updateItemInAllTaskRequestsPM(task);
+        taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
+
     }
 
     private void removeCurrentItem(TaskRequestPM a) {
         syncAllTasks.remove(a);
+       syncAllTasks.notifyAll();
     }
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
@@ -66,13 +87,7 @@ public class AllTaskRequestsPM implements TaskEventListener{
         return currentTaskRequest.get();
     }
 
-    public TaskEventListener getListener() {
-        return listener;
-    }
 
-    public void setListener(TaskEventListener listener) {
-        this.listener = listener;
-    }
 
     @Override
     public void handleNewTaskEvent(TaskRequestPM task) {
@@ -84,7 +99,5 @@ public class AllTaskRequestsPM implements TaskEventListener{
         updateItemInAllTaskRequestsPM(taskRequest);
     }
 
-    public void updateTaskRequestService(TaskRequestPM task) {
-        this.taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
-    }
+
 }

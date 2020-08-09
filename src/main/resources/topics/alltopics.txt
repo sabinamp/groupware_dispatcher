@@ -27,10 +27,10 @@ couriers/info/update/courierId 
 The 2 topics below are used by groupware_dispatcher -
 the dispatcher client and the mobile app . The dispatcher assigns delivery tasks to couriers.
 The couriers accept or deny task requests.
-orders/task/courierId/taskId/request QoS 2 
-orders/task/courierId /taskId/accept QoS 2 
-orders/task/courierId/taskId/deny - QoS 2 
-orders/task/courierId/taskId/timeout - QoS 2 
-orders/task/courierId/taskId/completed - QoS 2 
+orders/courierId/taskId/request QoS 2 
+orders/courierId /taskId/accept QoS 2 
+orders/courierId/taskId/deny - QoS 2 
+orders/courierId/taskId/timeout - QoS 2 
+orders/courierId/taskId/completed - QoS 2 
 
 

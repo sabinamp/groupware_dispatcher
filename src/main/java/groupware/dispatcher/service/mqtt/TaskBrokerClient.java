@@ -4,11 +4,11 @@ import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
+import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.CourierServiceImpl;
+import groupware.dispatcher.service.TaskRequestEventListener;
+import groupware.dispatcher.service.TaskRequestPMEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
-import groupware.dispatcher.service.model.Conn;
-import groupware.dispatcher.service.model.CourierInfo;
-import groupware.dispatcher.service.model.CourierStatus;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class TaskBrokerClient extends BrokerClient{
+public class TaskBrokerClient extends BrokerClient implements TaskRequestEventListener {
     private static final java.util.UUID IDENTIFIER = UUID.randomUUID();
 
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
@@ -30,7 +30,8 @@ public class TaskBrokerClient extends BrokerClient{
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskBrokerClient.class));
 
 
-    public TaskBrokerClient(CourierServiceImpl courierService, TaskRequestServiceImpl taskRequestService){
+    public TaskBrokerClient(CourierServiceImpl courierService, TaskRequestServiceImpl taskRequestService)
+    {
         this.courierService= courierService;
         this.taskRequestService = taskRequestService;
 
@@ -55,12 +56,12 @@ public class TaskBrokerClient extends BrokerClient{
     }
 
 
-    public void connectPublishTaskRequest(TaskRequest taskRequest) {
+    private void connectPublishTaskRequest(TaskRequest taskRequest) {
         String courierId= taskRequest.getAssigneeId();
         String taskId= taskRequest.getTaskId();
-        String topicNewTaskRequestFilter="orders/"+taskId+"/"+courierId+"/request";
+        String topicNewTaskRequestFilter="orders/"+courierId+"/"+taskId+"/request";
         this.clientTaskRequestsPublisher.connectWith()
-                .keepAlive(100)
+                .keepAlive(120)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
@@ -70,26 +71,27 @@ public class TaskBrokerClient extends BrokerClient{
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
-                        logger.info("connectAndRequestCourier " + courierId + " The connection to the broker failed."
+                        logger.info("connectPublishTaskRequest " + courierId + " The connection to the broker failed."
                                 + throwable.getMessage());
-                        System.out.println("connectAndRequestCourier " + courierId + " The connection to the broker failed."+ throwable.getMessage());
+                        System.out.println("connectPublishTaskRequest " + courierId + " The connection to the broker failed."+ throwable.getMessage());
                     } else {
-                        System.out.println(" - successful connection to the broker. The client clientTaskRequestPublisher is connected.");
-                        logger.info(" - successful connection to the broker. The client clientTaskRequestPublisher is connected.");
-                        connectToBrokerAndSubscribeToTaskUpdates(taskRequest.getTaskId());
+                        System.out.println(" connectPublishTaskRequest- successful connection to the broker. The client clientTaskRequestPublisher is connected.");
+                        logger.info(" connectPublishTaskRequest- successful connection to the broker. The client clientTaskRequestPublisher is connected.");
+
                     }
+                    connectToBrokerAndSubscribeToTaskUpdates(taskRequest.getTaskId(), taskRequest);
                 });
     }
 
 
-    public void connectToBrokerAndSubscribeToTaskUpdates(String taskId){
+    private void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest task){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
         this.clientTaskSubscriber.connectWith()
                 .keepAlive(180)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToTaskRequestUpdates(taskId))
+                .thenComposeAsync(v -> subscribeToTaskRequestUpdates(taskId, task))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -103,14 +105,15 @@ public class TaskBrokerClient extends BrokerClient{
     }
 
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(String taskId) {
-        String topic="orders/task/"+taskId+"/+";
+    private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(String taskId, TaskRequest task) {
+        String courierId=task.getAssigneeId();
+        String topic="orders/"+courierId+"/"+taskId+"/#";
         return clientTaskRequestsPublisher.subscribeWith()
                 .topicFilter(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .callback(publish -> {
                     // Process the received message
-                    String topicEnd= publish.getTopic().getLevels().get(1);
+                    String topicEnd= publish.getTopic().getLevels().get(3);
                     if (topicEnd.equals("accept")){
                         taskRequestService.confirmTask(taskId, true);
                         System.out.println("update received for the task request "+ taskId);
@@ -127,7 +130,7 @@ public class TaskBrokerClient extends BrokerClient{
                    if( publish.getPayload().isPresent()){
                         System.out.println("update received for the task request sent to "+ taskId);
                         String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
-                        taskRequestService.updateTaskRequest(taskId, ModelObjManager.convertJsonToTaskRequest(receivedString));
+                        handleTaskUpdateEvent(ModelObjManager.convertJsonToTaskRequest(receivedString));
                     }
                 })
                 .send()
@@ -152,4 +155,14 @@ public class TaskBrokerClient extends BrokerClient{
         return taskRequestService;
     }
 
+    @Override
+    public void handleNewTaskEvent(TaskRequest task) {
+        connectPublishTaskRequest(task);
+
+    }
+
+    @Override
+    public void handleTaskUpdateEvent(TaskRequest taskRequest) {
+        taskRequestService.updateAllTaskRequestPM(taskRequest.getTaskId(), taskRequest);
+    }
 }

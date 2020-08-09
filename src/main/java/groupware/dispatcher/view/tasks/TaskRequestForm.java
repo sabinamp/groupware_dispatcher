@@ -190,24 +190,25 @@ public class TaskRequestForm extends VBox implements ViewMixin {
     private void save(ActionEvent evt) {
         currentTaskIdentifier++;
         if(orderIdChoiceBox.getValue() != null && courierIdChoiceBox.getValue() != null && taskTypeChoiceBox.getValue() != null){
-            String relatedOrderId= orderIdChoiceBox.getValue().getOrderId();
+            String relatedOrderId = orderIdChoiceBox.getValue().getOrderId();
             String assigneeId = courierIdChoiceBox.getValue().getCourierId();
             System.out.println("TaskRequestForm - Saving " + datePicker.getValue() + taskTypeChoiceBox.getValue()+ deliveryTypeChoiceBox.getValue()
-                    + "orderId "+relatedOrderId + "courierID " + assigneeId);
+                    + " orderId "+relatedOrderId + " courierID " + assigneeId);
             TaskRequestPM task = new TaskRequestPM();
             task.setTaskId("T"+currentTaskIdentifier);
+            task.setOrderId(relatedOrderId);
+            task.setAssigneeId(assigneeId);
             task.setTaskType(taskTypeChoiceBox.getValue());
             task.setDeliveryType(deliveryTypeChoiceBox.getValue());
             task.setAccepted(false);
-            task.setOrderId(orderIdChoiceBox.getValue().getOrderId());
-            task.setAssigneeId(assigneeId);
-            LocalDate date=datePicker.getValue();
+            task.setSentWhen(LocalDateTime.now());
+
+            LocalDate date = datePicker.getValue();
             task.setDueOn( LocalDateTime.of(date.getYear(), date.getMonth(), date.getDayOfMonth(),
                     LocalDateTime.MIN.getHour()+17, 0, 0));
             task.setDone(false);
 
-            this.allTaskRequestsPM.updateAllTaskRequestsPM(task);
-            this.allTaskRequestsPM.updateTaskRequestService(task);
+            this.allTaskRequestsPM.updateAllTaskRequestsPMAndService(task);
             TaskEvent taskEvent= new TaskEvent(TaskEvent.NEW_TASK);
             this.fireEvent(taskEvent);
             resetFields();

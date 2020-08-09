@@ -1,11 +1,8 @@
 package groupware.dispatcher.service;
 
 
-import groupware.dispatcher.presentationmodel.AllCouriersPM;
-import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
-import groupware.dispatcher.service.model.CourierStatus;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ModelObjManager;
 
@@ -23,7 +20,8 @@ public class TaskRequestServiceImpl{
     private CourierServiceImpl courierService;
 
     private AllTaskRequestsPM allTaskRequestsPM;
-    private TaskEventListener taskEventListener;
+    private TaskRequestPMEventListener taskRequestPMEventListener;
+    private TaskRequestEventListener taskRequestEventListener;
     static{
         tasks= new HashMap<>();
     }
@@ -47,25 +45,44 @@ public class TaskRequestServiceImpl{
                 tasks.put(id, taskRequest);
                 setCurrentTaskRequest(taskRequest);
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
-                        "The task with id : "+ id+" added or updated.");
-                if(taskEventListener != null){
-                    taskEventListener.handleTaskUpdateEvent(TaskRequestPM.of(taskRequest));
+                        "The task with id : "+ id+" updated.");
+                if(taskRequestEventListener != null){
+                    taskRequestEventListener.handleTaskUpdateEvent(taskRequest);
                 }
-
             }else{
                 tasks.put(id, taskRequest);
                 setCurrentTaskRequest(taskRequest);
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
-                        "The task with id : "+ id+" added or updated.");
-                if(taskEventListener != null){
-                    taskEventListener.handleNewTaskEvent(TaskRequestPM.of(taskRequest));
+                        "The task with id : "+ id+" added.");
+                if(taskRequestEventListener != null){
+                    taskRequestEventListener.handleNewTaskEvent(taskRequest);
                 }
             }
-
             return true;
         }
     }
 
+    public boolean updateAllTaskRequestPM(String id, TaskRequest taskRequest) {
+        if(taskRequest == null) {
+            logger.info("updateAllTaskRequestPM() received arg taskRequest - null");
+            return false;
+        }else {
+            if(tasks.get(id) != null){
+                tasks.put(id, taskRequest);
+                setCurrentTaskRequest(taskRequest);
+                System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +
+                        "The task with id : "+ id+" updated.");
+                if(taskRequestPMEventListener != null){
+                    taskRequestPMEventListener.handleTaskUpdateEvent(TaskRequestPM.of(taskRequest));
+                }
+            }else{
+                System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +
+                        "The task with id : "+ id+" should exist but it doesn't exist in the tasks list.");
+
+            }
+            return true;
+        }
+    }
 
     public boolean updateTaskRequestAssignee(String taskId, String courierId) {
         TaskRequest task= getTaskRequestById(taskId);
@@ -83,7 +100,6 @@ public class TaskRequestServiceImpl{
         System.out.println("Successfully updated the task request due date : " + successful);
         return successful;
     }
-
 
     public boolean updateTaskRequestDone(String taskId, boolean done) {
         TaskRequest task = getTaskRequestById(taskId);
@@ -107,7 +123,6 @@ public class TaskRequestServiceImpl{
     }
 
 
-
     public TaskRequest getCurrentTaskRequest() {
         return currentTaskRequest;
     }
@@ -124,27 +139,20 @@ public class TaskRequestServiceImpl{
         updateTaskRequestAccepted(taskId, accepted);
     }
 
-
-
-   /* @Override
-    public void handleNewTaskEvent(TaskRequest taskRequest){
-        //event sent always by the GUI
-        updateTaskRequest(taskRequest.getTaskId(), taskRequest);
-        System.out.println("handleNewTaskEvent"+taskRequest.getTaskId());
+    public TaskRequestPMEventListener getTaskRequestPMEventListener() {
+        return taskRequestPMEventListener;
     }
 
-    //TaskUpdate event usually sent by the courier
-    @Override
-    public void handleTaskUpdateEvent(TaskRequest taskRequest) {
-        updateTaskRequest(taskRequest.getTaskId(), taskRequest);
-        allTaskRequestsPM.updateAllTaskRequestsPM(TaskRequestPM.of(taskRequest));
-    }*/
-
-    public TaskEventListener getTaskEventListener() {
-        return taskEventListener;
+    public void setTaskRequestPMEventListener(TaskRequestPMEventListener taskRequestPMEventListener) {
+        this.taskRequestPMEventListener = taskRequestPMEventListener;
     }
 
-    public void setTaskEventListener(TaskEventListener taskEventListener) {
-        this.taskEventListener = taskEventListener;
+    public TaskRequestEventListener getTaskRequestEventListener() {
+        return taskRequestEventListener;
     }
+
+    public void setTaskRequestEventListener(TaskRequestEventListener taskRequestEventListener) {
+        this.taskRequestEventListener = taskRequestEventListener;
+    }
+
 }

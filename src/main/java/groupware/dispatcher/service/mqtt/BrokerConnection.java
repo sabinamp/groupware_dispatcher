@@ -7,9 +7,9 @@ import groupware.dispatcher.service.model.TaskRequest;
 
 
 public class BrokerConnection {
-    private CourierBrokerClient courierBrokerClient;
-    private OrdersBrokerClient ordersBrokerClient;
-    private TaskBrokerClient taskBrokerClient;
+    public static CourierBrokerClient courierBrokerClient;
+    public static OrdersBrokerClient ordersBrokerClient;
+    public static TaskBrokerClient taskBrokerClient;
 
 
     public BrokerConnection(CourierServiceImpl courierService, OrderServiceImpl orderService, TaskRequestServiceImpl taskService) {
@@ -53,9 +53,7 @@ public class BrokerConnection {
 
     }
 
-     void connectTaskServiceToBroker(TaskRequest taskReq){
-        taskBrokerClient.connectPublishTaskRequest(taskReq);
-    }
+
 
 
 }
