@@ -49,20 +49,20 @@ public class AllCouriersPM implements CourierEventListener {
         return syncAllCouriers;
     }
 
+    public void updateItemInAllCouriersPM(CourierPM pm){
+        for(int i=0; i < syncAllCouriers.size(); i++){
+            if(syncAllCouriers.get(i).equals(pm)){
+                syncAllCouriers.set(i, pm);
+            }
+        }
+    }
 
     public void updateAllCouriersPM(CourierPM pm){
-        syncAllCouriers.add(pm);
-    }
-    public void updateAndReplaceItemInAllCouriersPM(CourierPM pm){
-        String courierID = pm.getCourierId();
 
-        syncAllCouriers.forEach( a-> {
-            if(a.getCourierId().equals(courierID)){
-                removeCourierToBeReplaced(a);
-            }
-        });
         syncAllCouriers.add(pm);
     }
+
+
 
     private void removeCourierToBeReplaced(CourierPM c){
         syncAllCouriers.remove(c);
@@ -140,6 +140,6 @@ public class AllCouriersPM implements CourierEventListener {
 
     @Override
     public void handleCourierUpdateEvent(CourierPM courierInfo) {
-        updateAndReplaceItemInAllCouriersPM(courierInfo);
+        updateItemInAllCouriersPM(courierInfo);
     }
 }

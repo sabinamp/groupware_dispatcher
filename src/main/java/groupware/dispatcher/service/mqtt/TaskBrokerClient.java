@@ -61,14 +61,14 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
         String taskId= taskRequest.getTaskId();
         String topicNewTaskRequestFilter="orders/"+courierId+"/"+taskId+"/request";
         this.clientTaskRequestsPublisher.connectWith()
-                .keepAlive(120)
-                .cleanSession(false)
+                .keepAlive(60)
+                .cleanSession(true)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
                 .thenComposeAsync(v -> publishToTopic(clientTaskRequestsPublisher,
                         topicNewTaskRequestFilter,
                         taskRequestService.convertToJson(taskRequest)) )
-                .whenComplete((connAck, throwable) -> {
+                .whenCompleteAsync((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
                         logger.info("connectPublishTaskRequest " + courierId + " The connection to the broker failed."
@@ -79,20 +79,26 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                         logger.info(" connectPublishTaskRequest- successful connection to the broker. The client clientTaskRequestPublisher is connected.");
 
                     }
-                    connectToBrokerAndSubscribeToTaskUpdates(taskRequest.getTaskId(), taskRequest);
-                });
+
+                }).thenAcceptAsync(connAck->
+                        {
+                            System.out.println("connectPublishTaskRequest completed" + connAck.getTopic());
+                            handleTaskUpdateEvent(taskRequest);
+                        });
     }
 
 
-    private void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest task){
+
+
+    private void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest taskRequest){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
         this.clientTaskSubscriber.connectWith()
-                .keepAlive(180)
+                .keepAlive(120)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToTaskRequestUpdates(taskId, task))
-                .whenComplete((connAck, throwable) -> {
+                .thenComposeAsync(v -> subscribeToTaskRequestUpdates(taskId, taskRequest))
+                .whenCompleteAsync((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
                         logger.info("The connection to the broker failed."+ throwable.getMessage());
@@ -100,6 +106,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                     } else {
                         System.out.println("successful connection to the broker. The client clientTaskSubscriber is connected");
                         logger.info("successful connection to the broker. The client clientTaskSubscriber is connected");
+
                     }
                 });
     }
@@ -108,33 +115,38 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
     private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(String taskId, TaskRequest task) {
         String courierId=task.getAssigneeId();
         String topic="orders/"+courierId+"/"+taskId+"/#";
-        return clientTaskRequestsPublisher.subscribeWith()
+        return clientTaskSubscriber.subscribeWith()
                 .topicFilter(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .callback(publish -> {
                     // Process the received message
                     String topicEnd= publish.getTopic().getLevels().get(3);
-                    if (topicEnd.equals("accept")){
-                        taskRequestService.confirmTask(taskId, true);
-                        System.out.println("update received for the task request "+ taskId);
-                    }else if(topicEnd.equals("deny")){
-                        taskRequestService.confirmTask(taskId, false);
-                        System.out.println("update received for the task request "+ taskId);
-                    }else if(topicEnd.equals("timeout")){
-                        taskRequestService.confirmTask(taskId, false);
-                        System.out.println("task timed out - update received for the task request "+ taskId);
-                    }else if(topicEnd.equals("completed")){
-                        taskRequestService.updateTaskRequestDone(taskId, true);
-                        System.out.println("task completed- update received for the task request "+ taskId);
+                    switch (topicEnd) {
+                        case "accept":
+                            taskRequestService.confirmTask(taskId, true);
+                            System.out.println("task accepted - update received for the task request " + taskId);
+                            break;
+                        case "deny":
+                            taskRequestService.confirmTask(taskId, false);
+                            System.out.println("update received for the task request " + taskId);
+                            break;
+                        case "timeout":
+                            taskRequestService.confirmTask(taskId, false);
+                            System.out.println("task timed out - update received for the task request " + taskId);
+                            break;
+                        case "completed":
+                            taskRequestService.updateTaskRequestDone(taskId, true);
+                            System.out.println("task completed- update received for the task request " + taskId);
+                            break;
                     }
                    if( publish.getPayload().isPresent()){
                         System.out.println("update received for the task request sent to "+ taskId);
                         String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
-                        handleTaskUpdateEvent(ModelObjManager.convertJsonToTaskRequest(receivedString));
+                        taskRequestService.updateAllTaskRequestPM(taskId, ModelObjManager.convertJsonToTaskRequest(receivedString));
                     }
                 })
                 .send()
-                .whenComplete((mqtt3SubAck, throwable) -> {
+                .whenCompleteAsync((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to subscribe
                         logger.warning("Couldn't subscribe to topic " + topic);
@@ -156,13 +168,12 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
     }
 
     @Override
-    public void handleNewTaskEvent(TaskRequest task) {
-        connectPublishTaskRequest(task);
-
+    public void handleNewTaskEvent(TaskRequest taskRequest) {
+      connectPublishTaskRequest(taskRequest);
     }
 
     @Override
     public void handleTaskUpdateEvent(TaskRequest taskRequest) {
-        taskRequestService.updateAllTaskRequestPM(taskRequest.getTaskId(), taskRequest);
+        connectToBrokerAndSubscribeToTaskUpdates(taskRequest.getTaskId(), taskRequest);
     }
 }

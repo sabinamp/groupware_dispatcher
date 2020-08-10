@@ -71,13 +71,13 @@ public class CourierBrokerClient extends BrokerClient{
         this.clientCourierInfo.connectWith()
                 .keepAlive(100)
                 .cleanSession(false)
-                .willPublish()
+              /*  .willPublish()
                 .topic("couriers/info/get/" + courierId)
                 .qos(MqttQos.EXACTLY_ONCE)
-                .applyWillPublish()
+                .applyWillPublish()*/
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-              //  .thenComposeAsync(v -> publishToTopic(clientCourierInfo,topicName,null))
+               .thenComposeAsync(v -> publishToTopic(clientCourierInfo,topicName,null))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -110,9 +110,9 @@ public class CourierBrokerClient extends BrokerClient{
                     } else {
                         System.out.println("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
                         logger.info("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
-
+                        //clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/#").send();
                     }
-                    clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/#").send();
+
                 });
     }
 
@@ -197,18 +197,23 @@ public class CourierBrokerClient extends BrokerClient{
 
                         String tobeUpdated= publish.getTopic().getLevels().get(1);
                         String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
-                        if (tobeUpdated.equals("status")){
-                            courierService.setStatus(courierId, CourierStatus.fromValue(receivedString));
-                            System.out.println("update received for the courier "+ receivedString);
-                        }else if(tobeUpdated.equals("conn")){
-                            courierService.setConn(courierId, Conn.fromValue(receivedString));
-                            System.out.println("update received for the courier "+ receivedString);
-                        }else if(tobeUpdated.equals("assigned_orders")){
-                            courierService.updateAssignedOrders(courierId, receivedString);
-                            System.out.println("update received for the courier "+ receivedString);
-                        }else if(tobeUpdated.equals("info")){
-                            courierService.updateCourierInfo(courierId, ModelObjManager.convertJsonToCourierInfo(receivedString));
-                            System.out.println("update received for the courier "+ receivedString);
+                        switch (tobeUpdated) {
+                            case "status":
+                                courierService.setStatus(courierId, CourierStatus.fromValue(receivedString));
+                                System.out.println("update received for the courier " + receivedString);
+                                break;
+                            case "conn":
+                                courierService.setConn(courierId, Conn.fromValue(receivedString));
+                                System.out.println("update received for the courier " + receivedString);
+                                break;
+                            case "assigned_orders":
+                                courierService.updateAssignedOrders(courierId, receivedString);
+                                System.out.println("update received for the courier " + receivedString);
+                                break;
+                            case "info":
+                                courierService.updateCourierInfo(courierId, ModelObjManager.convertJsonToCourierInfo(receivedString));
+                                System.out.println("update received for the courier " + receivedString);
+                                break;
                         }
                     }
                 })

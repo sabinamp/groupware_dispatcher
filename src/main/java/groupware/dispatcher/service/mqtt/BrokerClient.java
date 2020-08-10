@@ -15,7 +15,7 @@ public class BrokerClient {
 
 
     CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload){
-        CompletableFuture<Mqtt3Publish> mqtt3PublishCompletableFuture = client.publishWith()
+       return client.publishWith()
                 .topic(myTopic)
                 .retain(true)
                 .payload(myPayload == null? null: myPayload.getBytes())
@@ -30,13 +30,14 @@ public class BrokerClient {
                         logger.info(" - published to the topic " + myTopic);
                     }
                 });
-        return  mqtt3PublishCompletableFuture;
+
     }
 
 
     Mqtt3Publish publishMessage(String topic, String myPayload){
         return Mqtt3Publish.builder()
                 .topic(topic)
+                .retain(true)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .payload(myPayload == null? null: myPayload.getBytes())
                 .build();

@@ -52,7 +52,7 @@ public class CourierServiceImpl implements CourierService {
         if(courier == null ){
             return false;
         }else{
-            if(couriers.get(courierId) != null){
+            if(couriers.get(courierId) == null){
                 couriers.put(courierId, courier);
                 CourierPM currentCourierPM = CourierPM.of(courierId, courier);
                 allCouriersPMListener.handleNewCourierEvent(currentCourierPM);

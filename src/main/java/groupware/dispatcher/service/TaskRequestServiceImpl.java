@@ -104,7 +104,7 @@ public class TaskRequestServiceImpl{
     public boolean updateTaskRequestDone(String taskId, boolean done) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setDone(done);
-        boolean successful = updateTaskRequest(taskId, task);
+        boolean successful = updateAllTaskRequestPM(taskId, task);
         System.out.println("Successfully updated the task request : " + successful);
         return successful;
     }
@@ -112,7 +112,7 @@ public class TaskRequestServiceImpl{
     public boolean updateTaskRequestAccepted(String taskId, boolean confirmed) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setConfirmed(confirmed);
-        boolean successful = updateTaskRequest(taskId, task);
+        boolean successful = updateAllTaskRequestPM(taskId, task);
         System.out.println("Successfully updated the task request : " + successful);
         return successful;
     }
