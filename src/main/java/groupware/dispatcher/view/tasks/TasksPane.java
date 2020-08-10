@@ -85,23 +85,27 @@ public class TasksPane extends BorderPane implements ViewMixin {
 
     @Override
     public void setupValueChangedListeners() {
-        this.allOrdersPM.getAllOrderEntries().addListener(new ListChangeListener<>() {
-            @Override
-            public void onChanged(Change<? extends OrderPM> c) {
-                int lastIndex = c.getList().size() -1;
-                ordersRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getOrderId()));
-            }
+        this.allOrdersPM.getAllOrderEntries().addListener((ListChangeListener<OrderPM>) c -> {
+            int lastIndex = c.getList().size() -1;
+            ordersRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getOrderId() +" "
+            +c.getList().get(lastIndex).getOrderType()));
         });
 
-        this.allCouriersPM.getAllCourierEntries().addListener(new ListChangeListener<>() {
-            @Override
-            public void onChanged(Change<? extends CourierPM> c) {
+        this.allCouriersPM.getAllCourierEntries().addListener((ListChangeListener<CourierPM>) c -> {
+            c.next();
+            if(c.wasAdded()){
                 int lastIndex = c.getList().size() -1;
 
                 tRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getCourierId() +" "
-                + c.getList().get(lastIndex).getName()));
+                        + c.getList().get(lastIndex).getName()));
             }
+
         });
+       /*for(int i=0; i < this.allCouriersPM.getAllCourierEntries().size(); i++){
+           CourierPM current=this.allCouriersPM.getAllCourierEntries().get(i);
+           tRoot.getChildren().add(new TreeItem<>(current.getCourierId() +" "
+                   + current.getName()));
+       }*/
     }
 
     @Override

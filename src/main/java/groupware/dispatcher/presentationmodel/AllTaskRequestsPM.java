@@ -50,18 +50,11 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
     }
     public void updateItemInAllTaskRequestsPM(TaskRequestPM task){
-       /* synchronized (syncAllTasks ){
-            syncAllTasks.forEach(a->{
-                if(a.getTaskId().equals(task.getTaskId())){
-                    removeCurrentItem(a);
-                    syncAllTasks.notifyAll();
-                }
-            });
-*/
-            syncAllTasks.remove(task);
-            syncAllTasks.add(task);
-            syncAllTasks.notifyAll();
-
+       for(int i =0; i < syncAllTasks.size(); i++){
+           if(syncAllTasks.get(i).getTaskId().equals(task.getTaskId())){
+               syncAllTasks.set(i, task);
+           }
+       }
 
     }
 
@@ -71,10 +64,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
 
     }
 
-    private void removeCurrentItem(TaskRequestPM a) {
-        syncAllTasks.remove(a);
-       syncAllTasks.notifyAll();
-    }
+
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
         return currentTaskRequest;
