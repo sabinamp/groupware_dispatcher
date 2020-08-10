@@ -42,12 +42,7 @@ public class AllOrdersPM implements OrderEventListener {
     }
 
     private void setupValueChangedListeners() {
-        syncAllOrdersMap.addListener(new MapChangeListener<>() {
-            @Override
-            public void onChanged(Change<? extends String, ? extends OrderPM> change) {
-                System.out.println("syncAllOrdersMap Update"+ change);
-            }
-        });
+        syncAllOrdersMap.addListener((MapChangeListener<String, OrderPM>) change -> System.out.println("syncAllOrdersMap Update"+ change));
 
 
         syncAllOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
@@ -59,7 +54,7 @@ public class AllOrdersPM implements OrderEventListener {
             boolean wasAdded = change.wasAdded();
             List<OrderPM> listChanges = new ArrayList<>(change.getList());
 
-            //todo - notification popup
+            //notification popup
             Platform.runLater(()->{
                 int changeNb = change.getList().size();
                     System.out.println("showAlertWithDefaultHeaderText called. The number of updates or new orders " + changeNb);
@@ -74,11 +69,11 @@ public class AllOrdersPM implements OrderEventListener {
         });
     }
 
-    public void updateAllOrdersPM(OrderPM orderPM){
+  /*  public void updateAllOrdersPM(OrderPM orderPM){
         syncAllOrders.add(orderPM);
         syncAllOrdersMap.put(orderPM.getOrderId(), orderPM);
-    }
-    public void updateItemInAllOrdersPM(OrderPM orderPM){
+    }*/
+    public void updateAllOrdersPM(OrderPM orderPM){
         String id = orderPM.getOrderId();
         OrderPM existingOrder = syncAllOrdersMap.get(id);
         if(existingOrder != null){
@@ -95,6 +90,7 @@ public class AllOrdersPM implements OrderEventListener {
     {
         return this.allOrders;
     }
+
     // Show an Info Alert with default header Text
     private void showAlertWithDefaultHeaderText(boolean updated, OrderPM changedOrder) {
         final String NotifyICON = "\uf0f3";
@@ -105,7 +101,7 @@ public class AllOrdersPM implements OrderEventListener {
         alert.setTitle(title);
 
         StringBuilder content = new StringBuilder(changedOrder.getOrderId());
-           // if(changedOrder.getOrderStatus().equals(OrderStatus.PENDING)) {
+
            if( updated) {
                content.append(" Order updated ")
                        .append( changedOrder.getOrderId() )
@@ -149,11 +145,11 @@ public class AllOrdersPM implements OrderEventListener {
 
     @Override
     public void handleNewOrderEvent(OrderPM order) {
-        updateAllOrdersPM(order);
+        this.updateAllOrdersPM(order);
     }
 
     @Override
     public void handleOrderUpdateEvent(OrderPM orderPM) {
-        this.updateItemInAllOrdersPM(orderPM);
+        this.updateAllOrdersPM(orderPM);
     }
 }

@@ -28,8 +28,8 @@ public class TaskRequestServiceImpl{
 
     public TaskRequestServiceImpl(OrderServiceImpl orderService, CourierServiceImpl courierService){
         logger = LogManager.getLogManager().getLogger(String.valueOf(TaskRequestServiceImpl.class));
-      this.orderService = orderService;
-      this.courierService = courierService;
+        this.orderService = orderService;
+        this.courierService = courierService;
     }
 
     public TaskRequest getTaskRequestById(String taskId){
@@ -135,9 +135,7 @@ public class TaskRequestServiceImpl{
        return ModelObjManager.convertToJSON(taskRequest);
     }
 
-    public void confirmTask(String taskId, boolean accepted) {
-        updateTaskRequestAccepted(taskId, accepted);
-    }
+
 
     public TaskRequestPMEventListener getTaskRequestPMEventListener() {
         return taskRequestPMEventListener;

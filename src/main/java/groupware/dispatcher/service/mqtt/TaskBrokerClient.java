@@ -55,36 +55,24 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
         clientTaskRequestsPublisher.disconnect();
     }
 
+    private void connectClientTaskRequestsPublisher() {
+        this.clientTaskRequestsPublisher.connectWith()
+                .keepAlive(180)
+                .cleanSession(true)
+                .send()
+                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
+    }
 
     private void connectPublishTaskRequest(TaskRequest taskRequest) {
         String courierId= taskRequest.getAssigneeId();
         String taskId= taskRequest.getTaskId();
         String topicNewTaskRequestFilter="orders/"+courierId+"/"+taskId+"/request";
-        this.clientTaskRequestsPublisher.connectWith()
-                .keepAlive(60)
-                .cleanSession(true)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> publishToTopic(clientTaskRequestsPublisher,
-                        topicNewTaskRequestFilter,
-                        taskRequestService.convertToJson(taskRequest)) )
-                .whenCompleteAsync((connAck, throwable) -> {
-                    if (throwable != null) {
-                        // Handle connection failure
-                        logger.info("connectPublishTaskRequest " + courierId + " The connection to the broker failed."
-                                + throwable.getMessage());
-                        System.out.println("connectPublishTaskRequest " + courierId + " The connection to the broker failed."+ throwable.getMessage());
-                    } else {
-                        System.out.println(" connectPublishTaskRequest- successful connection to the broker. The client clientTaskRequestPublisher is connected.");
-                        logger.info(" connectPublishTaskRequest- successful connection to the broker. The client clientTaskRequestPublisher is connected.");
 
-                    }
+        connectClientTaskRequestsPublisher();
+        publishToTopic(clientTaskRequestsPublisher, topicNewTaskRequestFilter,
+                        taskRequestService.convertToJson(taskRequest));
+        System.out.println("connectPublishTaskRequest() called");
 
-                }).thenAcceptAsync(connAck->
-                        {
-                            System.out.println("connectPublishTaskRequest completed" + connAck.getTopic());
-                            handleTaskUpdateEvent(taskRequest);
-                        });
     }
 
 
@@ -123,15 +111,15 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                     String topicEnd= publish.getTopic().getLevels().get(3);
                     switch (topicEnd) {
                         case "accept":
-                            taskRequestService.confirmTask(taskId, true);
+                            taskRequestService.updateTaskRequestAccepted(taskId, true);
                             System.out.println("task accepted - update received for the task request " + taskId);
                             break;
                         case "deny":
-                            taskRequestService.confirmTask(taskId, false);
+                            taskRequestService.updateTaskRequestAccepted(taskId, false);
                             System.out.println("update received for the task request " + taskId);
                             break;
                         case "timeout":
-                            taskRequestService.confirmTask(taskId, false);
+                            taskRequestService.updateTaskRequestAccepted(taskId, false);
                             System.out.println("task timed out - update received for the task request " + taskId);
                             break;
                         case "completed":
@@ -169,11 +157,12 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
     @Override
     public void handleNewTaskEvent(TaskRequest taskRequest) {
-      connectPublishTaskRequest(taskRequest);
+        connectPublishTaskRequest(taskRequest);
+        connectToBrokerAndSubscribeToTaskUpdates(taskRequest.getTaskId(), taskRequest);
     }
 
     @Override
     public void handleTaskUpdateEvent(TaskRequest taskRequest) {
-        connectToBrokerAndSubscribeToTaskUpdates(taskRequest.getTaskId(), taskRequest);
+
     }
 }

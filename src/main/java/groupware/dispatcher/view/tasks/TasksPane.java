@@ -81,6 +81,7 @@ public class TasksPane extends BorderPane implements ViewMixin {
 
     @Override
     public void setupBindings() {
+
            }
 
     @Override
@@ -101,11 +102,7 @@ public class TasksPane extends BorderPane implements ViewMixin {
             }
 
         });
-       /*for(int i=0; i < this.allCouriersPM.getAllCourierEntries().size(); i++){
-           CourierPM current=this.allCouriersPM.getAllCourierEntries().get(i);
-           tRoot.getChildren().add(new TreeItem<>(current.getCourierId() +" "
-                   + current.getName()));
-       }*/
+
     }
 
     @Override
