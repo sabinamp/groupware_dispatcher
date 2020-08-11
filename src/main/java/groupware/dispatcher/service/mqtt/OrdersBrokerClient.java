@@ -21,11 +21,12 @@ public class OrdersBrokerClient extends BrokerClient {
     Mqtt3AsyncClient client2;
     Mqtt3AsyncClient orderSubscriber;
     private OrderService orderService;
-    private final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
+    private final Logger logger;
 
 
     public OrdersBrokerClient(OrderService orderServiceImpl){
         orderService= orderServiceImpl;
+        logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
 
         orderGetPublisher = MqttClient.builder()
                 .useMqttVersion3()
@@ -103,15 +104,15 @@ public class OrdersBrokerClient extends BrokerClient {
     public void connectAndRequestExistingOrder(String orderId){
         System.out.println("connecting to Broker and publishing the request for the existing order "+orderId);
         this.orderGetPublisher.connectWith()
-                .keepAlive(80)
-                .cleanSession(true)
-                .willPublish()
+                .keepAlive(120)
+                .cleanSession(false)
+               /* .willPublish()
                 .topic("orders/all_info/get/"+ orderId)
                 .qos(MqttQos.EXACTLY_ONCE)
-                .applyWillPublish()
+                .applyWillPublish()*/
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                //.thenComposeAsync(v-> publishToTopic(orderGetPublisher,"orders/get/"+ orderId,null))
+                .thenComposeAsync(v-> publishToTopic(orderGetPublisher,"orders/all_info/get/"+ orderId,null))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -127,7 +128,7 @@ public class OrdersBrokerClient extends BrokerClient {
     public void connectAndSubscribeForExistingOrders() {
         System.out.println("connecting to Broker and subscribing for existing orders. ");
         this.orderSubscriber.connectWith()
-                .keepAlive(180)
+                .keepAlive(120)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
@@ -152,8 +153,8 @@ public class OrdersBrokerClient extends BrokerClient {
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
                         String orderId = mqtt3Publish.getTopic().getLevels().get(3);
-                        String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
-                        OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
+                        String received = ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
+                        OrderDescriptiveInfo order = ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                         if (order != null) {
                             System.out.println("the order "+orderId+" has been received from the broker.");
                             orderService.updateOrder(orderId, order);
@@ -193,6 +194,9 @@ public class OrdersBrokerClient extends BrokerClient {
     }
     public void stopClient2BrokerConnection(){
         client2.disconnect();
+    }
+    public void stopClientOrderSubscriber(){
+        orderSubscriber.disconnect();
     }
 
 

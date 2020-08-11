@@ -69,15 +69,15 @@ public class CourierBrokerClient extends BrokerClient{
         String topicName= "couriers/info/get/" + courierId;
         System.out.println("connecting to Broker and subscribing for courier "+courierId);
         this.clientCourierInfo.connectWith()
-                .keepAlive(100)
+                .keepAlive(80)
                 .cleanSession(false)
-              /*  .willPublish()
+               /* .willPublish()
                 .topic("couriers/info/get/" + courierId)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .applyWillPublish()*/
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-               .thenComposeAsync(v -> publishToTopic(clientCourierInfo,topicName,null))
+                .thenComposeAsync(v -> publishToTopic(clientCourierInfo,topicName,null))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -96,7 +96,7 @@ public class CourierBrokerClient extends BrokerClient{
     public void connectAndSubscribeForCourierInfoResponse(){
         System.out.println("connecting to Broker and subscribing for courier info. ");
         this.clientCourierInfoSubscriber.connectWith()
-                .keepAlive(120)
+                .keepAlive(80)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
@@ -117,7 +117,7 @@ public class CourierBrokerClient extends BrokerClient{
     }
 
      CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(){
-        String topicName = "couriers/info/get/#";
+        String topicName = "couriers/info/get/+/response";
         System.out.println("entering subscribeToGetCourierById for the topic "+topicName);
 
         return this.clientCourierInfoSubscriber.subscribeWith()
@@ -134,7 +134,6 @@ public class CourierBrokerClient extends BrokerClient{
                             CourierInfo courier = ModelObjManager.convertJsonToCourierInfo(received);
                             if(courier != null){
                                 courierService.saveCourier(courierId, courier);
-
                             }else{
                                 System.out.println("the converted courier object is null");
                             }
@@ -159,7 +158,7 @@ public class CourierBrokerClient extends BrokerClient{
     public void connectToBrokerAndSubscribeToCourierUpdates(){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToCourierUpdates");
         this.clientCourierUpdates.connectWith()
-                .keepAlive(180)
+                .keepAlive(160)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))

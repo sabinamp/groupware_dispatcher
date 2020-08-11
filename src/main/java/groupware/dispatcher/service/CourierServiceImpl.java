@@ -49,17 +49,20 @@ public class CourierServiceImpl implements CourierService {
 
     @Override
     public boolean saveCourier(String courierId, CourierInfo courier) {
+        boolean updating = false;
         if(courier == null ){
             return false;
         }else{
-            if(couriers.get(courierId) == null){
-                couriers.put(courierId, courier);
-                CourierPM currentCourierPM = CourierPM.of(courierId, courier);
-                allCouriersPMListener.handleNewCourierEvent(currentCourierPM);
-            }else{
-                couriers.put(courierId, courier);
-                CourierPM currentCourierPM = CourierPM.of(courierId, courier);
+
+            if(couriers.get(courierId) != null){
+              updating = true;
+            }
+            couriers.put(courierId, courier);
+            CourierPM currentCourierPM = CourierPM.of(courierId, courier);
+            if(updating){
                 allCouriersPMListener.handleCourierUpdateEvent(currentCourierPM);
+            }else{
+                allCouriersPMListener.handleNewCourierEvent(currentCourierPM);
             }
             return true;
         }
