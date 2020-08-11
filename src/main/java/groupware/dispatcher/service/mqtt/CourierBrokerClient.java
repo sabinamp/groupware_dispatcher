@@ -20,12 +20,14 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class CourierBrokerClient extends BrokerClient{
-    private static final java.util.UUID IDENTIFIER = UUID.randomUUID();
+    private static final String IDENTIFIER_ClientCourierInfo = "ClientCourierInfo";
+    private static final String IDENTIFIER_ClientCourierUpdates = "ClientCourierUpdates";
+    private static final String IDENTIFIER_ClientCourierInfoSubscriber = "ClientCourierInfoSubscriber";
+
     private Mqtt3AsyncClient clientCourierInfo;
     private Mqtt3AsyncClient clientCourierUpdates;
     private Mqtt3AsyncClient clientCourierInfoSubscriber;
-    private Mqtt3AsyncClient clientTaskRequestsPublisher;
-    private Mqtt3AsyncClient clientTaskSubscriber;
+
     private CourierServiceImpl courierService;
 
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(CourierBrokerClient.class));
@@ -36,21 +38,21 @@ public class CourierBrokerClient extends BrokerClient{
 
         clientCourierInfo = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(IDENTIFIER.toString())
+                .identifier(IDENTIFIER_ClientCourierInfo)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientCourierInfoSubscriber = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(UUID.randomUUID().toString())
+                .identifier(IDENTIFIER_ClientCourierInfoSubscriber)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientCourierUpdates = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(UUID.randomUUID().toString())
+                .identifier(IDENTIFIER_ClientCourierUpdates)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
@@ -65,38 +67,26 @@ public class CourierBrokerClient extends BrokerClient{
     }
 
 
+    public void connectClientCourierInfo(){
+        this.clientCourierInfo.connectWith()
+                .keepAlive(160)
+                .cleanSession(false)
+                .send()
+                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
+    }
+
    public void connectAndRequestCourier(String courierId){
         String topicName= "couriers/info/get/" + courierId;
         System.out.println("connecting to Broker and subscribing for courier "+courierId);
-        this.clientCourierInfo.connectWith()
-                .keepAlive(80)
-                .cleanSession(false)
-               /* .willPublish()
-                .topic("couriers/info/get/" + courierId)
-                .qos(MqttQos.EXACTLY_ONCE)
-                .applyWillPublish()*/
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> publishToTopic(clientCourierInfo,topicName,null))
-                .whenComplete((connAck, throwable) -> {
-                    if (throwable != null) {
-                        // Handle connection failure
-                        logger.info("connectAndRequestCourier " + courierId + " The connection to the broker failed."
-                                        + throwable.getMessage());
-                        System.out.println("connectAndRequestCourier " + courierId + " The connection to the broker failed."+ throwable.getMessage());
-                    } else {
-                        System.out.println(" - successful connection to the broker. The client clientCourierInfo is connected");
-                        logger.info(" - successful connection to the broker. The client clientCourierInfo is connected");
-
-                    }
-                });
-    }
+       connectClientCourierInfo();
+        publishToTopic(this.clientCourierInfo,topicName,null);
+   }
 
 
     public void connectAndSubscribeForCourierInfoResponse(){
         System.out.println("connecting to Broker and subscribing for courier info. ");
         this.clientCourierInfoSubscriber.connectWith()
-                .keepAlive(80)
+                .keepAlive(120)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))

@@ -16,40 +16,62 @@ public class BrokerConnection {
         courierBrokerClient = new CourierBrokerClient(courierService);
         ordersBrokerClient = new OrdersBrokerClient(orderService);
         taskBrokerClient = new TaskBrokerClient(courierService, taskService);
-        connectCourierServiceToBroker();
-        connectOrderServiceToBroker();
+        connectCourierServiceToBroker.run();
+        connectOrderServiceToBroker.run();
     }
 
 
-    private void connectCourierServiceToBroker(){
-        subscribeToCouriers();
-        courierBrokerClient.connectToBrokerAndSubscribeToCourierUpdates();
-    }
+    Runnable connectCourierServiceToBroker = new Runnable() {
+        @Override
+        public void run() {
+            subscribeToCouriers();
+            courierBrokerClient.connectToBrokerAndSubscribeToCourierUpdates();
+        }
+    };
 
-    private void connectOrderServiceToBroker(){
 
-        subscribeToOrders();
-        ordersBrokerClient.connectToBrokerAndSubscribeToNewOrders();
-    }
+    Runnable connectOrderServiceToBroker =new Runnable() {
+        @Override
+        public void run() {
+            subscribeToOrders();
+            ordersBrokerClient.connectToBrokerAndSubscribeToNewOrders();
+        }
+    };
+
 
     private void subscribeToCouriers(){
+
         courierBrokerClient.connectAndRequestCourier("C100");
+
         courierBrokerClient.connectAndRequestCourier("C101");
+
         courierBrokerClient.connectAndRequestCourier("C102");
+
         courierBrokerClient.connectAndRequestCourier("C103");
+
         courierBrokerClient.connectAndRequestCourier("C104");
+
         courierBrokerClient.connectAndRequestCourier("C105");
+
         courierBrokerClient.connectAndRequestCourier("C106");
+
         courierBrokerClient.connectAndRequestCourier("C107");
         courierBrokerClient.connectAndSubscribeForCourierInfoResponse();
+
+
     }
 
     private void subscribeToOrders(){
+
         ordersBrokerClient.connectAndRequestExistingOrder("OR1111");
+        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1111");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1122");
+        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1122");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1123");
+        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1123");
         ordersBrokerClient.connectAndRequestExistingOrder("OR1124");
-        ordersBrokerClient.connectAndSubscribeForExistingOrders();
+        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1124");
+
 
     }
 

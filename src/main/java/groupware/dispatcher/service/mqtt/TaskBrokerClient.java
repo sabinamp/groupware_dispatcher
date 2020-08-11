@@ -20,7 +20,8 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class TaskBrokerClient extends BrokerClient implements TaskRequestEventListener {
-    private static final java.util.UUID IDENTIFIER = UUID.randomUUID();
+    private static final String IDENTIFIER_ClientTaskRequestsPublisher = "ClientTaskRequestsPublisher";
+    private static final String IDENTIFIER_ClientTaskSubscriber = "ClientTaskSubscriber";
 
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
     private Mqtt3AsyncClient clientTaskSubscriber;
@@ -37,13 +38,13 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
         clientTaskRequestsPublisher = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(UUID.randomUUID().toString())
+                .identifier(IDENTIFIER_ClientTaskRequestsPublisher)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientTaskSubscriber = MqttClient.builder().useMqttVersion3()
-                .identifier(UUID.randomUUID().toString())
+                .identifier(IDENTIFIER_ClientTaskSubscriber)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
@@ -57,7 +58,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
     private void connectClientTaskRequestsPublisher() {
         this.clientTaskRequestsPublisher.connectWith()
-                .keepAlive(180)
+                .keepAlive(120)
                 .cleanSession(true)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
@@ -77,16 +78,18 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
 
 
-
-    private void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest taskRequest){
-        System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
-        this.clientTaskSubscriber.connectWith()
-                .keepAlive(120)
-                .cleanSession(false)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToTaskRequestUpdates(taskId, taskRequest))
-                .whenCompleteAsync((connAck, throwable) -> {
+private void connectClientTaskSubscriber(){
+    System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
+    this.clientTaskSubscriber.connectWith()
+            .keepAlive(120)
+            .cleanSession(false)
+            .send()
+            .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
+}
+    public void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest taskRequest){
+        connectClientTaskSubscriber();
+        subscribeToTaskRequestUpdates(taskId, taskRequest);
+                /*.whenCompleteAsync((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
                         logger.info("The connection to the broker failed."+ throwable.getMessage());
@@ -96,7 +99,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                         logger.info("successful connection to the broker. The client clientTaskSubscriber is connected");
 
                     }
-                });
+                });*/
     }
 
 

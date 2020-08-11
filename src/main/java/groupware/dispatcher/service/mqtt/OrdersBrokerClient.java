@@ -1,6 +1,5 @@
 package groupware.dispatcher.service.mqtt;
 
-import com.hivemq.client.mqtt.datatypes.MqttQos;
 import groupware.dispatcher.service.OrderService;
 import groupware.dispatcher.service.model.*;
 import com.hivemq.client.mqtt.MqttClient;
@@ -16,9 +15,11 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class OrdersBrokerClient extends BrokerClient {
-    private static final java.util.UUID IDENTIFIER = java.util.UUID.randomUUID();
+    private static final String IDENTIFIER_OrderGetPublisher = "orderGetPublisher";
+    private static final String IDENTIFIER_OrderSubscriber = "orderSubscriber";
+    private static final String IDENTIFIER_SubscribeToNewOrders = "subscribeToNewOrders";
     Mqtt3AsyncClient orderGetPublisher;
-    Mqtt3AsyncClient client2;
+    Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
     private OrderService orderService;
     private final Logger logger;
@@ -30,21 +31,21 @@ public class OrdersBrokerClient extends BrokerClient {
 
         orderGetPublisher = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(IDENTIFIER.toString())
+                .identifier(IDENTIFIER_OrderGetPublisher)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
-        client2 = MqttClient.builder()
+        subscribeToNewOrders = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(UUID.randomUUID().toString())
+                .identifier(IDENTIFIER_SubscribeToNewOrders)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         orderSubscriber = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(UUID.randomUUID().toString())
+                .identifier(IDENTIFIER_OrderSubscriber)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
@@ -54,7 +55,7 @@ public class OrdersBrokerClient extends BrokerClient {
 
     public void connectToBrokerAndSubscribeToNewOrders(){
         System.out.println("connecting to Broker");
-        this.client2.connectWith()
+        this.subscribeToNewOrders.connectWith()
                 .keepAlive(180)
                 .cleanSession(false)
                 .send()
@@ -66,8 +67,8 @@ public class OrdersBrokerClient extends BrokerClient {
                         logger.info("The connection to the broker failed."+ throwable.getMessage());
                         System.out.println("The connection to the broker failed."+ throwable.getMessage());
                     } else {
-                        System.out.println("successful connection to the broker. The client "+ IDENTIFIER + "is connected");
-                        logger.info("successful connection to the broker. The client "+ IDENTIFIER + " is connected");
+                        System.out.println("successful connection to the broker. The client "+ IDENTIFIER_SubscribeToNewOrders + "is connected");
+                        logger.info("successful connection to the broker. The client "+ IDENTIFIER_SubscribeToNewOrders + " is connected");
                     }
                 });
         }
@@ -76,7 +77,7 @@ public class OrdersBrokerClient extends BrokerClient {
     private CompletableFuture<Mqtt3SubAck> subscribeToNewOrders(){
         String topicName = "orders/new";
         System.out.println("entering subscribeToNewOrders for the topic "+topicName);
-         return this.client2.subscribeWith()
+         return this.subscribeToNewOrders.subscribeWith()
             .topicFilter("orders/new")
             .callback(mqtt3Publish -> {
                 if(mqtt3Publish.getPayload().isPresent()){
@@ -100,39 +101,28 @@ public class OrdersBrokerClient extends BrokerClient {
             });
     }
 
-
-    public void connectAndRequestExistingOrder(String orderId){
-        System.out.println("connecting to Broker and publishing the request for the existing order "+orderId);
+    public void connectClientOrderGetPublisher() {
         this.orderGetPublisher.connectWith()
-                .keepAlive(120)
-                .cleanSession(false)
-               /* .willPublish()
-                .topic("orders/all_info/get/"+ orderId)
-                .qos(MqttQos.EXACTLY_ONCE)
-                .applyWillPublish()*/
+                .keepAlive(100)
+                .cleanSession(true)
                 .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v-> publishToTopic(orderGetPublisher,"orders/all_info/get/"+ orderId,null))
-                .whenComplete((connAck, throwable) -> {
-                    if (throwable != null) {
-                        // Handle connection failure
-                        logger.info("connectAndRequestExistingOrder " + orderId + " The connection to the broker failed."
-                                        + throwable.getMessage());
-                        System.out.println("connectAndRequestExistingOrder " + orderId + " The connection to the broker failed."+ throwable.getMessage());
-                    } else {
-                        System.out.println("connectAndRequestExistingOrder - successful connection to the broker. The client "+ IDENTIFIER + "is connected");
-                        logger.info("connectAndRequestExistingOrder - successful connection to the broker. The client "+ IDENTIFIER + " is connected");
-                    }
-                });
+                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
     }
-    public void connectAndSubscribeForExistingOrders() {
+    public void connectAndRequestExistingOrder(String orderId){
+        connectClientOrderGetPublisher();
+        publishToTopic(orderGetPublisher,"orders/all_info/get/"+ orderId,null);
+        System.out.println("connecting to Broker and publishing the request for the existing order "+orderId);
+
+    }
+
+    public void connectAndSubscribeForExistingOrder(String orderId) {
         System.out.println("connecting to Broker and subscribing for existing orders. ");
         this.orderSubscriber.connectWith()
                 .keepAlive(120)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToGetOrderByIdResponse())
+                .thenComposeAsync(v -> subscribeToGetOrderByIdResponse(orderId))
                 .whenComplete((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
@@ -146,13 +136,13 @@ public class OrdersBrokerClient extends BrokerClient {
                 });
     }
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToGetOrderByIdResponse(){
-        String topic= "orders/all_info/get/+/response";
+    private CompletableFuture<Mqtt3SubAck> subscribeToGetOrderByIdResponse(String orderId){
+        String topic= "orders/all_info/get/"+ orderId + "/response";
         return this.orderSubscriber.subscribeWith()
                 .topicFilter(topic)
                 .callback(mqtt3Publish -> {
                     if(mqtt3Publish.getPayload().isPresent()){
-                        String orderId = mqtt3Publish.getTopic().getLevels().get(3);
+                       // String orderId = mqtt3Publish.getTopic().getLevels().get(3);
                         String received = ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
                         OrderDescriptiveInfo order = ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                         if (order != null) {
@@ -185,7 +175,7 @@ public class OrdersBrokerClient extends BrokerClient {
 
     public void stopClientBrokerConnection(){
         orderGetPublisher.disconnect();
-        client2.disconnect();
+        subscribeToNewOrders.disconnect();
         orderSubscriber.disconnect();
     }
 
@@ -193,7 +183,7 @@ public class OrdersBrokerClient extends BrokerClient {
         orderGetPublisher.disconnect();
     }
     public void stopClient2BrokerConnection(){
-        client2.disconnect();
+        subscribeToNewOrders.disconnect();
     }
     public void stopClientOrderSubscriber(){
         orderSubscriber.disconnect();
