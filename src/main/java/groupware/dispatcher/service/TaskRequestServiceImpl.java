@@ -47,9 +47,9 @@ public class TaskRequestServiceImpl{
                 setCurrentTaskRequest(taskRequest);
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" updated.");
-                if(taskRequestEventListener != null){
+              /*  if(taskRequestEventListener != null){
                     taskRequestEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE),taskRequest);
-                }
+                }*/
             }else{
                 tasks.put(id, taskRequest);
                 setCurrentTaskRequest(taskRequest);

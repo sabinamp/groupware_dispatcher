@@ -147,8 +147,4 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
     }
 
-    @Override
-    public void handleTaskUpdateEvent(TaskEvent taskEvent, TaskRequest taskRequest) {
-
-    }
 }

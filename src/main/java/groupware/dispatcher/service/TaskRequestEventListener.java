@@ -12,5 +12,5 @@ public interface TaskRequestEventListener {
     void handleTaskUpdateEvent(TaskEvent event, Mqtt3Publish publish, String taskId);
 
 
-    void handleTaskUpdateEvent(TaskEvent taskEvent, TaskRequest taskRequest);
+
 }
