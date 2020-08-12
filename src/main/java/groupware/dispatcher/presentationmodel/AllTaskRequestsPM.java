@@ -3,6 +3,7 @@ package groupware.dispatcher.presentationmodel;
 
 import groupware.dispatcher.service.TaskRequestPMEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
+import groupware.dispatcher.view.util.TaskEvent;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -64,14 +65,22 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         });
     }
 
-    private void showAlertWithNoHeaderText(TaskRequestPM taskRequestPM) {
+    private void showAlertWithNoHeaderText(TaskEvent event, TaskRequestPM taskRequestPM, String update) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Task Request Update");
-
+        alert.setResizable(true);
+        String content= "";
         // Header Text: null
         alert.setHeaderText(null);
-        alert.setContentText("Task request PM Update. Task id: "+taskRequestPM.getTaskId()
-        +"\n task assignee : "+ taskRequestPM.getAssigneeId() + " \n task for order id: "+taskRequestPM.getOrderId());
+        if(event.getEventType().equals(TaskEvent.NEW_TASK)){
+            content= " Task Request "+"\n Task id: "+taskRequestPM.getTaskId()+"  has been sent to the task assignee."
+                     +"\n Task assignee ID: "+ taskRequestPM.getAssigneeId();
+        }else if(event.getEventType().equals(TaskEvent.UPDATE)){
+            content= "A Task Request Update has been received. Topic: "+update+"\n Task id: "+taskRequestPM.getTaskId()
+                    +"\n task assignee : "+ taskRequestPM.getAssigneeId() + "\n Order ID: "+taskRequestPM.getOrderId();
+        }
+
+        alert.setContentText(content);
         alert.showAndWait();
     }
 
@@ -80,17 +89,14 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     }
 
 
-    public void updateAllTaskRequestsPMAndService(TaskRequestPM task){
-        updateAllTaskRequestsPM(task);
-        taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
-    }
+
 
     public void updateAllTaskRequestsPM(TaskRequestPM task){
         boolean updating= false;
        for(int i =0; i < syncAllTasks.size(); i++){
            if(syncAllTasks.get(i).getTaskId().equals(task.getTaskId())){
-               syncAllTasks.set(i, task);
                updating = true;
+               syncAllTasks.set(i, task);
            }
        }
         if(!updating){
@@ -114,14 +120,19 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
 
 
     @Override
-    public void handleNewTaskEvent(TaskRequestPM task) {
-        this.updateAllTaskRequestsPMAndService(task);
+    public void handleNewTaskEvent(TaskEvent event, TaskRequestPM task) {
+        if(event.getEventType().equals(TaskEvent.NEW_TASK)){
+            this.updateAllTaskRequestsPM(task);
+            taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
+            Platform.runLater(() -> showAlertWithNoHeaderText(event, task, "New task sent"));
+        }
+
     }
 
     @Override
-    public void handleTaskUpdateEvent(TaskRequestPM taskRequest) {
+    public void handleTaskUpdateEvent(TaskEvent event, TaskRequestPM taskRequest, String update) {
         this.updateAllTaskRequestsPM(taskRequest);
-        Platform.runLater(() -> showAlertWithNoHeaderText(taskRequest));
+        Platform.runLater(() -> showAlertWithNoHeaderText(event, taskRequest, update));
     }
 
 

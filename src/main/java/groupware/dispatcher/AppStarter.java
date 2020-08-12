@@ -22,6 +22,8 @@ import javafx.stage.WindowEvent;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static groupware.dispatcher.service.util.MqttUtils.idle;
+
 public class AppStarter extends Application {
     private ApplicationUI rootPanel;
     private RootPM rootPM;
@@ -51,30 +53,34 @@ public class AppStarter extends Application {
             });
         }
     });
-    Runnable connectToBroker = new Runnable() {
+   /* Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
 
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
+                //do not exit
 
             });
         }
-    };
+    };*/
 
     @Override
     public void start(Stage primaryStage){
         rootPM = new RootPM();
         allCouriersPM =new AllCouriersPM();
         courierService.setAllCouriersPMListener(allCouriersPM);
-        connectToBroker.run();
+
 
         allOrdersPM = new AllOrdersPM();
         orderService.setOrderEventListener(allOrdersPM);
+
+        BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
         allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
         taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
         taskRequestService.setTaskRequestEventListener(BrokerConnection.taskBrokerClient);
+
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));
         exitBtn.setOnAction(e -> {
@@ -94,12 +100,9 @@ public class AppStarter extends Application {
         primaryStage.setTitle("Dispatcher GUI");
         primaryStage.setScene(scene);
         timer.start();
-        scene.getWindow().setOnCloseRequest(new EventHandler<>() {
-            @Override
-            public void handle(WindowEvent event) {
-                stop();
-                System.exit(0);
-            }
+        scene.getWindow().setOnCloseRequest(event -> {
+            stop();
+            System.exit(0);
         });
         primaryStage.show();
 

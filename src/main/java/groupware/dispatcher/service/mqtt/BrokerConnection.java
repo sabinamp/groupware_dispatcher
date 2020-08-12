@@ -24,8 +24,7 @@ public class BrokerConnection {
     Runnable connectCourierServiceToBroker = new Runnable() {
         @Override
         public void run() {
-            subscribeToCouriers();
-            courierBrokerClient.connectToBrokerAndSubscribeToCourierUpdates();
+            courierBrokerClient.subscribeToCouriers();
         }
     };
 
@@ -33,47 +32,13 @@ public class BrokerConnection {
     Runnable connectOrderServiceToBroker =new Runnable() {
         @Override
         public void run() {
-            subscribeToOrders();
-            ordersBrokerClient.connectToBrokerAndSubscribeToNewOrders();
+           ordersBrokerClient.subscribeToOrders();
         }
     };
 
 
-    private void subscribeToCouriers(){
-
-        courierBrokerClient.connectAndRequestCourier("C100");
-
-        courierBrokerClient.connectAndRequestCourier("C101");
-
-        courierBrokerClient.connectAndRequestCourier("C102");
-
-        courierBrokerClient.connectAndRequestCourier("C103");
-
-        courierBrokerClient.connectAndRequestCourier("C104");
-
-        courierBrokerClient.connectAndRequestCourier("C105");
-
-        courierBrokerClient.connectAndRequestCourier("C106");
-
-        courierBrokerClient.connectAndRequestCourier("C107");
-        courierBrokerClient.connectAndSubscribeForCourierInfoResponse();
 
 
-    }
-
-    private void subscribeToOrders(){
-
-        ordersBrokerClient.connectAndRequestExistingOrder("OR1111");
-        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1111");
-        ordersBrokerClient.connectAndRequestExistingOrder("OR1122");
-        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1122");
-        ordersBrokerClient.connectAndRequestExistingOrder("OR1123");
-        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1123");
-        ordersBrokerClient.connectAndRequestExistingOrder("OR1124");
-        ordersBrokerClient.connectAndSubscribeForExistingOrder("OR1124");
-
-
-    }
 
 
 

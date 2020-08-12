@@ -13,6 +13,14 @@ public class BrokerClient {
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(BrokerClient.class));
 
+    void connectClient(Mqtt3AsyncClient client, int keepAlive, boolean cleanSession){
+
+        client.connectWith()
+                .keepAlive(120)
+                .cleanSession(cleanSession)
+                .send()
+                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
+    }
 
     CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload){
        return client.publishWith()

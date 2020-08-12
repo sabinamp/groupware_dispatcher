@@ -69,10 +69,7 @@ public class AllOrdersPM implements OrderEventListener {
         });
     }
 
-  /*  public void updateAllOrdersPM(OrderPM orderPM){
-        syncAllOrders.add(orderPM);
-        syncAllOrdersMap.put(orderPM.getOrderId(), orderPM);
-    }*/
+
     public void updateAllOrdersPM(OrderPM orderPM){
         String id = orderPM.getOrderId();
         OrderPM existingOrder = syncAllOrdersMap.get(id);
@@ -106,7 +103,7 @@ public class AllOrdersPM implements OrderEventListener {
                content.append(" Order updated ")
                        .append( changedOrder.getOrderId() )
                        .append(" \n Order Status: ")
-                       .append(changedOrder.getOrderStatus())
+                       .append(changedOrder.getOrderStatus().toString())
                        .append(" \n Assigned to the Courier ")
                        .append(changedOrder.getCurrentAssignee());
 
@@ -114,9 +111,9 @@ public class AllOrdersPM implements OrderEventListener {
                content.append( " New order: ")
                        .append(changedOrder.getOrderId())
                        .append(" \n Order Status ")
-                       .append(changedOrder.getOrderStatus() )
+                       .append(changedOrder.getOrderStatus())
                        .append(" \n Order Placed on : ")
-                       .append(changedOrder.getOrderPlacedWhen().format(DateTimeFormatter.ofPattern("yyyy-mm-dd"))
+                       .append(changedOrder.getOrderPlacedWhen().format(DateTimeFormatter.ofPattern("dd.mm.yyyy hh:mm"))
                        );
             }
 

@@ -196,7 +196,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
                     + " orderId "+relatedOrderId + " courierID " + assigneeId);
             TaskRequestPM task = new TaskRequestPM();
             task.setTaskId("T"+currentTaskIdentifier);
-            task.setOrderId(relatedOrderId);
+            task.setOrderId(orderIdChoiceBox.getValue().getOrderId());
             task.setAssigneeId(assigneeId);
             task.setTaskType(taskTypeChoiceBox.getValue());
             task.setDeliveryType(deliveryTypeChoiceBox.getValue());
@@ -208,9 +208,10 @@ public class TaskRequestForm extends VBox implements ViewMixin {
                     LocalDateTime.MIN.getHour()+17, 0, 0));
             task.setDone(false);
 
-            this.allTaskRequestsPM.updateAllTaskRequestsPMAndService(task);
+
             TaskEvent taskEvent= new TaskEvent(TaskEvent.NEW_TASK);
-            this.fireEvent(taskEvent);
+            this.allTaskRequestsPM.handleNewTaskEvent(taskEvent, task);
+            //this.fireEvent(taskEvent);
             resetFields();
         }else{
             showAlertNoCurrentTask();

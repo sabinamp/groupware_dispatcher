@@ -5,6 +5,7 @@ import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ModelObjManager;
+import groupware.dispatcher.view.util.TaskEvent;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class TaskRequestServiceImpl{
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" updated.");
                 if(taskRequestEventListener != null){
-                    taskRequestEventListener.handleTaskUpdateEvent(taskRequest);
+                    taskRequestEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE),taskRequest);
                 }
             }else{
                 tasks.put(id, taskRequest);
@@ -55,14 +56,14 @@ public class TaskRequestServiceImpl{
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" added.");
                 if(taskRequestEventListener != null){
-                    taskRequestEventListener.handleNewTaskEvent(taskRequest);
+                    taskRequestEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
                 }
             }
             return true;
         }
     }
 
-    public boolean updateAllTaskRequestPM(String id, TaskRequest taskRequest) {
+    public boolean updateAllTaskRequestPM(String id, TaskRequest taskRequest, String update) {
         if(taskRequest == null) {
             logger.info("updateAllTaskRequestPM() received arg taskRequest - null");
             return false;
@@ -73,7 +74,7 @@ public class TaskRequestServiceImpl{
                 System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +
                         "The task with id : "+ id+" updated.");
                 if(taskRequestPMEventListener != null){
-                    taskRequestPMEventListener.handleTaskUpdateEvent(TaskRequestPM.of(taskRequest));
+                    taskRequestPMEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE), TaskRequestPM.of(taskRequest), update);
                 }
             }else{
                 System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +
@@ -84,13 +85,13 @@ public class TaskRequestServiceImpl{
         }
     }
 
-    public boolean updateTaskRequestAssignee(String taskId, String courierId) {
+  /*  public boolean updateTaskRequestAssignee(String taskId, String courierId) {
         TaskRequest task= getTaskRequestById(taskId);
         task.setAssigneeId(courierId);
         boolean successful = updateTaskRequest(taskId, task);
         System.out.println("Successfully updated the assignee : " + successful);
         return successful;
-    }
+    }*/
 
 
     public boolean updateTaskRequestDueOn(String taskId, LocalDateTime dueOn) {
@@ -101,18 +102,18 @@ public class TaskRequestServiceImpl{
         return successful;
     }
 
-    public boolean updateTaskRequestDone(String taskId, boolean done) {
+    public boolean updateTaskRequestDone(String taskId, boolean done, String topicEnd) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setDone(done);
-        boolean successful = updateAllTaskRequestPM(taskId, task);
+        boolean successful = updateAllTaskRequestPM(taskId, task, "Task "+topicEnd +"Completed: "+done);
         System.out.println("Successfully updated the task request : " + successful);
         return successful;
     }
 
-    public boolean updateTaskRequestAccepted(String taskId, boolean confirmed) {
+    public boolean updateTaskRequestAccepted(String taskId, boolean confirmed, String topicEnd) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setConfirmed(confirmed);
-        boolean successful = updateAllTaskRequestPM(taskId, task);
+        boolean successful = updateAllTaskRequestPM(taskId, task, "Task "+topicEnd +" Accepted: "+confirmed);
         System.out.println("Successfully updated the task request : " + successful);
         return successful;
     }

@@ -12,6 +12,7 @@ import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
+import groupware.dispatcher.service.util.MqttUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -145,25 +146,21 @@ public class CourierBrokerClient extends BrokerClient{
                 });
 
     }
+
+    private void connectClient(Mqtt3AsyncClient client, int keepAliveSec){
+                client.connectWith()
+                .keepAlive(keepAliveSec)
+                .cleanSession(true)
+                .send()
+                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
+    }
+
     public void connectToBrokerAndSubscribeToCourierUpdates(){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToCourierUpdates");
-        this.clientCourierUpdates.connectWith()
-                .keepAlive(160)
-                .cleanSession(false)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToCourierUpdates())
-                .whenComplete((connAck, throwable) -> {
-                    if (throwable != null) {
-                        // Handle connection failure
-                        logger.info("The connection to the broker failed."+ throwable.getMessage());
-                        System.out.println("The connection to the broker failed."+ throwable.getMessage());
-                    } else {
-                        System.out.println("successful connection to the broker. The client clientCourierUpdates is connected");
-                        logger.info("successful connection to the broker. The client clientCourierUpdates is connected");
+       connectClient(this.clientCourierUpdates, 160);
+       subscribeToCourierUpdates();
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(this.clientCourierUpdates);
 
-                    }
-                });
     }
 
 
@@ -207,7 +204,7 @@ public class CourierBrokerClient extends BrokerClient{
                     }
                 })
                 .send()
-                .whenComplete((mqtt3SubAck, throwable) -> {
+                .whenCompleteAsync((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to subscribe
                         logger.warning("Couldn't subscribe to topic " + topic);
@@ -226,4 +223,26 @@ public class CourierBrokerClient extends BrokerClient{
         return courierService;
     }
 
+    void subscribeToCouriers(){
+
+        connectAndRequestCourier("C100");
+
+        connectAndRequestCourier("C101");
+
+        connectAndRequestCourier("C102");
+
+        connectAndRequestCourier("C103");
+
+        connectAndRequestCourier("C104");
+
+        connectAndRequestCourier("C105");
+
+        connectAndRequestCourier("C106");
+
+        connectAndRequestCourier("C107");
+        connectAndSubscribeForCourierInfoResponse();
+        connectToBrokerAndSubscribeToCourierUpdates();
+
+
+    }
 }

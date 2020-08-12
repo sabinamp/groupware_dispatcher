@@ -88,8 +88,7 @@ public class TasksPane extends BorderPane implements ViewMixin {
     public void setupValueChangedListeners() {
         this.allOrdersPM.getAllOrderEntries().addListener((ListChangeListener<OrderPM>) c -> {
             int lastIndex = c.getList().size() -1;
-            ordersRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getOrderId() +" "
-            +c.getList().get(lastIndex).getOrderType()));
+            ordersRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getOrderId()));
         });
 
         this.allCouriersPM.getAllCourierEntries().addListener((ListChangeListener<CourierPM>) c -> {

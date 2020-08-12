@@ -7,6 +7,6 @@ import groupware.dispatcher.view.util.TaskEvent;
 
 public interface TaskRequestPMEventListener {
 
-    void handleNewTaskEvent( TaskRequestPM task);
-    void handleTaskUpdateEvent(TaskRequestPM taskRequest);
+    void handleNewTaskEvent(TaskEvent event, TaskRequestPM task);
+    void handleTaskUpdateEvent(TaskEvent event,TaskRequestPM taskRequest, String update);
 }
