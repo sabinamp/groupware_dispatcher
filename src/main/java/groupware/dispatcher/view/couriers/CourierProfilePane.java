@@ -105,7 +105,7 @@ public class CourierProfilePane extends GridPane implements ViewMixin {
         addRow(2, connectionStatusHBox);
         addRow(3, courierIdL, courierIdTxt);
         addRow(4, courierPhoneL, courierPhoneTxt);
-        addRow(5, new Label("Activity"));
+        addRow(5, new Label("Courier Activity"));
         addRow(6, assignedOrdersL, assignedOrdersTxt);
 
 
@@ -151,7 +151,7 @@ public class CourierProfilePane extends GridPane implements ViewMixin {
         add(courierIdTxt,1,3);
 
         add(courierPhoneTxt, 1, 4);
-        add(new Label("Activity"),0, 5);
+        add(new Label("Courier Activity"),0, 5);
         add(assignedOrdersTxt,1,6);
 
         if(current.getCourierConnectionStatus().equals(Conn.ONLINE)){

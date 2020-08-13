@@ -16,7 +16,7 @@ public class TaskRequestPM {
 
     private final ObjectProperty<LocalDateTime> dueOn = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> sentWhen = new SimpleObjectProperty<>();
-    private final BooleanProperty accepted= new SimpleBooleanProperty();
+    private final ObjectProperty<RequestReply> accepted= new SimpleObjectProperty<>();
     private final BooleanProperty done= new SimpleBooleanProperty();
 
 
@@ -28,7 +28,7 @@ public class TaskRequestPM {
     public void reset() {
         this.setDone(false);
         this.setDueOn(null);
-        this.setAccepted(false);
+        this.setAccepted(null);
         this.setAssigneeId("");
         this.setOrderId("");
         this.setDeliveryType(null);
@@ -43,7 +43,7 @@ public class TaskRequestPM {
         taskPM.setAssigneeId(taskRequest.getAssigneeId());
         taskPM.setTaskType(taskRequest.getTaskType());
         taskPM.setDeliveryType(taskRequest.getDeliveryType());
-        taskPM.setAccepted(taskRequest.isConfirmed());
+        taskPM.setAccepted(taskRequest.getConfirmed());
         taskPM.setDone(taskRequest.isDone());
         taskPM.setDueOn(taskRequest.getDueOn());
         return taskPM;
@@ -53,9 +53,10 @@ public class TaskRequestPM {
         TaskRequest taskRequest =  new TaskRequest();
         taskRequest.setTaskId(taskPM.getTaskId());
         taskRequest.setDone(taskPM.isDone());
+        taskRequest.setOrderId(taskPM.getOrderId());
         taskRequest.setDueOn(taskPM.getDueOn());
         taskRequest.setAssigneeId(taskPM.getAssigneeId());
-        taskRequest.setConfirmed(taskPM.isAccepted());
+        taskRequest.setConfirmed(taskPM.getAccepted());
         taskRequest.setSentWhen(taskPM.getSentWhen());
         taskRequest.setDeliveryType(taskPM.getDeliveryType());
         taskRequest.setTaskType(taskPM.getTaskType());
@@ -139,19 +140,6 @@ public class TaskRequestPM {
         this.sentWhen.set(sentWhen);
     }
 
-    public boolean isAccepted() {
-        return accepted.get();
-    }
-
-    public BooleanProperty acceptedProperty() {
-        return accepted;
-    }
-
-    public void setAccepted(boolean accepted) {
-        this.accepted.set(accepted);
-    }
-
-
 
     public TaskType getTaskType() {
         return taskType.get();
@@ -177,6 +165,15 @@ public class TaskRequestPM {
         this.done.set(done);
     }
 
+    public RequestReply getAccepted() {
+        return accepted.get();
+    }
 
+    public ObjectProperty<RequestReply> acceptedProperty() {
+        return accepted;
+    }
 
+    public void setAccepted(RequestReply accepted) {
+        this.accepted.set(accepted);
+    }
 }

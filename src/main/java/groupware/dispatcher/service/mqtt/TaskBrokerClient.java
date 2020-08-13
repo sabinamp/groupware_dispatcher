@@ -6,10 +6,10 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
-import groupware.dispatcher.service.CourierServiceImpl;
-import groupware.dispatcher.service.TaskRequestEventListener;
-import groupware.dispatcher.service.TaskRequestPMEventListener;
-import groupware.dispatcher.service.TaskRequestServiceImpl;
+import groupware.dispatcher.service.*;
+import groupware.dispatcher.service.model.DeliveryStep;
+import groupware.dispatcher.service.model.OrderStatus;
+import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
@@ -29,15 +29,16 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
     private Mqtt3AsyncClient clientTaskSubscriber;
     private CourierServiceImpl courierService;
-
+    private OrderService orderService;
     private TaskRequestServiceImpl taskRequestService;
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskBrokerClient.class));
 
 
-    public TaskBrokerClient(CourierServiceImpl courierService, TaskRequestServiceImpl taskRequestService)
+    public TaskBrokerClient(CourierServiceImpl courierService, OrderServiceImpl orderService, TaskRequestServiceImpl taskRequestService)
     {
         this.courierService= courierService;
         this.taskRequestService = taskRequestService;
+        this.orderService = orderService;
 
         clientTaskRequestsPublisher = MqttClient.builder()
                 .useMqttVersion3()
@@ -120,26 +121,43 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
     public void handleTaskUpdateEvent(TaskEvent event,Mqtt3Publish publish, String taskId) {
         // Process the received message
         String topicEnd= publish.getTopic().getLevels().get(3);
+        String assigneeID = publish.getTopic().getLevels().get(1);
+        TaskRequest task= taskRequestService.getTaskRequestById(taskId);
         switch (topicEnd) {
             case "accept":
-                taskRequestService.updateTaskRequestAccepted(taskId, true, topicEnd);
+
+                task.setConfirmed(RequestReply.ACCEPTED);
+                courierService.updateAssignedOrders(assigneeID, task.getOrderId());
+                taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +" Accepted.TopicEnd: "+topicEnd );
                 System.out.println("task accepted - update received for the task request " + taskId);
                 break;
             case "deny":
-                taskRequestService.updateTaskRequestAccepted(taskId, false, topicEnd);
+
+                task.setConfirmed(RequestReply.DENIED);
+                taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +" Denied. TopicEnd: "+topicEnd);
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
             case "timeout":
-                taskRequestService.updateTaskRequestAccepted(taskId, false, topicEnd);
+
+                task.setConfirmed(RequestReply.TIMEOUT);
+                taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +"Task timed out. TopicEnd: "+topicEnd);
                 System.out.println("task timed out - update received for the task request " + taskId);
                 break;
             case "completed":
-                taskRequestService.updateTaskRequestDone(taskId, true, topicEnd);
+
+                task.setDone(true);
                 System.out.println("task completed- update received for the task request " + taskId);
                 if( publish.getPayload().isPresent()){
-                    System.out.println("update received for the task request sent to "+ taskId);
                     String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
-                    taskRequestService.updateAllTaskRequestPM(taskId, ModelObjManager.convertJsonToTaskRequest(receivedString), topicEnd);
+                    task = ModelObjManager.convertJsonToTaskRequest(receivedString);
+
+                    DeliveryStep step=  new DeliveryStep();
+                    step.setCurrentAssignee(task.getAssigneeId());
+                    step.setCurrentStatus(task.getOutcome());
+                    step.setUpdatedWhen(task.getCompletedWhen());
+                    orderService.updateOrderStatus(task.getOrderId(),step);
+                    System.out.println("update received for the task request sent to "+ taskId);
+                    taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +topicEnd);
                 }
                 break;
             case "request":

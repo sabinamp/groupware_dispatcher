@@ -26,7 +26,7 @@ public class OrderIDCell extends TableCell<OrderPM, String> {
         } else {
             if (item != null) {
                 setText(item);
-                text = new Text(item.substring(0, 6).toUpperCase());
+                text = new Text(item.toUpperCase());
             }
         }
     }

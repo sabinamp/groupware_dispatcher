@@ -164,3 +164,10 @@
     -fx-max-width : 20;
 }
 
+.alert{
+    -fx-font-size: 1.25em;
+    -fx-font-family: 'Roboto Bold';
+    -fx-padding: 5;
+    -fx-background-color: #a7ffeb;
+
+}

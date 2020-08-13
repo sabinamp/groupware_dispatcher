@@ -20,7 +20,7 @@ public interface OrderService {
     List<ContactInfo> getOrderCustomerContactInfos(String orderId);
     List<ContactInfo> getOrderDestinationContactInfos(String orderId);
     LinkedList<DeliveryStep> getOrderDeliveryInfos(String orderId);
-    boolean updateOrderStatus(String orderId, String deliveryStep);
+    boolean updateOrderStatus(String orderId, DeliveryStep deliveryStep);
     Set<String> getAllOrderIds();
     Map<String, OrderDescriptiveInfo> getOrders();
 

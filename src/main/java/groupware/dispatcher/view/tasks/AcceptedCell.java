@@ -1,8 +1,7 @@
-package groupware.dispatcher.view.orders;
+package groupware.dispatcher.view.tasks;
 
-import groupware.dispatcher.presentationmodel.OrderPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
-import groupware.dispatcher.service.model.OrderStatus;
+import groupware.dispatcher.service.model.RequestReply;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
@@ -10,12 +9,12 @@ import javafx.scene.control.TableCell;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class OrderStatusCell extends TableCell<OrderPM, OrderStatus> {
+public class AcceptedCell extends TableCell<TaskRequestPM, RequestReply> {
 
     private Rectangle rectangle;
     private static final Insets INSETS = new Insets(2, 5, 2, 8);
 
-    public OrderStatusCell(){
+    public AcceptedCell(){
 
         setContentDisplay(ContentDisplay.LEFT);
         setPadding(INSETS);
@@ -23,7 +22,7 @@ public class OrderStatusCell extends TableCell<OrderPM, OrderStatus> {
     }
 
     @Override
-    protected void updateItem(OrderStatus item, boolean empty) {
+    protected void updateItem(RequestReply item, boolean empty) {
         // super.updateItem(item, empty);
         if ( empty ||  item == null) {
             // adding new item
@@ -31,12 +30,12 @@ public class OrderStatusCell extends TableCell<OrderPM, OrderStatus> {
             setGraphic(null);
         } else {
 
-            if (item.equals(OrderStatus.FAILED) || item.equals(OrderStatus.CANCELED) ){
-                rectangle = new Rectangle(20,20, Color.web("Red"));
-            }else if (item.equals(OrderStatus.COMPLETED)){
+            if (item.equals(RequestReply.ACCEPTED) ){
                 rectangle = new Rectangle(20, 20, Color.web("Green"));
+            }else if (item.equals(RequestReply.TIMEOUT)){
+                rectangle = new Rectangle(20,20, Color.web("Orange"));
             }else{
-                rectangle = new Rectangle(20, 20, Color.web("Orange"));
+                rectangle = new Rectangle(20,20, Color.web("Red"));
             }
 
             setText( item.toString());

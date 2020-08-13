@@ -2,6 +2,7 @@ package groupware.dispatcher.view.tasks;
 
 import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.service.model.DeliveryType;
+import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.view.couriers.IDCell;
 import groupware.dispatcher.view.util.ViewMixin;
@@ -55,9 +56,9 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         columnType.setCellFactory(cell-> new DeliveryTypeCell());
         columnType.setMinWidth(100);
 
-        TableColumn<TaskRequestPM, Boolean> columnAccepted = new TableColumn<>("Accepted");
+        TableColumn<TaskRequestPM, RequestReply> columnAccepted = new TableColumn<>("Accepted");
         columnAccepted.setCellValueFactory(cell-> cell.getValue().acceptedProperty());
-        columnAccepted.setCellFactory(cell-> new BooleanCell());
+        columnAccepted.setCellFactory(cell-> new AcceptedCell());
         columnAccepted.setMinWidth(100);
 
         TableColumn<TaskRequestPM, Boolean> columnDone = new TableColumn<>("Status");

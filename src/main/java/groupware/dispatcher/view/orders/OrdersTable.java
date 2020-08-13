@@ -52,7 +52,7 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         TableColumn<OrderPM, OrderStatus> statusColumn = new TableColumn<>("Order Status");
         statusColumn.setCellValueFactory(cell -> cell.getValue().orderStatusProperty());
         statusColumn.setCellFactory(cell -> new OrderStatusCell());
-        statusColumn.setMinWidth(100);
+        statusColumn.setMinWidth(150);
 
         TableColumn<OrderPM, String> assigneeColumn = new TableColumn<>("Assigned To");
         assigneeColumn.setCellValueFactory(cell -> cell.getValue().currentAssigneeProperty());

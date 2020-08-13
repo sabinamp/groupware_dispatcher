@@ -33,9 +33,9 @@ public class BooleanCell  extends TableCell<TaskRequestPM, Boolean> {
         } else {
 
             if (item ){
-                rectangle = new Rectangle(25, 25, Color.web("Green"));
+                rectangle = new Rectangle(20, 20, Color.web("Blue"));
             }else{
-                rectangle = new Rectangle(25,25, Color.web("Orange"));
+                rectangle = new Rectangle(20,20, Color.web("Orange"));
             }
 
             setText( item.toString());

@@ -200,7 +200,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
             task.setAssigneeId(assigneeId);
             task.setTaskType(taskTypeChoiceBox.getValue());
             task.setDeliveryType(deliveryTypeChoiceBox.getValue());
-            task.setAccepted(false);
+            task.setAccepted(null);
             task.setSentWhen(LocalDateTime.now());
 
             LocalDate date = datePicker.getValue();

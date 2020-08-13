@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
+import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,28 +41,10 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private void setupValueChangedListeners() {
         syncAllTasks.addListener((ListChangeListener.Change<? extends TaskRequestPM> change) -> {
             System.out.println("AllTaskRequestsPM Update"+ change);
-            change.next();
+           /* change.next();
             boolean wasUpdated = change.wasUpdated();
             boolean wasAdded = change.wasAdded();
-            List<TaskRequestPM> listChanges = new ArrayList<>(change.getList());
-
-            //notification popup
-          /*  if(wasUpdated) {
-                Platform.runLater(() -> {
-                    int changeNb = change.getList().size();
-                    System.out.println("The number of updates " + changeNb);
-                    if (listChanges.size() == changeNb) {
-                        while (changeNb > 0) {
-
-                            showAlertWithNoHeaderText(listChanges.get(changeNb - 1));
-                            System.out.println("showAlertWithNoHeaderText - task id" + listChanges.get(changeNb - 1).getTaskId());
-
-                            changeNb--;
-                        }
-                    }
-                });
-            }*/
-
+            List<TaskRequestPM> listChanges = new ArrayList<>(change.getList());  */
         });
     }
 
@@ -69,6 +52,8 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Task Request Update");
         alert.setResizable(true);
+        alert.initStyle(StageStyle.DECORATED);
+
         String content= "";
         // Header Text: null
         alert.setHeaderText(null);
@@ -79,7 +64,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
             content= "A Task Request Update has been received. Topic: "+update+"\n Task id: "+taskRequestPM.getTaskId()
                     +"\n task assignee : "+ taskRequestPM.getAssigneeId() + "\n Order ID: "+taskRequestPM.getOrderId();
         }
-
+        alert.setHeight(200);
         alert.setContentText(content);
         alert.showAndWait();
     }
@@ -89,10 +74,8 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     }
 
 
-
-
     public void updateAllTaskRequestsPM(TaskRequestPM task){
-        boolean updating= false;
+       boolean updating= false;
        for(int i =0; i < syncAllTasks.size(); i++){
            if(syncAllTasks.get(i).getTaskId().equals(task.getTaskId())){
                updating = true;
@@ -102,9 +85,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         if(!updating){
             syncAllTasks.add(task);
         }
-
     }
-
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
         return currentTaskRequest;
@@ -113,11 +94,10 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     public void setCurrentTaskRequest(TaskRequestPM currentTaskRequest) {
         this.currentTaskRequest.set(currentTaskRequest);
     }
+
     public TaskRequestPM getCurrentTaskRequest() {
         return currentTaskRequest.get();
     }
-
-
 
     @Override
     public void handleNewTaskEvent(TaskEvent event, TaskRequestPM task) {
@@ -126,14 +106,14 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
             taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
             Platform.runLater(() -> showAlertWithNoHeaderText(event, task, "New task sent"));
         }
-
     }
 
     @Override
     public void handleTaskUpdateEvent(TaskEvent event, TaskRequestPM taskRequest, String update) {
-        this.updateAllTaskRequestsPM(taskRequest);
-        Platform.runLater(() -> showAlertWithNoHeaderText(event, taskRequest, update));
+        if(event.getEventType().equals(TaskEvent.UPDATE)){
+            this.updateAllTaskRequestsPM(taskRequest);
+            Platform.runLater(() -> showAlertWithNoHeaderText(event, taskRequest, update));
+        }
     }
-
 
 }

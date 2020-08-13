@@ -32,7 +32,7 @@ public class TaskRequest {
     private LocalDateTime  sentWhen = null;
 
     @JsonProperty("confirmed")
-    private boolean confirmed = false;
+    private RequestReply confirmed = null;
 
     @JsonProperty("done")
     private boolean done = false;
@@ -40,6 +40,10 @@ public class TaskRequest {
     @JsonProperty("completedWhen")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm", locale = "de")
     private LocalDateTime completedWhen = null;
+
+
+    @JsonProperty("outcome")
+    private OrderStatus outcome = null;
 
     public TaskRequest taskId(String taskId) {
         this.taskId = taskId;
@@ -77,7 +81,7 @@ public class TaskRequest {
         return this;
     }
 
-    public TaskRequest confirmed(boolean accepted){
+    public TaskRequest confirmed(RequestReply accepted){
         this.confirmed = accepted;
         return this;
     }
@@ -89,6 +93,10 @@ public class TaskRequest {
 
     public TaskRequest completedWhen(LocalDateTime completedWhen) {
         this.completedWhen = completedWhen;
+        return this;
+    }
+    public TaskRequest taskType(OrderStatus outcome) {
+        this.outcome = outcome;
         return this;
     }
 
@@ -160,11 +168,12 @@ public class TaskRequest {
         this.completedWhen = completedWhen;
     }
 
-    public boolean isConfirmed() {
+
+    public RequestReply getConfirmed() {
         return confirmed;
     }
 
-    public void setConfirmed(boolean confirmed) {
+    public void setConfirmed(RequestReply confirmed) {
         this.confirmed = confirmed;
     }
 
@@ -174,6 +183,14 @@ public class TaskRequest {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    public OrderStatus getOutcome() {
+        return outcome;
+    }
+
+    public void setOutcome(OrderStatus outcome) {
+        this.outcome = outcome;
     }
 
     @Override
@@ -194,13 +211,14 @@ public class TaskRequest {
                 Objects.equals(this.dueOn, task.dueOn) &&
                 Objects.equals(this.confirmed, task.confirmed)&&
                 Objects.equals(this.done, task.done) &&
-                Objects.equals(this.completedWhen, task.completedWhen);
+                Objects.equals(this.completedWhen, task.completedWhen) &&
+                Objects.equals(this.outcome, task.outcome);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(taskId, orderId, assigneeId, sentWhen, deliveryType, taskType, dueOn,
-                confirmed, done, completedWhen);
+                confirmed, done, completedWhen, outcome);
     }
 
     @Override
@@ -217,6 +235,7 @@ public class TaskRequest {
         sb.append("    confirmed: ").append(toIndentedString(confirmed)).append("\n");
         sb.append("    done: ").append(toIndentedString(done)).append("\n");
         sb.append("    completedWhen: ").append(toIndentedString(completedWhen)).append("\n");
+        sb.append("    outcome: ").append(toIndentedString(outcome)).append("\n");
         sb.append("}");
         return sb.toString();
     }

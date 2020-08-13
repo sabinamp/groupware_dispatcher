@@ -139,15 +139,15 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public boolean updateOrderStatus(String orderId, String deliveryStep) {
+    public boolean updateOrderStatus(String orderId, DeliveryStep deliveryStep) {
         boolean successful= false;
         System.out.println("next step is : " + deliveryStep);
-        DeliveryStep next = ModelObjManager.convertDeliveryStepData(deliveryStep);
-        System.out.println("the next step (converted from json) is : " + next);
+       // DeliveryStep next = ModelObjManager.convertDeliveryStepData(deliveryStep);
+        System.out.println("the next step (converted from json) is : " + deliveryStep);
 
         OrderDescriptiveInfo order=orders.get(orderId);
         if(order != null){
-            order.addDeliveryInfosItem(next);
+            order.addDeliveryInfosItem(deliveryStep);
             successful = updateOrder(orderId, order);
             if(successful){
                 System.out.println("updateOrderStatus() - Successfully updated the order.");

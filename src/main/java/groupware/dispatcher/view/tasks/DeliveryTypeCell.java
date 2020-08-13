@@ -35,9 +35,9 @@ public class DeliveryTypeCell extends TableCell<TaskRequestPM, DeliveryType> {
         } else {
 
             if (DeliveryType.STANDARD.equals(item) ){
-                rectangle = new Rectangle(25, 25, Color.web("Blue"));
+                rectangle = new Rectangle(20, 20, Color.web("Blue"));
             }else{
-                rectangle = new Rectangle(25,25, Color.web("Red"));
+                rectangle = new Rectangle(20,20, Color.web("Red"));
             }
 
             setText(item.toString());
