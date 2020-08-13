@@ -75,7 +75,8 @@ public class TaskRequestServiceImpl{
                System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +
                         "The task with id : "+ id+" updated.");
                 if(taskRequestPMEventListener != null){
-                    taskRequestPMEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE), TaskRequestPM.of(taskRequest), update);
+                    TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
+                    taskRequestPMEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
                 }
             }else{
                 System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +

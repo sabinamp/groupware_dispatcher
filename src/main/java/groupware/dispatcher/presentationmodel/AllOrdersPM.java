@@ -27,7 +27,6 @@ public class AllOrdersPM implements OrderEventListener {
 
     private final  ObservableList<String> allOrderIDs = FXCollections.observableArrayList(allOrdersMap.keySet());
 
-
     private final ObservableMap<String, OrderPM> syncAllOrdersMap = FXCollections.synchronizedObservableMap(allOrdersMap);
     private final ObservableList<OrderPM> syncAllOrders = FXCollections.synchronizedObservableList(allOrders);
 

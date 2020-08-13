@@ -94,9 +94,9 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
             System.out.println("Focused: " +
                     getFocusModel().getFocusedItem());
         });
+        itemsProperty().bind(pm.allTaskEntriesProperty());
 
     }
-
 
 
 

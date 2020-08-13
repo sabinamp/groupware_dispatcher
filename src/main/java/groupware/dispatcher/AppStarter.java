@@ -25,6 +25,7 @@ import java.util.Date;
 import static groupware.dispatcher.service.util.MqttUtils.idle;
 
 public class AppStarter extends Application {
+
     private ApplicationUI rootPanel;
     private RootPM rootPM;
     private AllOrdersPM allOrdersPM;
@@ -70,7 +71,7 @@ public class AppStarter extends Application {
                 // updating live UI object requires JavaFX App Thread
                 //do not exit
                 try{
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -84,7 +85,27 @@ public class AppStarter extends Application {
     public void start(Stage primaryStage){
 
 
-        connectToBroker.run();
+        rootPM = new RootPM();
+        allCouriersPM =new AllCouriersPM();
+        courierService.setAllCouriersPMListener(allCouriersPM);
+
+
+        allOrdersPM = new AllOrdersPM();
+        orderService.setOrderEventListener(allOrdersPM);
+        BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
+        brokerConnection.startBrokerConnection();
+
+        Platform.runLater(()-> {
+            // updating live UI object requires JavaFX App Thread
+            //do not exit
+            try{
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+        });
         allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
         taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
         taskRequestService.setTaskRequestEventListener(BrokerConnection.taskBrokerClient);

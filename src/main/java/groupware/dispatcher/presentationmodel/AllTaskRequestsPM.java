@@ -10,12 +10,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.control.Alert;
 import javafx.stage.StageStyle;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class AllTaskRequestsPM implements TaskRequestPMEventListener {
@@ -26,7 +24,10 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private TaskRequestServiceImpl taskRequestService;
 
     private final ObservableList<TaskRequestPM> syncAllTasks = FXCollections.synchronizedObservableList(allTasks);
+    private final ObservableMap<String, TaskRequestPM> allTasksMap = FXCollections.observableHashMap();
 
+    private final ObservableMap<String, TaskRequestPM> syncAllTasksMap = FXCollections.synchronizedObservableMap(allTasksMap);
+    private ObjectProperty<ObservableList<TaskRequestPM>> allTaskEntries = new SimpleObjectProperty<>();
     private ObjectProperty<TaskRequestPM> currentTaskRequest = new SimpleObjectProperty<>();
 
     private TaskRequestPMEventListener listener;
@@ -36,6 +37,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         this.allOrdersPM = allOrdersPM;
         this.taskRequestService = taskRequestService;
         setupValueChangedListeners();
+        setAllTaskEntries(syncAllTasks);
     }
 
     private void setupValueChangedListeners() {
@@ -74,17 +76,16 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     }
 
 
+
     public void updateAllTaskRequestsPM(TaskRequestPM task){
-       boolean updating= false;
-       for(int i =0; i < syncAllTasks.size(); i++){
-           if(syncAllTasks.get(i).getTaskId().equals(task.getTaskId())){
-               updating = true;
-               syncAllTasks.set(i, task);
-           }
-       }
-        if(!updating){
-            syncAllTasks.add(task);
+        String id = task.getTaskId();
+        TaskRequestPM existingTask = syncAllTasksMap.get(id);
+        if(existingTask != null){
+            syncAllTasks.remove(existingTask);
         }
+        syncAllTasks.add(task);
+        syncAllTasksMap.put(id, task);
+
     }
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
@@ -116,4 +117,19 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         }
     }
 
+    public ObservableList<TaskRequestPM> getAllTaskEntries() {
+        return allTaskEntries.get();
+    }
+
+    public ObjectProperty<ObservableList<TaskRequestPM>> allTaskEntriesProperty() {
+        return allTaskEntries;
+    }
+
+    public void setAllTaskEntries(ObservableList<TaskRequestPM> allTaskEntries) {
+        this.allTaskEntries.set(allTaskEntries);
+    }
+
+    public ObservableMap<String, TaskRequestPM> getSyncAllTasksMap() {
+        return syncAllTasksMap;
+    }
 }

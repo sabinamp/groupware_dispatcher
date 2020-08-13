@@ -124,27 +124,28 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
         String assigneeID = publish.getTopic().getLevels().get(1);
         TaskRequest task= taskRequestService.getTaskRequestById(taskId);
         switch (topicEnd) {
-            case "accept":
-
+            case "accept": {
                 task.setConfirmed(RequestReply.ACCEPTED);
                 courierService.updateAssignedOrders(assigneeID, task.getOrderId());
                 taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +" Accepted.TopicEnd: "+topicEnd );
                 System.out.println("task accepted - update received for the task request " + taskId);
                 break;
-            case "deny":
-
+            }
+            case "deny": {
                 task.setConfirmed(RequestReply.DENIED);
                 taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +" Denied. TopicEnd: "+topicEnd);
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
-            case "timeout":
+            }
 
+            case "timeout": {
                 task.setConfirmed(RequestReply.TIMEOUT);
                 taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +"Task timed out. TopicEnd: "+topicEnd);
                 System.out.println("task timed out - update received for the task request " + taskId);
                 break;
-            case "completed":
+            }
 
+            case "completed": {
                 task.setDone(true);
                 System.out.println("task completed- update received for the task request " + taskId);
                 if( publish.getPayload().isPresent()){
@@ -152,7 +153,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                     task = ModelObjManager.convertJsonToTaskRequest(receivedString);
 
                     DeliveryStep step=  new DeliveryStep();
-                    step.setCurrentAssignee(task.getAssigneeId());
+                    step.setCurrentAssignee(assigneeID);
                     step.setCurrentStatus(task.getOutcome());
                     step.setUpdatedWhen(task.getCompletedWhen());
                     orderService.updateOrderStatus(task.getOrderId(),step);
@@ -160,6 +161,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                     taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +topicEnd);
                 }
                 break;
+            }
             case "request":
                 break;
         }
