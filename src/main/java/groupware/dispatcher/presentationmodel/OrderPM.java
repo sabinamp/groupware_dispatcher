@@ -209,6 +209,7 @@ public class OrderPM {
     public void setOrderType(DeliveryType orderType) {
         this.orderType.set(orderType);
     }
+
     @Override
     public String toString() {
         return "OrderPM{" +

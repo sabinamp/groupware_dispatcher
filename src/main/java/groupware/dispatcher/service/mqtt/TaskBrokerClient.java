@@ -5,10 +5,8 @@ import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
-import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.*;
 import groupware.dispatcher.service.model.DeliveryStep;
-import groupware.dispatcher.service.model.OrderStatus;
 import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
@@ -17,7 +15,6 @@ import groupware.dispatcher.service.util.MqttUtils;
 import groupware.dispatcher.view.util.TaskEvent;
 
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -127,20 +124,20 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
             case "accept": {
                 task.setConfirmed(RequestReply.ACCEPTED);
                 courierService.updateAssignedOrders(assigneeID, task.getOrderId());
-                taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +" Accepted.TopicEnd: "+topicEnd );
+                taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +" Accepted.TopicEnd: "+topicEnd );
                 System.out.println("task accepted - update received for the task request " + taskId);
                 break;
             }
             case "deny": {
                 task.setConfirmed(RequestReply.DENIED);
-                taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +" Denied. TopicEnd: "+topicEnd);
+                taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +" Denied. TopicEnd: "+topicEnd);
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
             }
 
             case "timeout": {
                 task.setConfirmed(RequestReply.TIMEOUT);
-                taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +"Task timed out. TopicEnd: "+topicEnd);
+                taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +"Task timed out. TopicEnd: "+topicEnd);
                 System.out.println("task timed out - update received for the task request " + taskId);
                 break;
             }
@@ -158,14 +155,13 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                     step.setUpdatedWhen(task.getCompletedWhen());
                     orderService.updateOrderStatus(task.getOrderId(),step);
                     System.out.println("update received for the task request sent to "+ taskId);
-                    taskRequestService.updateAllTaskRequestPM(taskId, task, "Task "+taskId +topicEnd);
+                    taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +topicEnd);
                 }
                 break;
             }
             case "request":
                 break;
         }
-
     }
 
 }

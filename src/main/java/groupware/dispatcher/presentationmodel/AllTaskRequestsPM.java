@@ -104,7 +104,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     public void handleNewTaskEvent(TaskEvent event, TaskRequestPM task) {
         if(event.getEventType().equals(TaskEvent.NEW_TASK)){
             this.updateAllTaskRequestsPM(task);
-            taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task));
+            taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task), null);
             Platform.runLater(() -> showAlertWithNoHeaderText(event, task, "New task sent"));
         }
     }

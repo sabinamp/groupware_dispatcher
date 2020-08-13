@@ -10,6 +10,7 @@ import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.scene.control.Alert;
 import javafx.scene.text.Text;
+import javafx.stage.StageStyle;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -55,16 +56,16 @@ public class AllOrdersPM implements OrderEventListener {
 
                 //notification popup
                 Platform.runLater(()->{
-                    if(wasAdded){
+
                         int changeNb = change.getList().size();
                         System.out.println("showAlertWithDefaultHeaderText called. The number of updates or new orders " + changeNb);
                         if(listChanges.size() == changeNb){
-                            while(changeNb > 0){
+                            if(changeNb > 0){
                                 showAlertWithDefaultHeaderText(wasUpdated, listChanges.get(changeNb-1));
-                                changeNb--;
+                                //changeNb--;
                             }
                         }
-                    }
+
                 });
 
 
@@ -96,6 +97,7 @@ public class AllOrdersPM implements OrderEventListener {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText("Order "+ changedOrder.getOrderId()+ " Notification");
         alert.setResizable(true);
+        alert.initStyle(StageStyle.DECORATED);
         String title ="Order Notification";
         alert.setTitle(title);
 
@@ -104,18 +106,18 @@ public class AllOrdersPM implements OrderEventListener {
            if( updated) {
                content.append(" Order updated ")
                        .append( changedOrder.getOrderId() )
-                       .append(" \n Order Status: ")
+                       .append("\n Order Status: ")
                        .append(changedOrder.getOrderStatus().toString())
-                       .append(" \n Assigned to the Courier ")
+                       .append("\n Assigned to the Courier ")
                        .append(changedOrder.getCurrentAssignee());
 
             }else{
                content.append( " New order: ")
                        .append(changedOrder.getOrderId())
-                       .append(" \n Order Status ")
+                       .append("\n Order Status ")
                        .append(changedOrder.getOrderStatus())
-                       .append(" \n Order Placed on : ")
-                       .append(changedOrder.getOrderPlacedWhen().format(DateTimeFormatter.ofPattern("dd.mm.yyyy hh:mm"))
+                       .append("\n Order Placed on : ")
+                       .append(changedOrder.getOrderPlacedWhen()/*.format(DateTimeFormatter.ofPattern("dd.mm.yyyyThh:mm"))*/
                        );
             }
 

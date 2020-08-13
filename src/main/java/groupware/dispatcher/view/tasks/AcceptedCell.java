@@ -26,7 +26,7 @@ public class AcceptedCell extends TableCell<TaskRequestPM, RequestReply> {
         // super.updateItem(item, empty);
         if ( empty ||  item == null) {
             // adding new item
-            setText(null);
+            setText("Not yet");
             setGraphic(null);
         } else {
 

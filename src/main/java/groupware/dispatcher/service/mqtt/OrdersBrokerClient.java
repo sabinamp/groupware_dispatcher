@@ -11,7 +11,6 @@ import groupware.dispatcher.service.util.ModelObjManager;
 import groupware.dispatcher.service.util.MqttUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -24,13 +23,10 @@ public class OrdersBrokerClient extends BrokerClient {
     Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
     private OrderService orderService;
-    private final Logger logger;
-
+    private static final Logger LOGGER = LogManager.getLogManager().getLogger(String.valueOf(OrdersBrokerClient.class));
 
     public OrdersBrokerClient(OrderService orderServiceImpl){
         orderService= orderServiceImpl;
-        logger = LogManager.getLogManager().getLogger(String.valueOf(this.getClass()));
-
         orderGetPublisher = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_OrderGetPublisher)
@@ -81,11 +77,11 @@ public class OrdersBrokerClient extends BrokerClient {
             .whenComplete((mqtt3SubAck, throwable) -> {
                 if (throwable != null) {
                     // Handle failure to subscribe
-                    logger.warning(IDENTIFIER_SubscribeToNewOrders+ "Couldn't subscribe to topic  "+ topicName);
+                    LOGGER.warning(IDENTIFIER_SubscribeToNewOrders+ "Couldn't subscribe to topic  "+ topicName);
                     System.out.println(IDENTIFIER_SubscribeToNewOrders+ " Could not subscribe to topic "+ topicName);
                 } else {
                     // Handle successful subscription, e.g. logging or incrementing a metric
-                    logger.info(IDENTIFIER_SubscribeToNewOrders+ " - subscribed to topic "+topicName);
+                    OrdersBrokerClient.LOGGER.info(IDENTIFIER_SubscribeToNewOrders+ " - subscribed to topic "+topicName);
                 }
             });
     }
@@ -93,15 +89,14 @@ public class OrdersBrokerClient extends BrokerClient {
 
 
     public void connectAndRequestExistingOrder(String orderId){
-     connectClient(this.orderGetPublisher, 120);
+        connectClient(this.orderGetPublisher, 60);
         publishToTopic(orderGetPublisher,"orders/all_info/get/"+ orderId,null);
-        System.out.println("connecting to Broker and publishing the request for the existing order "+orderId);
+        System.out.println("connecting to Broker and publishing the request for the existing order "+ orderId);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(orderGetPublisher);
-
     }
 
     public void connectAndSubscribeForExistingOrders() {
-        connectClient(this.orderSubscriber, 120);
+        connectClient(this.orderSubscriber, 60);
         System.out.println("connecting to Broker and subscribing for existing orders. ");
         subscribeToGetOrderByIdResponse();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.orderSubscriber);
@@ -130,18 +125,18 @@ public class OrdersBrokerClient extends BrokerClient {
                             System.out.println("the order "+orderId+" has been received from the broker.");
                             orderService.updateOrder(orderId, order);
                         } else {
-                            logger.warning("OrderId "+orderId + " order is null");
+                            System.out.println("OrderId "+orderId + " order is null");
                         }
                     }
                 } ).send()
                 .whenCompleteAsync((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to subscribe
-                        logger.warning("Couldn't subscribe to topic "+ topic);
+                        LOGGER.warning("Couldn't subscribe to topic "+ topic);
                         System.out.println(" Could not subscribe to topic "+ topic);
                     } else {
                         // Handle successful subscription, e.g. logging or incrementing a metric
-                        logger.info(" - subscribed to topic " + topic);
+                        LOGGER.info(" - subscribed to topic " + topic);
                         System.out.println(" - subscribed to topic " + topic);
                     }
                 });
@@ -179,8 +174,6 @@ public class OrdersBrokerClient extends BrokerClient {
 
         connectAndSubscribeForExistingOrders();
         connectToBrokerAndSubscribeToNewOrders();
-
-
     }
 
 }

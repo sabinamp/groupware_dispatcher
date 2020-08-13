@@ -14,7 +14,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class TaskRequestServiceImpl{
-    private final Logger logger;
+    private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskRequestServiceImpl.class));
     private static Map<String, TaskRequest> tasks;
     private TaskRequest currentTaskRequest;
     private OrderServiceImpl orderService;
@@ -28,7 +28,6 @@ public class TaskRequestServiceImpl{
     }
 
     public TaskRequestServiceImpl(OrderServiceImpl orderService, CourierServiceImpl courierService){
-        logger = LogManager.getLogManager().getLogger(String.valueOf(TaskRequestServiceImpl.class));
         this.orderService = orderService;
         this.courierService = courierService;
     }
@@ -37,22 +36,22 @@ public class TaskRequestServiceImpl{
             return tasks.get(taskId);
       }
 
-    public boolean updateTaskRequest(String id, TaskRequest taskRequest) {
+    public boolean updateTaskRequest(String id, TaskRequest taskRequest, String update) {
         if(taskRequest == null) {
             logger.info("updateTask() received arg taskRequest - null");
             return false;
         }else {
-            if(tasks.get(id) != null){
-                tasks.put(id, taskRequest);
-                setCurrentTaskRequest(taskRequest);
+            boolean updating = tasks.get(id) != null;
+            tasks.put(id, taskRequest);
+            setCurrentTaskRequest(taskRequest);
+            if(updating){
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" updated.");
-              /*  if(taskRequestEventListener != null){
-                    taskRequestEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE),taskRequest);
-                }*/
+                if(taskRequestPMEventListener != null){
+                    TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
+                    taskRequestPMEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
+                }
             }else{
-                tasks.put(id, taskRequest);
-                setCurrentTaskRequest(taskRequest);
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" added.");
                 if(taskRequestEventListener != null){
@@ -63,7 +62,7 @@ public class TaskRequestServiceImpl{
         }
     }
 
-    public boolean updateAllTaskRequestPM(String id, TaskRequest taskRequest, String update) {
+   /* public boolean updateAllTaskRequestPM(String id, TaskRequest taskRequest, String update) {
         if(taskRequest == null) {
             logger.info("updateAllTaskRequestPM() received arg taskRequest - null");
             return false;
@@ -85,19 +84,17 @@ public class TaskRequestServiceImpl{
             }
             return true;
         }
-    }
+    }*/
 
 
 
-    public boolean updateTaskRequestDueOn(String taskId, LocalDateTime dueOn) {
+    public boolean updateTaskRequestDueOn(String taskId, LocalDateTime dueOn, String update) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setDueOn(dueOn);
-        boolean successful = updateTaskRequest(taskId, task);
+        boolean successful = updateTaskRequest(taskId, task, update);
         System.out.println("Successfully updated the task request due date : " + successful);
         return successful;
     }
-
-
 
 
     public AllTaskRequestsPM getAllTaskRequestsPM() {
