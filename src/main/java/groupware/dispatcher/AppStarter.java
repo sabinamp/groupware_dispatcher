@@ -27,7 +27,6 @@ import static groupware.dispatcher.service.util.MqttUtils.idle;
 public class AppStarter extends Application {
     private ApplicationUI rootPanel;
     private RootPM rootPM;
-
     private AllOrdersPM allOrdersPM;
     private AllCouriersPM allCouriersPM;
     private AllTaskRequestsPM allTaskRequestsPM;
@@ -36,6 +35,7 @@ public class AppStarter extends Application {
     private final CourierServiceImpl courierService =  new CourierServiceImpl();
     private final  OrderServiceImpl orderService = new OrderServiceImpl();
     private final TaskRequestServiceImpl taskRequestService = new TaskRequestServiceImpl(orderService,courierService);
+
     // this is timer thread which will update out time view every second
     Thread timer = new Thread(() -> {
         SimpleDateFormat dt = new SimpleDateFormat("hh:mm:ss");
@@ -53,30 +53,38 @@ public class AppStarter extends Application {
             });
         }
     });
-   /* Runnable connectToBroker = new Runnable() {
+    Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
+            rootPM = new RootPM();
+            allCouriersPM =new AllCouriersPM();
+            courierService.setAllCouriersPMListener(allCouriersPM);
+
+
+            allOrdersPM = new AllOrdersPM();
+            orderService.setOrderEventListener(allOrdersPM);
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
+            brokerConnection.startBrokerConnection();
 
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
                 //do not exit
+                try{
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
 
             });
         }
-    };*/
+    };
 
     @Override
     public void start(Stage primaryStage){
-        rootPM = new RootPM();
-        allCouriersPM =new AllCouriersPM();
-        courierService.setAllCouriersPMListener(allCouriersPM);
 
 
-        allOrdersPM = new AllOrdersPM();
-        orderService.setOrderEventListener(allOrdersPM);
-
-        BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
+        connectToBroker.run();
         allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
         taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
         taskRequestService.setTaskRequestEventListener(BrokerConnection.taskBrokerClient);
@@ -89,13 +97,11 @@ public class AppStarter extends Application {
 
         });
 
-
         rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, taskRequestService);
 
         rootPanel.addClockToHeader(txtTime);
 
         rootPanel.addExitButton(exitBtn);
-
         Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");
         primaryStage.setScene(scene);

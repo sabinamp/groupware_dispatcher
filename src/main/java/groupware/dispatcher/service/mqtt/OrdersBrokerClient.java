@@ -59,8 +59,8 @@ public class OrdersBrokerClient extends BrokerClient {
         System.out.println("connecting to Broker");
         connectClient(this.subscribeToNewOrders, 120);
         subscribeToNewOrders();
-
-        }
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(this.subscribeToNewOrders);
+    }
 
 
     private CompletableFuture<Mqtt3SubAck> subscribeToNewOrders(){
@@ -104,12 +104,13 @@ public class OrdersBrokerClient extends BrokerClient {
         connectClient(this.orderSubscriber, 120);
         System.out.println("connecting to Broker and subscribing for existing orders. ");
         subscribeToGetOrderByIdResponse();
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(this.orderSubscriber);
 
     }
 
-    private void connectClient(Mqtt3AsyncClient client, int i) {
+    private void connectClient(Mqtt3AsyncClient client, int keepAlive) {
         client.connectWith()
-                .keepAlive(120)
+                .keepAlive(keepAlive)
                 .cleanSession(false)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
@@ -172,11 +173,8 @@ public class OrdersBrokerClient extends BrokerClient {
     void subscribeToOrders(){
 
         connectAndRequestExistingOrder("OR1111");
-
         connectAndRequestExistingOrder("OR1122");
-
         connectAndRequestExistingOrder("OR1123");
-
         connectAndRequestExistingOrder("OR1124");
 
         connectAndSubscribeForExistingOrders();

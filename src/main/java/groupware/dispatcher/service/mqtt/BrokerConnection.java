@@ -16,8 +16,6 @@ public class BrokerConnection {
         courierBrokerClient = new CourierBrokerClient(courierService);
         ordersBrokerClient = new OrdersBrokerClient(orderService);
         taskBrokerClient = new TaskBrokerClient(courierService, taskService);
-        connectCourierServiceToBroker.run();
-        connectOrderServiceToBroker.run();
     }
 
 
@@ -35,6 +33,11 @@ public class BrokerConnection {
            ordersBrokerClient.subscribeToOrders();
         }
     };
+
+    public void startBrokerConnection(){
+        connectCourierServiceToBroker.run();
+        connectOrderServiceToBroker.run();
+    }
 
 
 

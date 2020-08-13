@@ -1,3 +1,5 @@
+
+
 # Groupware Dispatcher Repository
 
 JavaFX Application used by the dispatcher for order management, delivery management and tracking.
@@ -18,6 +20,12 @@ It checks every incoming message and updates the user interface accordingly.
 # Groupware Store Repository -  Backend - Java Client
 The backend Java service connects to the broker, subscribes and listens to 'orders/all_info/get/#' and 'couriers/info/get/#' . It publishes the response to the topic
 'orders/all_info/get/+/response' and respectively 'couriers/info/get/+/response'.
+
+##Software & Tool Requirements:
+
+* Java 11
+* HiveMQ MQTT Client Library ( given in the build.gradle settings  )
+* Message Broker HiveMQ CE 2020.3-SNAPSHOT
 
 # Further HiveMQ Documentation
 HiveMQ Documentation / User Guide https://www.hivemq.com/docs/hivemq/4.3/user-guide/introduction.html

@@ -68,18 +68,11 @@ public class CourierBrokerClient extends BrokerClient{
     }
 
 
-    public void connectClientCourierInfo(){
-        this.clientCourierInfo.connectWith()
-                .keepAlive(160)
-                .cleanSession(false)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
-    }
 
    public void connectAndRequestCourier(String courierId){
         String topicName= "couriers/info/get/" + courierId;
-        System.out.println("connecting to Broker and subscribing for courier "+courierId);
-       connectClientCourierInfo();
+        System.out.println("connecting to Broker and requesting courier data, courierId: "+courierId);
+        connectClient( this.clientCourierInfo, 60, false);
         publishToTopic(this.clientCourierInfo,topicName,null);
    }
 
@@ -92,7 +85,7 @@ public class CourierBrokerClient extends BrokerClient{
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
                 .thenComposeAsync(v -> subscribeToGetCourierById())
-                .whenComplete((connAck, throwable) -> {
+                .whenCompleteAsync((connAck, throwable) -> {
                     if (throwable != null) {
                         // Handle connection failure
                         logger.info("connectAndSubscribeForCourierInfo. The connection to the broker failed."
@@ -134,7 +127,7 @@ public class CourierBrokerClient extends BrokerClient{
                         }
                     }
                 } ).send()
-                .whenComplete((mqtt3SubAck, throwable) -> {
+                .whenCompleteAsync((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to subscribe
                         logger.warning("Couldn't subscribe to topic " + topicName);
@@ -147,18 +140,12 @@ public class CourierBrokerClient extends BrokerClient{
 
     }
 
-    private void connectClient(Mqtt3AsyncClient client, int keepAliveSec){
-                client.connectWith()
-                .keepAlive(keepAliveSec)
-                .cleanSession(true)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
-    }
+
 
     public void connectToBrokerAndSubscribeToCourierUpdates(){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToCourierUpdates");
-       connectClient(this.clientCourierUpdates, 160);
-       subscribeToCourierUpdates();
+        connectClient(this.clientCourierUpdates, 160, false);
+        subscribeToCourierUpdates();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.clientCourierUpdates);
 
     }
@@ -226,19 +213,12 @@ public class CourierBrokerClient extends BrokerClient{
     void subscribeToCouriers(){
 
         connectAndRequestCourier("C100");
-
         connectAndRequestCourier("C101");
-
         connectAndRequestCourier("C102");
-
         connectAndRequestCourier("C103");
-
         connectAndRequestCourier("C104");
-
         connectAndRequestCourier("C105");
-
         connectAndRequestCourier("C106");
-
         connectAndRequestCourier("C107");
         connectAndSubscribeForCourierInfoResponse();
         connectToBrokerAndSubscribeToCourierUpdates();

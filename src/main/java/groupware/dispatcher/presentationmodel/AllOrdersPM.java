@@ -54,17 +54,20 @@ public class AllOrdersPM implements OrderEventListener {
             boolean wasAdded = change.wasAdded();
             List<OrderPM> listChanges = new ArrayList<>(change.getList());
 
-            //notification popup
-            Platform.runLater(()->{
-                int changeNb = change.getList().size();
-                    System.out.println("showAlertWithDefaultHeaderText called. The number of updates or new orders " + changeNb);
-                    if(listChanges.size() == changeNb){
-                        while(changeNb > 0){
-                            showAlertWithDefaultHeaderText(wasUpdated, listChanges.get(changeNb-1));
-                            changeNb--;
+                //notification popup
+                Platform.runLater(()->{
+                    if(wasAdded){
+                        int changeNb = change.getList().size();
+                        System.out.println("showAlertWithDefaultHeaderText called. The number of updates or new orders " + changeNb);
+                        if(listChanges.size() == changeNb){
+                            while(changeNb > 0){
+                                showAlertWithDefaultHeaderText(wasUpdated, listChanges.get(changeNb-1));
+                                changeNb--;
+                            }
                         }
                     }
-                    });
+                });
+
 
         });
     }

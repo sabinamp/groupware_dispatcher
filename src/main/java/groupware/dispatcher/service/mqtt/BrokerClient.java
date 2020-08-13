@@ -16,7 +16,7 @@ public class BrokerClient {
     void connectClient(Mqtt3AsyncClient client, int keepAlive, boolean cleanSession){
 
         client.connectWith()
-                .keepAlive(120)
+                .keepAlive(keepAlive)
                 .cleanSession(cleanSession)
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
@@ -25,7 +25,7 @@ public class BrokerClient {
     CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload){
        return client.publishWith()
                 .topic(myTopic)
-                //.retain(true)
+                .retain(true)
                 .payload(myPayload == null? null: myPayload.getBytes())
                 .qos(MqttQos.EXACTLY_ONCE)
                 .send()
@@ -45,7 +45,7 @@ public class BrokerClient {
     Mqtt3Publish publishMessage(String topic, String myPayload){
         return Mqtt3Publish.builder()
                 .topic(topic)
-               // .retain(true)
+                .retain(true)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .payload(myPayload == null? null: myPayload.getBytes())
                 .build();

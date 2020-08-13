@@ -18,8 +18,6 @@ public class OrderPM {
     private final ObjectProperty<ContactInfo> destinationAddress =  new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();
 
-
-
     private final ObjectProperty<DeliveryType> orderType = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> scheduledParcelCollectionWhen = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> orderUpdatedWhen = new SimpleObjectProperty<>();

@@ -74,6 +74,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
         connectClient( this.clientTaskSubscriber, 120, false);
         subscribeToTaskRequestUpdates(taskId, taskRequest);
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
 
     }
 

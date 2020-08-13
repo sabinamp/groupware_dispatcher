@@ -45,7 +45,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         columnOrderID.setCellFactory(cell -> new OrderIDCell());
         columnOrderID.setMinWidth(100);
 
-        TableColumn<TaskRequestPM, String> columnCourierId= new TableColumn<>("Courier ID");
+        TableColumn<TaskRequestPM, String> columnCourierId= new TableColumn<>("Assigned To");
         columnCourierId.setCellValueFactory(cell->cell.getValue().assigneeIdProperty());
         columnCourierId.setCellFactory(cell -> new TaskIDCell());
         columnCourierId.setMinWidth(100);
@@ -55,12 +55,12 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         columnType.setCellFactory(cell-> new DeliveryTypeCell());
         columnType.setMinWidth(100);
 
-        TableColumn<TaskRequestPM, Boolean> columnAccepted = new TableColumn<>("Confirmed");
+        TableColumn<TaskRequestPM, Boolean> columnAccepted = new TableColumn<>("Accepted");
         columnAccepted.setCellValueFactory(cell-> cell.getValue().acceptedProperty());
         columnAccepted.setCellFactory(cell-> new BooleanCell());
         columnAccepted.setMinWidth(100);
 
-        TableColumn<TaskRequestPM, Boolean> columnDone = new TableColumn<>("Done");
+        TableColumn<TaskRequestPM, Boolean> columnDone = new TableColumn<>("Status");
         columnDone.setCellValueFactory(cell-> cell.getValue().doneProperty());
         columnDone.setCellFactory(cell-> new BooleanCell());
         columnDone.setMinWidth(100);
