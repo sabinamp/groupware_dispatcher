@@ -29,9 +29,6 @@ public class OrderPlacedWhenCell extends TableCell<OrderPM, LocalDateTime> {
         txtArea= new BorderPane();
         txtArea.setPrefWidth(100);
     }
-
-
-
     @Override
     protected void updateItem(LocalDateTime item, boolean empty) {
         setText(null);
