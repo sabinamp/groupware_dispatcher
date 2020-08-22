@@ -13,7 +13,6 @@ public class OrderPM {
     private final StringProperty orderId = new SimpleStringProperty();
     private final StringProperty customerName =  new SimpleStringProperty(ELLIPSIS);
 
-
     //final destination address
     private final ObjectProperty<ContactInfo> destinationAddress =  new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> orderPlacedWhen = new SimpleObjectProperty<>();

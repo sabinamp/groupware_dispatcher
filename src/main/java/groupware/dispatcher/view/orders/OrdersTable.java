@@ -3,9 +3,9 @@ package groupware.dispatcher.view.orders;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.OrderPM;
 import groupware.dispatcher.service.model.ContactInfo;
+import groupware.dispatcher.service.model.DeliveryStep;
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.OrderStatus;
-import groupware.dispatcher.view.couriers.LocalDateTimeCell;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
@@ -51,6 +51,11 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         placedWhenColumn.setCellFactory(cell -> new OrderPlacedWhenCell());
         placedWhenColumn.setMinWidth(100);
 
+        TableColumn<OrderPM, String> customerNameColumn = new TableColumn<>("Customer Name");
+        customerNameColumn.setCellValueFactory(cell -> cell.getValue().customerNameProperty());
+        customerNameColumn.setCellFactory(cell -> new TxtCell());
+        customerNameColumn.setMinWidth(100);
+
         TableColumn<OrderPM, ContactInfo> columnAddress = new TableColumn<>("Destination Address");
         columnAddress.setCellValueFactory(cell -> cell.getValue().destinationAddressProperty());
         columnAddress.setCellFactory(cell -> new DestinationAddressCell());
@@ -61,17 +66,19 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         statusColumn.setCellFactory(cell -> new OrderStatusCell());
         statusColumn.setMinWidth(150);
 
-        TableColumn<OrderPM, String> assigneeColumn = new TableColumn<>("Assigned To");
+        TableColumn<OrderPM, String> assigneeColumn = new TableColumn<>("Updated by");
         assigneeColumn.setCellValueFactory(cell -> cell.getValue().currentAssigneeProperty());
-        assigneeColumn.setCellFactory(cell -> new AssigneeCell());
+        assigneeColumn.setCellFactory(cell -> new TxtCell());
         assigneeColumn.setMinWidth(100);
 
-        TableColumn<OrderPM, LocalDateTime> updatedWhenColumn = new TableColumn<>("Last Update");
+
+
+        TableColumn<OrderPM, LocalDateTime> updatedWhenColumn = new TableColumn<>("Updated");
         updatedWhenColumn.setCellValueFactory(cell -> cell.getValue().orderUpdatedWhenProperty());
         updatedWhenColumn.setCellFactory(cell -> new OrderUpdatedWhenCell());
         updatedWhenColumn.setMinWidth(100);
 
-        getColumns().addAll(Arrays.asList(columnId, typeColumn, placedWhenColumn,columnAddress, statusColumn,
+        getColumns().addAll(Arrays.asList(columnId, typeColumn, placedWhenColumn,customerNameColumn,columnAddress, statusColumn,
                 assigneeColumn,updatedWhenColumn));
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         TableViewSelectionModel<OrderPM> tsm = getSelectionModel();

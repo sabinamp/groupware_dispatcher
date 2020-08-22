@@ -17,12 +17,12 @@ import java.time.format.DateTimeFormatter;
 public class OrderUpdatedWhenCell extends TableCell<OrderPM, LocalDateTime> {
     private static final String datePattern = "M/d/YY H:mm";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(datePattern);
-    private static final Insets INSETS = new Insets(1, 5, 1, 8);
+    private static final Insets INSETS = new Insets(2, 5, 4, 8);
     private BorderPane txtArea;
 
     public OrderUpdatedWhenCell() {
         setGraphic(null);
-        setContentDisplay(ContentDisplay.LEFT);
+        setContentDisplay(ContentDisplay.CENTER);
         setPadding(INSETS);
         setAlignment(Pos.CENTER_LEFT);
         txtArea= new BorderPane();
@@ -37,7 +37,7 @@ public class OrderUpdatedWhenCell extends TableCell<OrderPM, LocalDateTime> {
             setText(null);
             setGraphic(null);
         } else {
-            if (item != null && !empty) {
+            if (item != null) {
                 String lines= DATE_FORMATTER.format(item);
                 String[] parts= lines.split(" ");
                 Text date= new Text();
@@ -46,7 +46,7 @@ public class OrderUpdatedWhenCell extends TableCell<OrderPM, LocalDateTime> {
                 date.setFont(Font.font ("Roboto Regular", 13));
                 date.setFill(Color.web("#ECF7FF"));
                 time.setText(parts[1]);
-                time.setFont(Font.font ("Roboto Regular", 11));
+                time.setFont(Font.font ("Roboto Regular", 13));
                 time.setFill(Color.web("#ECF7FF"));
                 txtArea.setTop(date);
                 txtArea.setBottom(time);

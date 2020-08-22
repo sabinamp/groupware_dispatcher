@@ -32,8 +32,9 @@ public class AllOrdersPM implements OrderEventListener {
     private final ObservableList<OrderPM> syncAllOrders = FXCollections.synchronizedObservableList(allOrders);
 
 
-
     private final ObjectProperty<ObservableList<OrderPM>> allOrderEntries = new SimpleObjectProperty<>();
+    private static final String datePattern = "M/d/YY HH:mm";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(datePattern);
 
     public AllOrdersPM(){
         setupValueChangedListeners();
@@ -65,9 +66,7 @@ public class AllOrdersPM implements OrderEventListener {
                                 //changeNb--;
                             }
                         }
-
                 });
-
 
         });
     }
@@ -117,7 +116,7 @@ public class AllOrdersPM implements OrderEventListener {
                        .append("\n Order Status ")
                        .append(changedOrder.getOrderStatus())
                        .append("\n Order Placed on : ")
-                       .append(changedOrder.getOrderPlacedWhen()/*.format(DateTimeFormatter.ofPattern("dd.mm.yyyyThh:mm"))*/
+                       .append(DATE_FORMATTER.format(changedOrder.getOrderPlacedWhen())
                        );
             }
 

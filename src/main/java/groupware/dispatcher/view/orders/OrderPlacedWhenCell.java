@@ -16,14 +16,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class OrderPlacedWhenCell extends TableCell<OrderPM, LocalDateTime> {
-    private static final String datePattern = "M/d/YY H:mm";
+    private static final String datePattern = "M/d/YY HH:mm";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(datePattern);
-    private static final Insets INSETS = new Insets(1, 5, 1, 8);
+    private static final Insets INSETS = new Insets(2, 5, 4, 8);
     private BorderPane txtArea;
 
     public OrderPlacedWhenCell() {
         setGraphic(null);
-        setContentDisplay(ContentDisplay.LEFT);
+        setContentDisplay(ContentDisplay.CENTER);
         setPadding(INSETS);
         setAlignment(Pos.CENTER_LEFT);
         txtArea= new BorderPane();
@@ -36,8 +36,7 @@ public class OrderPlacedWhenCell extends TableCell<OrderPM, LocalDateTime> {
             setText(null);
             setGraphic(null);
         } else {
-            if (item != null && !empty) {
-                //setText(DATE_FORMATTER.format(item));
+            if (item != null) {
 
                 String lines= DATE_FORMATTER.format(item);
                 String[] parts= lines.split(" ");
@@ -48,7 +47,7 @@ public class OrderPlacedWhenCell extends TableCell<OrderPM, LocalDateTime> {
                 date.setFill(Color.web("#ECF7FF"));
                 time.setText(parts[1]);
                 // time.setStyle("-fx-text-color: #4F8A10;-fx-font-weight:bold;");
-                time.setFont(Font.font ("Roboto Regular", 11));
+                time.setFont(Font.font ("Roboto Regular", 13));
                 time.setFill(Color.web("#ECF7FF"));
                 txtArea.setTop(date);
                 txtArea.setBottom(time);
