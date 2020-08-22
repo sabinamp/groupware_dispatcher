@@ -39,7 +39,7 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         TableColumn<OrderPM, String> columnId = new TableColumn<>("Order ID");
         columnId.setCellValueFactory(cell -> cell.getValue().orderIdProperty());
         columnId.setCellFactory(cell -> new OrderIDCell());
-        columnId.setMinWidth(100);
+        columnId.setMinWidth(80);
 
         TableColumn<OrderPM, DeliveryType> typeColumn = new TableColumn<>("Delivery Type");
         typeColumn.setCellValueFactory(cell -> cell.getValue().orderTypeProperty());
@@ -59,7 +59,7 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         TableColumn<OrderPM, ContactInfo> columnAddress = new TableColumn<>("Destination Address");
         columnAddress.setCellValueFactory(cell -> cell.getValue().destinationAddressProperty());
         columnAddress.setCellFactory(cell -> new DestinationAddressCell());
-        columnAddress.setMinWidth(200);
+        columnAddress.setMinWidth(150);
 
         TableColumn<OrderPM, OrderStatus> statusColumn = new TableColumn<>("Order Status");
         statusColumn.setCellValueFactory(cell -> cell.getValue().orderStatusProperty());
@@ -69,11 +69,11 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         TableColumn<OrderPM, String> assigneeColumn = new TableColumn<>("Updated by");
         assigneeColumn.setCellValueFactory(cell -> cell.getValue().currentAssigneeProperty());
         assigneeColumn.setCellFactory(cell -> new TxtCell());
-        assigneeColumn.setMinWidth(100);
+        assigneeColumn.setMinWidth(80);
 
 
 
-        TableColumn<OrderPM, LocalDateTime> updatedWhenColumn = new TableColumn<>("Updated");
+        TableColumn<OrderPM, LocalDateTime> updatedWhenColumn = new TableColumn<>("Updated When");
         updatedWhenColumn.setCellValueFactory(cell -> cell.getValue().orderUpdatedWhenProperty());
         updatedWhenColumn.setCellFactory(cell -> new OrderUpdatedWhenCell());
         updatedWhenColumn.setMinWidth(100);
