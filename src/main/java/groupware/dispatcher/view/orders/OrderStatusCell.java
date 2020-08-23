@@ -16,7 +16,6 @@ public class OrderStatusCell extends TableCell<OrderPM, OrderStatus> {
     private static final Insets INSETS = new Insets(2, 5, 2, 8);
 
     public OrderStatusCell(){
-
         setContentDisplay(ContentDisplay.LEFT);
         setPadding(INSETS);
         setAlignment(Pos.CENTER_LEFT);
@@ -30,7 +29,6 @@ public class OrderStatusCell extends TableCell<OrderPM, OrderStatus> {
             setText(null);
             setGraphic(null);
         } else {
-
             if (item.equals(OrderStatus.FAILED) || item.equals(OrderStatus.CANCELED) ){
                 rectangle = new Rectangle(20,20, Color.web("Red"));
             }else if (item.equals(OrderStatus.COMPLETED)){

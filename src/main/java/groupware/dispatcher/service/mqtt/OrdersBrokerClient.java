@@ -24,7 +24,7 @@ public class OrdersBrokerClient extends BrokerClient {
     Mqtt3AsyncClient orderGetPublisher;
     Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
-    Mqtt3AsyncClient orderConfirmationPublisher;
+    Mqtt3AsyncClient orderStatusPublisher;
     private OrderService orderService;
     private static final Logger LOGGER = LogManager.getLogManager().getLogger(String.valueOf(OrdersBrokerClient.class));
 
@@ -51,7 +51,7 @@ public class OrdersBrokerClient extends BrokerClient {
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
-        orderConfirmationPublisher = MqttClient.builder()
+        orderStatusPublisher = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_OrderSubscriber)
                 .serverHost("127.0.0.1")
@@ -64,10 +64,8 @@ public class OrdersBrokerClient extends BrokerClient {
     public void connectToBrokerAndSubscribeToNewOrders(){
         System.out.println("connecting to Broker");
         connectClient(this.subscribeToNewOrders, 120);
-        connectClient(orderConfirmationPublisher,120);
         subscribeToNewOrders();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.subscribeToNewOrders);
-        MqttUtils.addDisconnectOnRuntimeShutDownHock(this.orderConfirmationPublisher);
     }
 
 

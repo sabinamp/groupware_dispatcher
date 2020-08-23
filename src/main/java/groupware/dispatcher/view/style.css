@@ -26,7 +26,7 @@
     -fx-spacing    : 10px;
     -fx-background-color: black ;
     -fx-text-fill: white;
-    -fx-min-width: 700px;
+    -fx-min-width: 600px;
 }
 
 .invalid .text {
@@ -55,21 +55,20 @@
     -fx-font-size: 1.15em;
     -fx-text-fill: #323438;
     -fx-spacing: 15;
-
 }
 .couriers-pane{
     -fx-padding: 5;
     -fx-background-color: black;
     -fx-text-fill: #8A8C95;
     -fx-spacing: 20;
-    -fx-min-width: 500px;
+    -fx-min-width: 600px;
 }
 .tasks-pane{
     -fx-padding: 5;
     -fx-background-color: transparent;
     -fx-text-fill: black;
     -fx-spacing: 20;
-    -fx-min-width: 500px;
+    -fx-min-width: 600px;
 }
 
 .table-view {

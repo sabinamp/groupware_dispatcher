@@ -64,9 +64,13 @@ public class TaskRequestServiceImpl{
         }
     }
 
-    public boolean updateTaskRequestReply(String taskId, RequestReply reply, String update) {
+    public boolean updateTaskRequestReply(String taskId, RequestReply reply, String update, String assigneeID) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setConfirmed(reply);
+        if(reply.equals(RequestReply.ACCEPTED)){
+            courierService.updateAssignedOrders(assigneeID, task.getOrderId());
+            orderService.updateOrderAssignee(task.getOrderId(),assigneeID);
+        }
         boolean successful = updateTaskRequest(taskId, task, update);
         System.out.println("Successfully updated the task request due date : " + successful);
         return successful;

@@ -16,7 +16,7 @@ public class NotesPane extends VBox implements ViewMixin {
     @Override
     public void initializeSelf() {
         getStyleClass().add("activity-pane");
-        setPrefWidth(250);
+        setPrefWidth(300);
     }
 
     @Override

@@ -26,8 +26,6 @@ public class AllOrdersPM implements OrderEventListener {
     private final ObservableMap<String, OrderPM> allOrdersMap = FXCollections.observableHashMap();
 
 
-    private final  ObservableList<String> allOrderIDs = FXCollections.observableArrayList(allOrdersMap.keySet());
-
     private final ObservableMap<String, OrderPM> syncAllOrdersMap = FXCollections.synchronizedObservableMap(allOrdersMap);
     private final ObservableList<OrderPM> syncAllOrders = FXCollections.synchronizedObservableList(allOrders);
 
@@ -148,6 +146,11 @@ public class AllOrdersPM implements OrderEventListener {
     @Override
     public void handleOrderUpdateEvent(OrderPM orderPM) {
         this.updateAllOrdersPM(orderPM);
-        Platform.runLater(() ->showAlertWithDefaultHeaderText(true, orderPM));
+        //Platform.runLater(() ->showAlertWithDefaultHeaderText(true, orderPM));
     }
+
+
 }
+
+
+

@@ -5,6 +5,7 @@ import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.SetChangeListener;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -57,7 +58,7 @@ public class TasksPane extends BorderPane implements ViewMixin {
         ordersTab.setContent(treeView);
 
         Tab tabRight = new Tab("Couriers");
-        tRoot= new TreeItem<>("Available Couriers");
+        tRoot= new TreeItem<>("City Couriers");
         courierTreeView = new TreeView<>(tRoot);
         courierTreeView.setRoot(tRoot);
         courierTreeView.setEditable(false);
@@ -65,16 +66,6 @@ public class TasksPane extends BorderPane implements ViewMixin {
 
         Set<TreeItem<String>> tRootChildren = new HashSet<>();
 
-      /*  tasksRootChildren.add( new TreeItem<>("C100"));
-        tasksRootChildren.add( new TreeItem<>("C101"));
-        tasksRootChildren.add(new TreeItem<>("C102"));
-        tasksRootChildren.add(new TreeItem<>("C103"));
-        tasksRootChildren.add(new TreeItem<>("C104"));
-        tasksRootChildren.add(new TreeItem<>("C105"));
-        tasksRootChildren.add(new TreeItem<>("C106"));
-        tasksRootChildren.add(new TreeItem<>("C107"));*/
-
-        //tRoot.getChildren().addAll(tRootChildren);
         tabRight.setContent(courierTreeView);
         tabPaneLeft.getTabs().addAll(ordersTab, tabRight);
     }
@@ -82,14 +73,20 @@ public class TasksPane extends BorderPane implements ViewMixin {
     @Override
     public void setupBindings() {
 
-           }
+
+    }
 
     @Override
     public void setupValueChangedListeners() {
-        this.allOrdersPM.getAllOrderEntries().addListener((ListChangeListener<OrderPM>) c -> {
-            int lastIndex = c.getList().size() -1;
-            ordersRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getOrderId()));
+        allOrdersPM.getAllOrderEntries().addListener((ListChangeListener<OrderPM>) c -> {
+            c.next();
+            if(c.wasAdded()) {
+                int lastIndex = c.getList().size() - 1;
+                ordersRoot.getChildren().add(new TreeItem<>(c.getList().get(lastIndex).getOrderId()+" "
+                       + c.getList().get(lastIndex).getOrderType()));
+            }
         });
+
 
         this.allCouriersPM.getAllCourierEntries().addListener((ListChangeListener<CourierPM>) c -> {
             c.next();
@@ -101,12 +98,10 @@ public class TasksPane extends BorderPane implements ViewMixin {
             }
 
         });
-
     }
 
     @Override
     public void layoutParts() {
-
         setLeft(tabPaneLeft);
         setCenter(taskTable);
         setRight(taskForm);

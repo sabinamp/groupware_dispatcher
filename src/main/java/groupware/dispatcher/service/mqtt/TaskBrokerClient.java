@@ -25,15 +25,15 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
     private Mqtt3AsyncClient clientTaskSubscriber;
-    private CourierServiceImpl courierService;
+
 
     private TaskRequestServiceImpl taskRequestService;
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskBrokerClient.class));
 
 
-    public TaskBrokerClient(CourierServiceImpl courierService, TaskRequestServiceImpl taskRequestService)
+    public TaskBrokerClient(TaskRequestServiceImpl taskRequestService)
     {
-        this.courierService= courierService;
+
         this.taskRequestService = taskRequestService;
         clientTaskRequestsPublisher = MqttClient.builder()
                 .useMqttVersion3()
@@ -98,10 +98,6 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                 });
     }
 
-    public CourierServiceImpl getOrderService() {
-        return courierService;
-    }
-
     public TaskRequestServiceImpl getTaskRequestService() {
         return taskRequestService;
     }
@@ -120,18 +116,20 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
         TaskRequest task= taskRequestService.getTaskRequestById(taskId);
         switch (topicEnd) {
             case "accept": {
-                courierService.updateAssignedOrders(assigneeID, task.getOrderId());
-                taskRequestService.updateTaskRequestReply(taskId, RequestReply.ACCEPTED, "Task "+taskId +" Accepted.Topic End: "+topicEnd );
+                taskRequestService.updateTaskRequestReply(taskId, RequestReply.ACCEPTED,
+                        "Task "+taskId +" Accepted.Topic End: "+topicEnd , assigneeID);
                 System.out.println("task accepted - update received for the task request " + taskId);
                 break;
             }
             case "deny": {
-                taskRequestService.updateTaskRequestReply(taskId, RequestReply.DENIED, "Task "+taskId +" Denied. Topic End: "+topicEnd);
+                taskRequestService.updateTaskRequestReply(taskId, RequestReply.DENIED,
+                        "Task "+taskId +" Denied. Topic End: "+topicEnd, assigneeID);
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
             }
             case "timeout": {
-                taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT, "Task "+taskId +"Task timed out. Topic End: "+topicEnd);
+                taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT,
+                        "Task "+taskId +"Task timed out. Topic End: "+topicEnd, assigneeID);
                 System.out.println("task timed out - update received for the task request " + taskId);
                 break;
             }

@@ -66,10 +66,10 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         statusColumn.setCellFactory(cell -> new OrderStatusCell());
         statusColumn.setMinWidth(150);
 
-        TableColumn<OrderPM, String> assigneeColumn = new TableColumn<>("Updated by");
+        TableColumn<OrderPM, String> assigneeColumn = new TableColumn<>("Assigned to");
         assigneeColumn.setCellValueFactory(cell -> cell.getValue().currentAssigneeProperty());
         assigneeColumn.setCellFactory(cell -> new TxtCell());
-        assigneeColumn.setMinWidth(80);
+        assigneeColumn.setMinWidth(90);
 
 
         TableColumn<OrderPM, LocalDateTime> updatedWhenColumn = new TableColumn<>("Updated When");
