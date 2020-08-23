@@ -80,15 +80,15 @@ public class OrdersBrokerClient extends BrokerClient {
                     System.out.println("new order received " +received);
                    OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                    if(order != null) {
-                       orderService.updateOrder(order.getOrderId(), order);
                        DeliveryStep startedStep = new DeliveryStep();
                        startedStep.setUpdatedWhen(LocalDateTime.now());
                        startedStep.setCurrentStatus(OrderStatus.CONFIRMED);
                        startedStep.setCurrentAssignee("C000");
-                       orderService.updateOrderStatus(order.getOrderId(), startedStep);
+                       order.addDeliveryInfosItem(startedStep);
+                       orderService.updateOrder(order.getOrderId(), order);
                        //publish order confirmation
                        String topicToPublishConfirmation= "orders/status/update/"+order.getOrderId();
-                       publishToTopic(subscribeToNewOrders,topicToPublishConfirmation, ModelObjManager.convertToJSON(order));
+                       publishToTopic(subscribeToNewOrders,topicToPublishConfirmation, ModelObjManager.convertToJSON(startedStep));
                    }
                 }
             } ).send()
@@ -114,7 +114,7 @@ public class OrdersBrokerClient extends BrokerClient {
     }
 
     public void connectAndSubscribeForExistingOrders() {
-        connectClient(this.orderSubscriber, 60);
+        connectClient(this.orderSubscriber, 80);
         System.out.println("connecting to Broker and subscribing for existing orders. ");
         subscribeToGetOrderByIdResponse();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.orderSubscriber);
