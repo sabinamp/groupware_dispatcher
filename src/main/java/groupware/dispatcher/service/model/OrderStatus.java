@@ -10,7 +10,9 @@ public enum OrderStatus {
 
     PENDING("New Order"),
 
-    STARTED("Order Processed"),
+    CONFIRMED("Confirmed"),
+
+    STARTED("Assigned"),
 
     PARCEL_COLLECTED("Parcel Collected"),
 

@@ -24,7 +24,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
 
     private ObservableList<TaskRequestPM> selectedEntries;
     private ObservableList<Integer> selectedEntryIndex;
-    private  TableViewSelectionModel<TaskRequestPM> tsm;
+    private TableViewSelectionModel<TaskRequestPM> tsm;
 
     public TaskRequestTable(AllTaskRequestsPM pm){
         super();
@@ -35,11 +35,10 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
     @Override
     public void initializeParts() {
 
-
         TableColumn<TaskRequestPM, String> columnTaskId= new TableColumn<>("Task ID");
         columnTaskId.setCellValueFactory(cell->cell.getValue().taskIdProperty());
         columnTaskId.setCellFactory(cell -> new TaskIDCell());
-        columnTaskId.setMinWidth(100);
+        columnTaskId.setMinWidth(80);
 
         TableColumn<TaskRequestPM, String> columnOrderID= new TableColumn<>("Order ID");
         columnOrderID.setCellValueFactory(cell->cell.getValue().orderIdProperty());
@@ -49,7 +48,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         TableColumn<TaskRequestPM, String> columnCourierId= new TableColumn<>("Assigned To");
         columnCourierId.setCellValueFactory(cell->cell.getValue().assigneeIdProperty());
         columnCourierId.setCellFactory(cell -> new TaskIDCell());
-        columnCourierId.setMinWidth(100);
+        columnCourierId.setMinWidth(80);
 
         TableColumn<TaskRequestPM, DeliveryType> columnType = new TableColumn<>("Type");
         columnType.setCellValueFactory(cell-> cell.getValue().deliveryTypeProperty());
@@ -66,14 +65,12 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         columnDone.setCellFactory(cell-> new BooleanCell());
         columnDone.setMinWidth(100);
 
-        getColumns().addAll(Arrays.asList(columnTaskId, columnCourierId, columnOrderID, columnType,columnAccepted, columnDone));
+        getColumns().addAll(Arrays.asList(columnTaskId, columnCourierId, columnOrderID, columnType, columnAccepted, columnDone));
+
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        setItems(pm.getSyncAllTasks());
-
         tsm = getSelectionModel();
-
         tsm.setSelectionMode(SelectionMode.SINGLE);
-
+        setItems(pm.getSyncAllTasks());
         // getting selected items
         selectedEntries = tsm.getSelectedItems();
         selectedEntryIndex = tsm.getSelectedIndices();
@@ -85,7 +82,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
     public void layoutParts() {
     }
 
-    @Override
+/*    @Override
     public void setupBindings() {
         // tracking selection
         tsm.selectedIndexProperty().addListener((obs) -> {
@@ -94,9 +91,9 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
             System.out.println("Focused: " +
                     getFocusModel().getFocusedItem());
         });
-        itemsProperty().bind(pm.allTaskEntriesProperty());
+      //  itemsProperty().bind(pm.allTaskEntriesProperty());
 
-    }
+    }*/
 
 
 

@@ -11,6 +11,7 @@ import groupware.dispatcher.service.util.ModelObjManager;
 import groupware.dispatcher.service.util.MqttUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -19,9 +20,11 @@ public class OrdersBrokerClient extends BrokerClient {
     private static final String IDENTIFIER_OrderGetPublisher = "orderGetPublisher";
     private static final String IDENTIFIER_OrderSubscriber = "orderSubscriber";
     private static final String IDENTIFIER_SubscribeToNewOrders = "subscribeToNewOrders";
+    private static final String IDENTIFIER_orderConfirmationPublisher = "orderConfirmationPublisher";
     Mqtt3AsyncClient orderGetPublisher;
     Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
+    Mqtt3AsyncClient orderConfirmationPublisher;
     private OrderService orderService;
     private static final Logger LOGGER = LogManager.getLogManager().getLogger(String.valueOf(OrdersBrokerClient.class));
 
@@ -48,14 +51,23 @@ public class OrdersBrokerClient extends BrokerClient {
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
+        orderConfirmationPublisher = MqttClient.builder()
+                .useMqttVersion3()
+                .identifier(IDENTIFIER_OrderSubscriber)
+                .serverHost("127.0.0.1")
+                .serverPort(1883)
+                .automaticReconnectWithDefaultConfig()
+                .buildAsync();
     }
 
 
     public void connectToBrokerAndSubscribeToNewOrders(){
         System.out.println("connecting to Broker");
         connectClient(this.subscribeToNewOrders, 120);
+        connectClient(orderConfirmationPublisher,120);
         subscribeToNewOrders();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.subscribeToNewOrders);
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(this.orderConfirmationPublisher);
     }
 
 
@@ -71,6 +83,14 @@ public class OrdersBrokerClient extends BrokerClient {
                    OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                    if(order != null) {
                        orderService.updateOrder(order.getOrderId(), order);
+                       DeliveryStep startedStep = new DeliveryStep();
+                       startedStep.setUpdatedWhen(LocalDateTime.now());
+                       startedStep.setCurrentStatus(OrderStatus.CONFIRMED);
+                       startedStep.setCurrentAssignee("C000");
+                       orderService.updateOrderStatus(order.getOrderId(), startedStep);
+                       //publish order confirmation
+                       String topicToPublishConfirmation= "orders/status/update/"+order.getOrderId();
+                       publishToTopic(subscribeToNewOrders,topicToPublishConfirmation, ModelObjManager.convertToJSON(order));
                    }
                 }
             } ).send()

@@ -29,7 +29,7 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
 
     @Override
     public void initializeSelf() {
-        this.setPrefSize(900, 400);
+        this.setPrefSize(800, 400);
 
     }
 
@@ -72,17 +72,15 @@ public class OrdersTable extends TableView<OrderPM> implements ViewMixin {
         assigneeColumn.setMinWidth(80);
 
 
-
         TableColumn<OrderPM, LocalDateTime> updatedWhenColumn = new TableColumn<>("Updated When");
         updatedWhenColumn.setCellValueFactory(cell -> cell.getValue().orderUpdatedWhenProperty());
         updatedWhenColumn.setCellFactory(cell -> new OrderUpdatedWhenCell());
         updatedWhenColumn.setMinWidth(100);
 
-        getColumns().addAll(Arrays.asList(columnId, typeColumn, placedWhenColumn,customerNameColumn,columnAddress, statusColumn,
-                assigneeColumn,updatedWhenColumn));
+        getColumns().addAll(Arrays.asList(columnId, typeColumn, placedWhenColumn, customerNameColumn, columnAddress, statusColumn,
+                assigneeColumn, updatedWhenColumn));
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         TableViewSelectionModel<OrderPM> tsm = getSelectionModel();
-
         tsm.setSelectionMode(SelectionMode.SINGLE);
         setItems(ordersPModel.getSyncAllOrders());
         selectedEntryIndex = tsm.getSelectedIndices();

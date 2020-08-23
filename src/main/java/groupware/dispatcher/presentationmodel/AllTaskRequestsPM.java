@@ -30,9 +30,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private ObjectProperty<ObservableList<TaskRequestPM>> allTaskEntries = new SimpleObjectProperty<>();
     private ObjectProperty<TaskRequestPM> currentTaskRequest = new SimpleObjectProperty<>();
 
-    private TaskRequestPMEventListener listener;
-
-    public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, TaskRequestServiceImpl taskRequestService){
+   public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, TaskRequestServiceImpl taskRequestService){
         this.allCouriersPM= allCouriersPM;
         this.allOrdersPM = allOrdersPM;
         this.taskRequestService = taskRequestService;
@@ -76,7 +74,6 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     }
 
 
-
     public void updateAllTaskRequestsPM(TaskRequestPM task){
         String id = task.getTaskId();
         TaskRequestPM existingTask = syncAllTasksMap.get(id);
@@ -85,7 +82,6 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         }
         syncAllTasks.add(task);
         syncAllTasksMap.put(id, task);
-
     }
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {

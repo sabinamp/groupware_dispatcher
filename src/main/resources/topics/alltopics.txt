@@ -6,6 +6,7 @@ orders/all_info/update/id
 
 orders/status/get/ id
 orders/status/get/ id/response
+orders/status/update/ id
 
 
 orders/info/get/id

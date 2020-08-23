@@ -17,7 +17,6 @@ public class BooleanCell  extends TableCell<TaskRequestPM, Boolean> {
     private static final Insets INSETS = new Insets(2, 5, 2, 8);
 
     public BooleanCell(){
-
         setContentDisplay(ContentDisplay.LEFT);
         setPadding(INSETS);
         setAlignment(Pos.CENTER_LEFT);

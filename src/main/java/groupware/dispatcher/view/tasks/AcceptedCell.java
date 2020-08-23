@@ -26,16 +26,18 @@ public class AcceptedCell extends TableCell<TaskRequestPM, RequestReply> {
         // super.updateItem(item, empty);
         if ( empty ||  item == null) {
             // adding new item
-            setText("Not yet");
+            setText(null);
             setGraphic(null);
         } else {
 
             if (item.equals(RequestReply.ACCEPTED) ){
                 rectangle = new Rectangle(20, 20, Color.web("Green"));
             }else if (item.equals(RequestReply.TIMEOUT)){
-                rectangle = new Rectangle(20,20, Color.web("Orange"));
-            }else{
+                rectangle = new Rectangle(20,20, Color.web("Blue"));
+            }else if (item.equals(RequestReply.DENIED)){
                 rectangle = new Rectangle(20,20, Color.web("Red"));
+            }else{
+                rectangle = new Rectangle(20,20, Color.web("Orange"));
             }
 
             setText( item.toString());

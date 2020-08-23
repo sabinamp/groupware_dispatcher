@@ -34,6 +34,8 @@ public class OrderStatusCell extends TableCell<OrderPM, OrderStatus> {
             if (item.equals(OrderStatus.FAILED) || item.equals(OrderStatus.CANCELED) ){
                 rectangle = new Rectangle(20,20, Color.web("Red"));
             }else if (item.equals(OrderStatus.COMPLETED)){
+                rectangle = new Rectangle(20, 20, Color.web("Blue"));
+            }else if(item.equals(OrderStatus.CONFIRMED)){
                 rectangle = new Rectangle(20, 20, Color.web("Green"));
             }else{
                 rectangle = new Rectangle(20, 20, Color.web("Orange"));

@@ -2,6 +2,7 @@ package groupware.dispatcher.view.tasks;
 
 import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.service.model.DeliveryType;
+import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskType;
 import groupware.dispatcher.view.util.TaskEvent;
 import groupware.dispatcher.view.util.ViewMixin;
@@ -200,7 +201,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
             task.setAssigneeId(assigneeId);
             task.setTaskType(taskTypeChoiceBox.getValue());
             task.setDeliveryType(deliveryTypeChoiceBox.getValue());
-            task.setAccepted(null);
+            task.setAccepted(RequestReply.PENDING);
             task.setSentWhen(LocalDateTime.now());
 
             LocalDate date = datePicker.getValue();

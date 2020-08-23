@@ -6,7 +6,7 @@ import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
 import groupware.dispatcher.service.*;
-import groupware.dispatcher.service.model.DeliveryStep;
+
 import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
@@ -26,17 +26,15 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
     private Mqtt3AsyncClient clientTaskSubscriber;
     private CourierServiceImpl courierService;
-    private OrderService orderService;
+
     private TaskRequestServiceImpl taskRequestService;
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskBrokerClient.class));
 
 
-    public TaskBrokerClient(CourierServiceImpl courierService, OrderServiceImpl orderService, TaskRequestServiceImpl taskRequestService)
+    public TaskBrokerClient(CourierServiceImpl courierService, TaskRequestServiceImpl taskRequestService)
     {
         this.courierService= courierService;
         this.taskRequestService = taskRequestService;
-        this.orderService = orderService;
-
         clientTaskRequestsPublisher = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_ClientTaskRequestsPublisher)
@@ -122,40 +120,31 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
         TaskRequest task= taskRequestService.getTaskRequestById(taskId);
         switch (topicEnd) {
             case "accept": {
-                task.setConfirmed(RequestReply.ACCEPTED);
                 courierService.updateAssignedOrders(assigneeID, task.getOrderId());
-                taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +" Accepted.TopicEnd: "+topicEnd );
+                taskRequestService.updateTaskRequestReply(taskId, RequestReply.ACCEPTED, "Task "+taskId +" Accepted.Topic End: "+topicEnd );
                 System.out.println("task accepted - update received for the task request " + taskId);
                 break;
             }
             case "deny": {
-                task.setConfirmed(RequestReply.DENIED);
-                taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +" Denied. TopicEnd: "+topicEnd);
+                taskRequestService.updateTaskRequestReply(taskId, RequestReply.DENIED, "Task "+taskId +" Denied. Topic End: "+topicEnd);
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
             }
-
             case "timeout": {
-                task.setConfirmed(RequestReply.TIMEOUT);
-                taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +"Task timed out. TopicEnd: "+topicEnd);
+                taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT, "Task "+taskId +"Task timed out. Topic End: "+topicEnd);
                 System.out.println("task timed out - update received for the task request " + taskId);
                 break;
             }
-
             case "completed": {
-                task.setDone(true);
                 System.out.println("task completed- update received for the task request " + taskId);
                 if( publish.getPayload().isPresent()){
                     String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
-                    task = ModelObjManager.convertJsonToTaskRequest(receivedString);
+                    TaskRequest updatedTask = ModelObjManager.convertJsonToTaskRequest(receivedString);
 
-                    DeliveryStep step=  new DeliveryStep();
-                    step.setCurrentAssignee(assigneeID);
-                    step.setCurrentStatus(task.getOutcome());
-                    step.setUpdatedWhen(task.getCompletedWhen());
-                    orderService.updateOrderStatus(task.getOrderId(),step);
-                    System.out.println("update received for the task request sent to "+ taskId);
-                    taskRequestService.updateTaskRequest(taskId, task, "Task "+taskId +topicEnd);
+                    taskRequestService.updateTaskRequestStatusCompleted(taskId, true,"Task "+taskId +""+topicEnd,
+                            assigneeID, updatedTask );
+                }else{
+                    System.out.println("task completed- but message payload missing " + taskId);
                 }
                 break;
             }

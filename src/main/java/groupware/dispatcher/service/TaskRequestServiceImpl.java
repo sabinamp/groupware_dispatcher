@@ -3,6 +3,8 @@ package groupware.dispatcher.service;
 
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
+import groupware.dispatcher.service.model.DeliveryStep;
+import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ModelObjManager;
 import groupware.dispatcher.view.util.TaskEvent;
@@ -40,7 +42,7 @@ public class TaskRequestServiceImpl{
         if(taskRequest == null) {
             logger.info("updateTask() received arg taskRequest - null");
             return false;
-        }else {
+        } else {
             boolean updating = tasks.get(id) != null;
             tasks.put(id, taskRequest);
             setCurrentTaskRequest(taskRequest);
@@ -62,33 +64,31 @@ public class TaskRequestServiceImpl{
         }
     }
 
-   /* public boolean updateAllTaskRequestPM(String id, TaskRequest taskRequest, String update) {
-        if(taskRequest == null) {
-            logger.info("updateAllTaskRequestPM() received arg taskRequest - null");
-            return false;
-        }else {
-            boolean updating = tasks.get(id) != null;
-            tasks.put(id, taskRequest);
-            setCurrentTaskRequest(taskRequest);
-            if(updating){
-               System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +
-                        "The task with id : "+ id+" updated.");
-                if(taskRequestPMEventListener != null){
-                    TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
-                    taskRequestPMEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
-                }
-            }else{
-                System.out.println("TaskRequestServiceImplementation updateAllTaskRequestPM() called. " +
-                        "The task with id : "+ id+" should exist but it doesn't exist in the tasks list.");
+    public boolean updateTaskRequestReply(String taskId, RequestReply reply, String update) {
+        TaskRequest task = getTaskRequestById(taskId);
+        task.setConfirmed(reply);
+        boolean successful = updateTaskRequest(taskId, task, update);
+        System.out.println("Successfully updated the task request due date : " + successful);
+        return successful;
+    }
 
-            }
-            return true;
+    public boolean updateTaskRequestStatusCompleted(String taskId, boolean done, String update, String assigneeID, TaskRequest updatedTask) {
+        //TaskRequest task = getTaskRequestById(taskId);
+        boolean successful = false;
+        if(updatedTask !=null && updatedTask.getTaskId().equals(taskId)){
+            updatedTask.setDone(true);
+            DeliveryStep step= new DeliveryStep();
+            step.setCurrentAssignee(assigneeID);
+            step.setCurrentStatus(updatedTask.getOutcome());
+            step.setUpdatedWhen(updatedTask.getCompletedWhen());
+            orderService.updateOrderStatus(updatedTask.getOrderId(),step);
+
+            successful = updateTaskRequest(taskId, updatedTask, update);
+            System.out.println("Successfully updated the task request : "+taskId + successful);
         }
-    }*/
-
-
-
-    public boolean updateTaskRequestDueOn(String taskId, LocalDateTime dueOn, String update) {
+       return successful;
+    }
+   public boolean updateTaskRequestDueOn(String taskId, LocalDateTime dueOn, String update) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setDueOn(dueOn);
         boolean successful = updateTaskRequest(taskId, task, update);

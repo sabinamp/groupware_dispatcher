@@ -46,7 +46,6 @@ public class OrderServiceImpl implements OrderService{
                 orders.put(id, order);
                 orderEventListener.handleNewOrderEvent(OrderPM.ofOrder(order));
             }
-
             return true;
         }
     }

@@ -45,7 +45,6 @@ public class AllOrdersPM implements OrderEventListener {
     private void setupValueChangedListeners() {
         syncAllOrdersMap.addListener((MapChangeListener<String, OrderPM>) change -> System.out.println("syncAllOrdersMap Update"+ change));
 
-
         syncAllOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
 
             System.out.println("AllOrdersPM Update"+ change);
@@ -119,8 +118,6 @@ public class AllOrdersPM implements OrderEventListener {
                        .append(DATE_FORMATTER.format(changedOrder.getOrderPlacedWhen())
                        );
             }
-
-
         alert.setContentText(content.toString());
         alert.showAndWait();
     }
@@ -151,5 +148,6 @@ public class AllOrdersPM implements OrderEventListener {
     @Override
     public void handleOrderUpdateEvent(OrderPM orderPM) {
         this.updateAllOrdersPM(orderPM);
+        Platform.runLater(() ->showAlertWithDefaultHeaderText(true, orderPM));
     }
 }

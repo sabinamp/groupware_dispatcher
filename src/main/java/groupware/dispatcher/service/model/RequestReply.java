@@ -10,7 +10,8 @@ public enum RequestReply {
 
     ACCEPTED("Accepted"),
     TIMEOUT("Timeout"),
-    DENIED("Denied");
+    DENIED("Denied"),
+    PENDING("Pending");
 
     private String value;
 
