@@ -7,7 +7,9 @@ import groupware.dispatcher.service.model.DeliveryStep;
 import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ModelObjManager;
+import groupware.dispatcher.service.util.TimerService;
 import groupware.dispatcher.view.util.TaskEvent;
+import javafx.application.Platform;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -17,14 +19,16 @@ import java.util.logging.Logger;
 
 public class TaskRequestServiceImpl{
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskRequestServiceImpl.class));
+    private static final String TASK_TIMEOUT_UPDATE = "Task Timeout";
     private static Map<String, TaskRequest> tasks;
     private TaskRequest currentTaskRequest;
     private OrderServiceImpl orderService;
     private CourierServiceImpl courierService;
 
     private AllTaskRequestsPM allTaskRequestsPM;
-    private TaskRequestEventListener taskRequestEventListener;
+    private TaskRequestBrokerEventListener taskRequestBrokerEventListener;
     private TaskRequestPMEventListener taskRequestPMEventListener;
+    private TimerService timerService;
     static{
         tasks= new HashMap<>();
     }
@@ -32,6 +36,15 @@ public class TaskRequestServiceImpl{
     public TaskRequestServiceImpl(OrderServiceImpl orderService, CourierServiceImpl courierService){
         this.orderService = orderService;
         this.courierService = courierService;
+        //this.timerService = new TimerService();
+    }
+
+    private void startTaskTimer(TaskRequest request){
+        this.timerService.init();
+        String taskId= request.getTaskId();
+        Runnable timeoutTrigger= () -> Platform.runLater(()-> updateTaskRequestReply(taskId,RequestReply.TIMEOUT,TASK_TIMEOUT_UPDATE, request.getAssigneeId()));
+        timerService.schedule(timeoutTrigger, 600000, taskId);
+
     }
 
     public TaskRequest getTaskRequestById(String taskId){
@@ -49,19 +62,23 @@ public class TaskRequestServiceImpl{
             if(updating){
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" updated.");
-                if( taskRequestEventListener != null){
-                    TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
-                    taskRequestEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
+                if(taskRequestBrokerEventListener != null &&(taskRequestPMEventListener != null)){
+                    if(update!= null && update.equals(TASK_TIMEOUT_UPDATE)){
+                        taskRequestPMEventListener.handleTimeoutTaskEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), taskRequest);
+                        taskRequestBrokerEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), TaskRequestPM.of(taskRequest), TASK_TIMEOUT_UPDATE);
+                    }else{
+                        TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
+                        taskRequestBrokerEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
+                        //timerService.cancel(id,true);
+                    }
+
                 }
             }else{
                 if(taskRequestPMEventListener != null){
-                    if(update!= null && update.equals("Task_Timeout")){
-                        taskRequestPMEventListener.handleTimeoutTaskEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), taskRequest);
-                    } else{
-                        taskRequestPMEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
-                        System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
+                    taskRequestPMEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
+                    System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                                 "The task with id : "+ id+" added.");
-                    }
+                    //startTaskTimer(taskRequest);
 
                 }
             }
@@ -75,10 +92,7 @@ public class TaskRequestServiceImpl{
         if(reply.equals(RequestReply.ACCEPTED)){
             courierService.updateAssignedOrders(assigneeID, task.getOrderId());
             orderService.updateOrderAssignee(task.getOrderId(),assigneeID);
-            //to update order status from confirmed to assigned in the case of a new order
-        }
-        if(reply.equals(RequestReply.TIMEOUT)){
-            System.out.println("Task timed out!");
+            //to update order status from confirmed to assigned in the case of a new order-todo
         }
         boolean successful = this.updateTaskRequest(taskId, task, update);
         System.out.println("Successfully updated the task request due date : " + successful);
@@ -128,12 +142,12 @@ public class TaskRequestServiceImpl{
        return ModelObjManager.convertToJSON(taskRequest);
     }
 
-    public TaskRequestEventListener getTaskRequestEventListener() {
-        return taskRequestEventListener;
+    public TaskRequestBrokerEventListener getTaskRequestBrokerEventListener() {
+        return taskRequestBrokerEventListener;
     }
 
-    public void setTaskRequestEventListener(TaskRequestEventListener taskRequestEventListener) {
-        this.taskRequestEventListener = taskRequestEventListener;
+    public void setTaskRequestBrokerEventListener(TaskRequestBrokerEventListener taskRequestBrokerEventListener) {
+        this.taskRequestBrokerEventListener = taskRequestBrokerEventListener;
     }
 
     public TaskRequestPMEventListener getTaskRequestPMEventListener() {

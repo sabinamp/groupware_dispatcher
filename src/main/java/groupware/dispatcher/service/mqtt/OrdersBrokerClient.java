@@ -70,25 +70,17 @@ public class OrdersBrokerClient extends BrokerClient {
 
 
     private CompletableFuture<Mqtt3SubAck> subscribeToNewOrders(){
-        String topicName = "orders/new";
+        String topicName = "orders/confirmed/#";
         System.out.println("entering subscribeToNewOrders for the topic "+topicName);
          return this.subscribeToNewOrders.subscribeWith()
-            .topicFilter("orders/new").qos(MqttQos.AT_LEAST_ONCE)
+            .topicFilter(topicName).qos(MqttQos.EXACTLY_ONCE)
             .callback(mqtt3Publish -> {
                 if(mqtt3Publish.getPayload().isPresent()){
                     String received= ByteBufferToStringConversion.byteBuffer2String(mqtt3Publish.getPayload().get(), StandardCharsets.UTF_8);
                     System.out.println("new order received " +received);
                    OrderDescriptiveInfo order= ModelObjManager.convertJsonToOrderDescriptiveInfo(received);
                    if(order != null) {
-                       DeliveryStep startedStep = new DeliveryStep();
-                       startedStep.setUpdatedWhen(LocalDateTime.now());
-                       startedStep.setCurrentStatus(OrderStatus.CONFIRMED);
-                       startedStep.setCurrentAssignee("C000");
-                       order.addDeliveryInfosItem(startedStep);
                        orderService.updateOrder(order.getOrderId(), order);
-                       //publish order confirmation
-                       String topicToPublishConfirmation= "orders/status/update/"+order.getOrderId();
-                       publishToTopic(subscribeToNewOrders,topicToPublishConfirmation, ModelObjManager.convertToJSON(startedStep));
                    }
                 }
             } ).send()

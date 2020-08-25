@@ -62,7 +62,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         String taskId= taskRequest.getTaskId();
         String topicNewTaskRequestFilter="orders/"+courierId+"/"+taskId+"/request";
 
-        connectClient( this.clientTaskRequestsPublisher, 120, false);
+        connectClient( this.clientTaskRequestsPublisher, 60, false);
         publishToTopic(clientTaskRequestsPublisher, topicNewTaskRequestFilter,
                         taskRequestService.convertToJson(taskRequest));
         System.out.println("connectPublishTaskRequest() called");
@@ -149,12 +149,12 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
             }
-            case "timeout": {
-               /* taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT,
+            case "timeout":  break; /*{
+                taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT,
                         "Task "+taskId +"Task timed out. Topic End: "+topicEnd, assigneeID);
-                System.out.println("task timed out - update received for the task request " + taskId);*/
+                System.out.println("task timed out - update received for the task request " + taskId);
                 break;
-            }
+            }*/
             case "completed": {
                 System.out.println("task completed- update received for the task request " + taskId);
                 if( publish.getPayload().isPresent()){

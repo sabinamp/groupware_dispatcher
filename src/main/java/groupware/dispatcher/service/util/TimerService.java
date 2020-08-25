@@ -15,7 +15,7 @@ public class TimerService {
     private ScheduledExecutorService scheduledExecutorService;
 
     // Map of scheduled fixed rate timers.
-    private final HashMap<Integer, ScheduledFuture<?>> timerIdMap = new HashMap<>();
+    private final HashMap<String, ScheduledFuture<?>> timerIdMap = new HashMap<>();
 
     /**
      * Initializes the timer service.
@@ -31,7 +31,7 @@ public class TimerService {
      */
     public void dispose() {
         // Cancels all fixed rate timers.
-        for (Integer timerId : timerIdMap.keySet()) {
+        for (String timerId : timerIdMap.keySet()) {
             cancel(timerId, true);
         }
 
@@ -61,17 +61,15 @@ public class TimerService {
      * @param task                The task to run.
      * @param delayInMilliseconds Time interval, in milliseconds, at which the task
      *                            is repeated.
-     * @return The ID of the scheduled timer. Can be used to cancel the timer.
      */
-    public Integer scheduleAtFixedRate(final Runnable task, long delayInMilliseconds) {
+    public void scheduleAtFixedRate(final Runnable task, long delayInMilliseconds, String timerId) {
         // Schedules the task.
         ScheduledFuture<?> future = scheduledExecutorService.scheduleAtFixedRate(
                 task, delayInMilliseconds, delayInMilliseconds, TimeUnit.MILLISECONDS);
 
-        Integer timerId = timerIdMap.size() + 1;
+        //
         timerIdMap.put(timerId, future);
 
-        return timerId;
     }
 
     /**
@@ -81,9 +79,24 @@ public class TimerService {
      * @param mayInterruptIfRunning May interrupt if running boolean
      * @return True if the cancellation was successful, false otherwise.
      */
-    public boolean cancel(Integer timerId, boolean mayInterruptIfRunning) {
+    public boolean cancel(String timerId, boolean mayInterruptIfRunning) {
         ScheduledFuture<?> future = timerIdMap.get(timerId);
         return future != null ? future.cancel(mayInterruptIfRunning) : false;
+    }
+
+
+    /**
+     * Schedules the given timer task to run a single time.
+     *
+     * @param task                The task to run.
+     * @param delayInMilliseconds Delay, in milliseconds, after which to run the
+     *                            task.
+     */
+    public void schedule(final Runnable task, long delayInMilliseconds, String timerId) {
+        ScheduledFuture<?> future = scheduledExecutorService.schedule(task, delayInMilliseconds, TimeUnit.MILLISECONDS);
+
+        timerIdMap.put(timerId, future);
+
     }
 
 }

@@ -1,7 +1,7 @@
 package groupware.dispatcher.presentationmodel;
 
 
-import groupware.dispatcher.service.TaskRequestEventListener;
+import groupware.dispatcher.service.TaskRequestBrokerEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.util.TaskEvent;
 import javafx.application.Platform;
@@ -17,7 +17,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 
 
-public class AllTaskRequestsPM implements TaskRequestEventListener {
+public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
     private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList(new Callback<>() {
         @Override
         public Observable[] call(TaskRequestPM param) {

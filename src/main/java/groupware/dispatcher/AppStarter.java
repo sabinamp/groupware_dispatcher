@@ -103,7 +103,7 @@ public class AppStarter extends Application {
 
         });
         allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
-        taskRequestService.setTaskRequestEventListener(allTaskRequestsPM);
+        taskRequestService.setTaskRequestBrokerEventListener(allTaskRequestsPM);
         taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);
 
         Button exitBtn = new Button("Exit");
