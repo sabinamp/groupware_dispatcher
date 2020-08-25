@@ -48,7 +48,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientTaskTimeoutPublisher = MqttClient.builder().useMqttVersion3()
-                .identifier(IDENTIFIER_ClientTaskSubscriber)
+                .identifier(IDENTIFIER_ClientTaskTimeoutPublisher)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
@@ -79,7 +79,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         publishToTopic(clientTaskTimeoutPublisher, timeoutTaskRequestTopicFilter,
                 null);
         System.out.println("connectPublishTaskRequestTimeout() called");
-        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskTimeoutPublisher);
 
     }
 

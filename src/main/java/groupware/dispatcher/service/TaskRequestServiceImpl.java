@@ -36,14 +36,16 @@ public class TaskRequestServiceImpl{
     public TaskRequestServiceImpl(OrderServiceImpl orderService, CourierServiceImpl courierService){
         this.orderService = orderService;
         this.courierService = courierService;
-        //this.timerService = new TimerService();
+        this.timerService = new TimerService();
+        this.timerService.init();
     }
 
     private void startTaskTimer(TaskRequest request){
-        this.timerService.init();
+
         String taskId= request.getTaskId();
         Runnable timeoutTrigger= () -> Platform.runLater(()-> updateTaskRequestReply(taskId,RequestReply.TIMEOUT,TASK_TIMEOUT_UPDATE, request.getAssigneeId()));
-        timerService.schedule(timeoutTrigger, 600000, taskId);
+        //1 minute for testing
+        timerService.schedule(timeoutTrigger, 60000, taskId);
 
     }
 
@@ -69,7 +71,7 @@ public class TaskRequestServiceImpl{
                     }else{
                         TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
                         taskRequestBrokerEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
-                        //timerService.cancel(id,true);
+                        timerService.cancel(id,true);
                     }
 
                 }
@@ -78,7 +80,7 @@ public class TaskRequestServiceImpl{
                     taskRequestPMEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
                     System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                                 "The task with id : "+ id+" added.");
-                    //startTaskTimer(taskRequest);
+                    startTaskTimer(taskRequest);
 
                 }
             }
