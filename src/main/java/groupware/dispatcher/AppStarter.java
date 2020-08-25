@@ -11,18 +11,14 @@ import groupware.dispatcher.service.mqtt.BrokerConnection;
 import groupware.dispatcher.view.ApplicationUI;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import static groupware.dispatcher.service.util.MqttUtils.idle;
 
 public class AppStarter extends Application {
 
@@ -107,8 +103,8 @@ public class AppStarter extends Application {
 
         });
         allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
-        taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
-        taskRequestService.setTaskRequestEventListener(BrokerConnection.taskBrokerClient);
+        taskRequestService.setTaskRequestEventListener(allTaskRequestsPM);
+        taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);
 
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));

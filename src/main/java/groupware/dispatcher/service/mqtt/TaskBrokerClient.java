@@ -19,13 +19,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class TaskBrokerClient extends BrokerClient implements TaskRequestEventListener {
-    private static final String IDENTIFIER_ClientTaskRequestsPublisher = "ClientTaskRequestsPublisher";
-    private static final String IDENTIFIER_ClientTaskSubscriber = "ClientTaskSubscriber";
-
+public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEventListener {
+    private static final String IDENTIFIER_ClientTaskRequestsPublisher = "dispatcher_ClientTaskRequestsPublisher";
+    private static final String IDENTIFIER_ClientTaskSubscriber = "dispatcher_ClientTaskSubscriber";
+    private static final String IDENTIFIER_ClientTaskTimeoutPublisher = "dispatcher_ClientTaskTimeoutPublisher";
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
     private Mqtt3AsyncClient clientTaskSubscriber;
-
+    private Mqtt3AsyncClient clientTaskTimeoutPublisher;
 
     private TaskRequestServiceImpl taskRequestService;
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskBrokerClient.class));
@@ -33,7 +33,6 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
     public TaskBrokerClient(TaskRequestServiceImpl taskRequestService)
     {
-
         this.taskRequestService = taskRequestService;
         clientTaskRequestsPublisher = MqttClient.builder()
                 .useMqttVersion3()
@@ -43,6 +42,12 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientTaskSubscriber = MqttClient.builder().useMqttVersion3()
+                .identifier(IDENTIFIER_ClientTaskSubscriber)
+                .serverHost("127.0.0.1")
+                .serverPort(1883)
+                .automaticReconnectWithDefaultConfig()
+                .buildAsync();
+        clientTaskTimeoutPublisher = MqttClient.builder().useMqttVersion3()
                 .identifier(IDENTIFIER_ClientTaskSubscriber)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
@@ -65,6 +70,18 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
 
     }
 
+    private void connectPublishTaskRequestTimeout(TaskRequest taskRequest) {
+        String courierId= taskRequest.getAssigneeId();
+        String taskId= taskRequest.getTaskId();
+        String timeoutTaskRequestTopicFilter="orders/"+courierId+"/"+taskId+"/timeout";
+
+        connectClient( this.clientTaskTimeoutPublisher, 60, false);
+        publishToTopic(clientTaskTimeoutPublisher, timeoutTaskRequestTopicFilter,
+                null);
+        System.out.println("connectPublishTaskRequestTimeout() called");
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
+
+    }
 
     public void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest taskRequest){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
@@ -109,6 +126,11 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
     }
 
     @Override
+    public void handleTimeoutTaskEvent(TaskEvent event, TaskRequest task) {
+        connectPublishTaskRequestTimeout(task);
+    }
+
+    @Override
     public void handleTaskUpdateEvent(TaskEvent event,Mqtt3Publish publish, String taskId) {
         // Process the received message
         String topicEnd= publish.getTopic().getLevels().get(3);
@@ -128,9 +150,9 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestEventLi
                 break;
             }
             case "timeout": {
-                taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT,
+               /* taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT,
                         "Task "+taskId +"Task timed out. Topic End: "+topicEnd, assigneeID);
-                System.out.println("task timed out - update received for the task request " + taskId);
+                System.out.println("task timed out - update received for the task request " + taskId);*/
                 break;
             }
             case "completed": {

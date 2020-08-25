@@ -43,7 +43,7 @@ public class AllOrdersPM implements OrderEventListener {
     private void setupValueChangedListeners() {
         syncAllOrdersMap.addListener((MapChangeListener<String, OrderPM>) change -> System.out.println("syncAllOrdersMap Update"+ change));
 
-        syncAllOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
+        /*syncAllOrders.addListener((ListChangeListener.Change<? extends OrderPM> change) -> {
 
             System.out.println("AllOrdersPM Update"+ change);
             change.next();
@@ -65,7 +65,7 @@ public class AllOrdersPM implements OrderEventListener {
                         }
                 });
 
-        });
+        });*/
     }
 
 
@@ -104,7 +104,7 @@ public class AllOrdersPM implements OrderEventListener {
                        .append( changedOrder.getOrderId() )
                        .append("\n Order Status: ")
                        .append(changedOrder.getOrderStatus().toString())
-                       .append("\n Assigned to the Courier ")
+                       .append("\n Assigned to the Courier: ")
                        .append(changedOrder.getCurrentAssignee());
 
             }else{
@@ -140,13 +140,15 @@ public class AllOrdersPM implements OrderEventListener {
 
     @Override
     public void handleNewOrderEvent(OrderPM order) {
+
         this.updateAllOrdersPM(order);
+        Platform.runLater(() ->showAlertWithDefaultHeaderText(false, order));
     }
 
     @Override
     public void handleOrderUpdateEvent(OrderPM orderPM) {
         this.updateAllOrdersPM(orderPM);
-        //Platform.runLater(() ->showAlertWithDefaultHeaderText(true, orderPM));
+        Platform.runLater(() ->showAlertWithDefaultHeaderText(true, orderPM));
     }
 
 

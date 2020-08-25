@@ -3,24 +3,15 @@ package groupware.dispatcher.view.tasks;
 import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.RequestReply;
-import groupware.dispatcher.service.model.TaskRequest;
-import groupware.dispatcher.view.couriers.IDCell;
 import groupware.dispatcher.view.util.ViewMixin;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 
 import java.util.Arrays;
 
 
 public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMixin {
-    private AllTaskRequestsPM pm;
-    public static ObservableList<TaskRequestPM> items =
-            FXCollections.observableArrayList( );
-
+    private AllTaskRequestsPM taskPModel;
 
     private ObservableList<TaskRequestPM> selectedEntries;
     private ObservableList<Integer> selectedEntryIndex;
@@ -28,7 +19,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
 
     public TaskRequestTable(AllTaskRequestsPM pm){
         super();
-       this.pm = pm;
+        this.taskPModel = pm;
         init();
     }
 
@@ -70,7 +61,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         tsm = getSelectionModel();
         tsm.setSelectionMode(SelectionMode.SINGLE);
-        setItems(pm.getSyncAllTasks());
+        setItems(taskPModel.getSyncAllTasks());
         // getting selected items
         selectedEntries = tsm.getSelectedItems();
         selectedEntryIndex = tsm.getSelectedIndices();
@@ -82,6 +73,11 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
     public void layoutParts() {
     }
 
+    @Override
+    public void setupValueChangedListeners() {
+
+
+    }
 /*    @Override
     public void setupBindings() {
         // tracking selection

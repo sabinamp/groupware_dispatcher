@@ -21,9 +21,9 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class CourierBrokerClient extends BrokerClient{
-    private static final String IDENTIFIER_ClientCourierInfo = "ClientCourierInfo";
-    private static final String IDENTIFIER_ClientCourierUpdates = "ClientCourierUpdates";
-    private static final String IDENTIFIER_ClientCourierInfoSubscriber = "ClientCourierInfoSubscriber";
+    private static final String IDENTIFIER_ClientCourierInfo = "dispatcher_ClientCourierInfo";
+    private static final String IDENTIFIER_ClientCourierUpdates = "dispatcher_ClientCourierUpdates";
+    private static final String IDENTIFIER_ClientCourierInfoSubscriber = "dispatcher_ClientCourierInfoSubscriber";
 
     private Mqtt3AsyncClient clientCourierInfo;
     private Mqtt3AsyncClient clientCourierUpdates;

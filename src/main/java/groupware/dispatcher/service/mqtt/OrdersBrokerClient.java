@@ -17,10 +17,10 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class OrdersBrokerClient extends BrokerClient {
-    private static final String IDENTIFIER_OrderGetPublisher = "orderGetPublisher";
-    private static final String IDENTIFIER_OrderSubscriber = "orderSubscriber";
-    private static final String IDENTIFIER_SubscribeToNewOrders = "subscribeToNewOrders";
-    private static final String IDENTIFIER_orderConfirmationPublisher = "orderConfirmationPublisher";
+    private static final String IDENTIFIER_OrderGetPublisher = "dispatcher_OrderGetPublisher";
+    private static final String IDENTIFIER_OrderSubscriber = "dispatcher_OrderSubscriber";
+    private static final String IDENTIFIER_SubscribeToNewOrders = "dispatcher_SubscribeToNewOrders";
+    private static final String IDENTIFIER_orderConfirmationPublisher = "dispatcher_OrderConfirmationPublisher";
     Mqtt3AsyncClient orderGetPublisher;
     Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
@@ -107,9 +107,10 @@ public class OrdersBrokerClient extends BrokerClient {
 
 
     public void connectAndRequestExistingOrder(String orderId){
+
         connectClient(this.orderGetPublisher, 60);
-        publishToTopic(orderGetPublisher,"orders/all_info/get/"+ orderId,null);
-        System.out.println("connecting to Broker and publishing the request for the existing order "+ orderId);
+        publishToTopic(orderGetPublisher,"orders/all_info/get/"+orderId,null);
+        System.out.println("connecting to Broker and publishing the request for the existing order. "+orderId);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(orderGetPublisher);
     }
 
@@ -183,13 +184,14 @@ public class OrdersBrokerClient extends BrokerClient {
         orderSubscriber.disconnect();
     }
 
+    //called by BrokerConnection
     void subscribeToOrders(){
 
         connectAndRequestExistingOrder("OR1111");
         connectAndRequestExistingOrder("OR1122");
         connectAndRequestExistingOrder("OR1123");
         connectAndRequestExistingOrder("OR1124");
-
+        //connectAndRequestExistingOrders();
         connectAndSubscribeForExistingOrders();
         connectToBrokerAndSubscribeToNewOrders();
     }

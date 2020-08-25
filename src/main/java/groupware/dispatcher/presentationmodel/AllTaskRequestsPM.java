@@ -1,10 +1,11 @@
 package groupware.dispatcher.presentationmodel;
 
 
-import groupware.dispatcher.service.TaskRequestPMEventListener;
+import groupware.dispatcher.service.TaskRequestEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.util.TaskEvent;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -13,11 +14,18 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.Alert;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 
 
-
-public class AllTaskRequestsPM implements TaskRequestPMEventListener {
-    private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList();
+public class AllTaskRequestsPM implements TaskRequestEventListener {
+    private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList(new Callback<>() {
+        @Override
+        public Observable[] call(TaskRequestPM param) {
+            return new Observable[]{param.taskIdProperty(),param.assigneeIdProperty(),
+            param.orderIdProperty(), param.deliveryTypeProperty(), param.acceptedProperty(),
+            param.doneProperty()};
+        }
+    });
 
     private AllCouriersPM allCouriersPM;
     private AllOrdersPM allOrdersPM;
@@ -41,10 +49,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private void setupValueChangedListeners() {
         syncAllTasks.addListener((ListChangeListener.Change<? extends TaskRequestPM> change) -> {
             System.out.println("AllTaskRequestsPM Update"+ change);
-           /* change.next();
-            boolean wasUpdated = change.wasUpdated();
-            boolean wasAdded = change.wasAdded();
-            List<TaskRequestPM> listChanges = new ArrayList<>(change.getList());  */
+
         });
     }
 
@@ -62,7 +67,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
                      +"\n Task assignee ID: "+ taskRequestPM.getAssigneeId();
         }else if(event.getEventType().equals(TaskEvent.UPDATE)){
             content= "A Task Request Update has been received. Topic: "+update+"\n Task id: "+taskRequestPM.getTaskId()
-                    +"\n task assignee : "+ taskRequestPM.getAssigneeId() + "\n Order ID: "+taskRequestPM.getOrderId();
+                    +"\n Task assignee : "+ taskRequestPM.getAssigneeId() + "\n Order ID: "+taskRequestPM.getOrderId();
         }
         alert.setHeight(200);
         alert.setContentText(content);
@@ -70,7 +75,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     }
 
     public ObservableList<TaskRequestPM> getSyncAllTasks() {
-        return syncAllTasks;
+        return this.syncAllTasks;
     }
 
 

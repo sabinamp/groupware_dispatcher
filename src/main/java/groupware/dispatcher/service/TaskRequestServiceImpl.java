@@ -23,8 +23,8 @@ public class TaskRequestServiceImpl{
     private CourierServiceImpl courierService;
 
     private AllTaskRequestsPM allTaskRequestsPM;
-    private TaskRequestPMEventListener taskRequestPMEventListener;
     private TaskRequestEventListener taskRequestEventListener;
+    private TaskRequestPMEventListener taskRequestPMEventListener;
     static{
         tasks= new HashMap<>();
     }
@@ -49,15 +49,20 @@ public class TaskRequestServiceImpl{
             if(updating){
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" updated.");
-                if(taskRequestPMEventListener != null){
+                if( taskRequestEventListener != null){
                     TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
-                    taskRequestPMEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
+                    taskRequestEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
                 }
             }else{
-                System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
-                        "The task with id : "+ id+" added.");
-                if(taskRequestEventListener != null){
-                    taskRequestEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
+                if(taskRequestPMEventListener != null){
+                    if(update!= null && update.equals("Task_Timeout")){
+                        taskRequestPMEventListener.handleTimeoutTaskEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), taskRequest);
+                    } else{
+                        taskRequestPMEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
+                        System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
+                                "The task with id : "+ id+" added.");
+                    }
+
                 }
             }
             return true;
@@ -70,8 +75,12 @@ public class TaskRequestServiceImpl{
         if(reply.equals(RequestReply.ACCEPTED)){
             courierService.updateAssignedOrders(assigneeID, task.getOrderId());
             orderService.updateOrderAssignee(task.getOrderId(),assigneeID);
+            //to update order status from confirmed to assigned in the case of a new order
         }
-        boolean successful = updateTaskRequest(taskId, task, update);
+        if(reply.equals(RequestReply.TIMEOUT)){
+            System.out.println("Task timed out!");
+        }
+        boolean successful = this.updateTaskRequest(taskId, task, update);
         System.out.println("Successfully updated the task request due date : " + successful);
         return successful;
     }
@@ -92,6 +101,7 @@ public class TaskRequestServiceImpl{
         }
        return successful;
     }
+
    public boolean updateTaskRequestDueOn(String taskId, LocalDateTime dueOn, String update) {
         TaskRequest task = getTaskRequestById(taskId);
         task.setDueOn(dueOn);
@@ -118,16 +128,6 @@ public class TaskRequestServiceImpl{
        return ModelObjManager.convertToJSON(taskRequest);
     }
 
-
-
-    public TaskRequestPMEventListener getTaskRequestPMEventListener() {
-        return taskRequestPMEventListener;
-    }
-
-    public void setTaskRequestPMEventListener(TaskRequestPMEventListener taskRequestPMEventListener) {
-        this.taskRequestPMEventListener = taskRequestPMEventListener;
-    }
-
     public TaskRequestEventListener getTaskRequestEventListener() {
         return taskRequestEventListener;
     }
@@ -136,4 +136,11 @@ public class TaskRequestServiceImpl{
         this.taskRequestEventListener = taskRequestEventListener;
     }
 
+    public TaskRequestPMEventListener getTaskRequestPMEventListener() {
+        return taskRequestPMEventListener;
+    }
+
+    public void setTaskRequestPMEventListener(TaskRequestPMEventListener taskRequestPMEventListener) {
+        this.taskRequestPMEventListener = taskRequestPMEventListener;
+    }
 }
