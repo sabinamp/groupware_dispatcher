@@ -99,8 +99,7 @@ public class OrdersBrokerClient extends BrokerClient {
 
 
     public void connectAndRequestExistingOrder(String orderId){
-
-        connectClient(this.orderGetPublisher, 60);
+        connectClient(this.orderGetPublisher, 30);
         publishToTopic(orderGetPublisher,"orders/all_info/get/"+orderId,null);
         System.out.println("connecting to Broker and publishing the request for the existing order. "+orderId);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(orderGetPublisher);

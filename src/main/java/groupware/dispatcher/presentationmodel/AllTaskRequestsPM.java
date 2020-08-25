@@ -18,14 +18,14 @@ import javafx.util.Callback;
 
 
 public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
-    private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList(new Callback<>() {
+    private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList(/*new Callback<>() {
         @Override
         public Observable[] call(TaskRequestPM param) {
             return new Observable[]{param.taskIdProperty(),param.assigneeIdProperty(),
             param.orderIdProperty(), param.deliveryTypeProperty(), param.acceptedProperty(),
             param.doneProperty()};
         }
-    });
+    }*/);
 
     private AllCouriersPM allCouriersPM;
     private AllOrdersPM allOrdersPM;
@@ -87,6 +87,7 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
         }
         syncAllTasks.add(task);
         syncAllTasksMap.put(id, task);
+        System.out.println("updateAllTaskRequestsPM-called. Task " +task.getTaskId());
     }
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
@@ -103,8 +104,8 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
 
     @Override
     public void handleNewTaskEvent(TaskEvent event, TaskRequestPM task) {
+        this.updateAllTaskRequestsPM(task);
         if(event.getEventType().equals(TaskEvent.NEW_TASK)){
-            this.updateAllTaskRequestsPM(task);
             taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task), null);
             Platform.runLater(() -> showAlertWithNoHeaderText(event, task, "New task sent"));
         }
@@ -112,8 +113,8 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
 
     @Override
     public void handleTaskUpdateEvent(TaskEvent event, TaskRequestPM taskRequest, String update) {
+        this.updateAllTaskRequestsPM(taskRequest);
         if(event.getEventType().equals(TaskEvent.UPDATE)){
-            this.updateAllTaskRequestsPM(taskRequest);
             Platform.runLater(() -> showAlertWithNoHeaderText(event, taskRequest, update));
         }
     }

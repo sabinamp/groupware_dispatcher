@@ -4,6 +4,7 @@ package groupware.dispatcher.service;
 import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.model.DeliveryStep;
+import groupware.dispatcher.service.model.OrderStatus;
 import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.service.model.TaskRequest;
 import groupware.dispatcher.service.util.ModelObjManager;
@@ -94,10 +95,17 @@ public class TaskRequestServiceImpl{
         if(reply.equals(RequestReply.ACCEPTED)){
             courierService.updateAssignedOrders(assigneeID, task.getOrderId());
             orderService.updateOrderAssignee(task.getOrderId(),assigneeID);
-            //to update order status from confirmed to assigned in the case of a new order-todo
+            //to update order status from confirmed to assigned in the case of a new order
+            if(orderService.getOrder(task.getOrderId()).getDeliveryInfos().getLast().getCurrentStatus().equals(OrderStatus.CONFIRMED)){
+                DeliveryStep stepStarted=new DeliveryStep();
+                stepStarted.setCurrentAssignee(assigneeID);
+                stepStarted.setCurrentStatus(OrderStatus.STARTED);
+                stepStarted.setUpdatedWhen(LocalDateTime.now());
+                orderService.updateOrderStatus(task.getOrderId(),stepStarted );
+            }
         }
         boolean successful = this.updateTaskRequest(taskId, task, update);
-        System.out.println("Successfully updated the task request due date : " + successful);
+        System.out.println("Successfully updated the task request : " + successful);
         return successful;
     }
 
