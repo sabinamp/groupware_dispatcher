@@ -37,7 +37,7 @@ public class BooleanCell  extends TableCell<TaskRequestPM, Boolean> {
                 rectangle = new Rectangle(20,20, Color.web("Orange"));
             }
             if(!item){
-                setText( "Open");
+                setText("Open");
             }else{
                 setText("Done");
             }

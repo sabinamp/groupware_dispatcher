@@ -15,7 +15,6 @@ public class AcceptedCell extends TableCell<TaskRequestPM, RequestReply> {
     private static final Insets INSETS = new Insets(2, 5, 2, 8);
 
     public AcceptedCell(){
-
         setContentDisplay(ContentDisplay.LEFT);
         setPadding(INSETS);
         setAlignment(Pos.CENTER_LEFT);
@@ -29,15 +28,15 @@ public class AcceptedCell extends TableCell<TaskRequestPM, RequestReply> {
             setText(null);
             setGraphic(null);
         } else {
-
+            if(item.equals(RequestReply.PENDING) ){
+                rectangle = new Rectangle(20,20, Color.web("Orange"));
+            }
             if (item.equals(RequestReply.ACCEPTED) ){
                 rectangle = new Rectangle(20, 20, Color.web("Green"));
             }else if (item.equals(RequestReply.TIMEOUT)){
                 rectangle = new Rectangle(20,20, Color.web("Blue"));
             }else if (item.equals(RequestReply.DENIED)){
                 rectangle = new Rectangle(20,20, Color.web("Red"));
-            }else{
-                rectangle = new Rectangle(20,20, Color.web("Orange"));
             }
 
             setText( item.toString());

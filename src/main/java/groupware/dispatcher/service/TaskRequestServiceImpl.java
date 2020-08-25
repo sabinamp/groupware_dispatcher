@@ -66,7 +66,7 @@ public class TaskRequestServiceImpl{
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" updated.");
                 if(taskRequestBrokerEventListener != null &&(taskRequestPMEventListener != null)){
-                    if(update!= null && update.equals(TASK_TIMEOUT_UPDATE)){
+                    if(update != null && update.equals(TASK_TIMEOUT_UPDATE)){
                         taskRequestPMEventListener.handleTimeoutTaskEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), taskRequest);
                         taskRequestBrokerEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), TaskRequestPM.of(taskRequest), TASK_TIMEOUT_UPDATE);
                     }else{
@@ -90,22 +90,24 @@ public class TaskRequestServiceImpl{
     }
 
     public boolean updateTaskRequestReply(String taskId, RequestReply reply, String update, String assigneeID) {
-        TaskRequest task = getTaskRequestById(taskId);
+        TaskRequest task = this.getTaskRequestById(taskId);
         task.setConfirmed(reply);
         if(reply.equals(RequestReply.ACCEPTED)){
             courierService.updateAssignedOrders(assigneeID, task.getOrderId());
-            orderService.updateOrderAssignee(task.getOrderId(),assigneeID);
+
             //to update order status from confirmed to assigned in the case of a new order
             if(orderService.getOrder(task.getOrderId()).getDeliveryInfos().getLast().getCurrentStatus().equals(OrderStatus.CONFIRMED)){
-                DeliveryStep stepStarted=new DeliveryStep();
+                DeliveryStep stepStarted = new DeliveryStep();
                 stepStarted.setCurrentAssignee(assigneeID);
                 stepStarted.setCurrentStatus(OrderStatus.STARTED);
                 stepStarted.setUpdatedWhen(LocalDateTime.now());
                 orderService.updateOrderStatus(task.getOrderId(),stepStarted );
-            }
+            }/*else{
+                orderService.updateOrderAssignee(task.getOrderId(),assigneeID);
+            }*/
         }
         boolean successful = this.updateTaskRequest(taskId, task, update);
-        System.out.println("Successfully updated the task request : " + successful);
+        System.out.println("updateTaskRequestReply() called. Successfully updated the task request : " + successful);
         return successful;
     }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Gets or Sets Delivery TaskType
+ * Gets or Sets Request Reply
  */
 public enum RequestReply {
 

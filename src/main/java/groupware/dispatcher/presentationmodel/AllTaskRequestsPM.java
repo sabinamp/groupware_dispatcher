@@ -5,7 +5,7 @@ import groupware.dispatcher.service.TaskRequestBrokerEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.util.TaskEvent;
 import javafx.application.Platform;
-import javafx.beans.Observable;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -14,7 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.scene.control.Alert;
 import javafx.stage.StageStyle;
-import javafx.util.Callback;
+
 
 
 public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
@@ -33,7 +33,6 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
 
     private final ObservableList<TaskRequestPM> syncAllTasks = FXCollections.synchronizedObservableList(allTasks);
     private final ObservableMap<String, TaskRequestPM> allTasksMap = FXCollections.observableHashMap();
-
     private final ObservableMap<String, TaskRequestPM> syncAllTasksMap = FXCollections.synchronizedObservableMap(allTasksMap);
     private ObjectProperty<ObservableList<TaskRequestPM>> allTaskEntries = new SimpleObjectProperty<>();
     private ObjectProperty<TaskRequestPM> currentTaskRequest = new SimpleObjectProperty<>();
@@ -79,15 +78,15 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
     }
 
 
-    public void updateAllTaskRequestsPM(TaskRequestPM task){
-        String id = task.getTaskId();
+    public void updateAllTaskRequestsPM(TaskRequestPM aTaskPM){
+        String id = aTaskPM.getTaskId();
         TaskRequestPM existingTask = syncAllTasksMap.get(id);
         if(existingTask != null){
-            syncAllTasks.remove(existingTask);
+            this.syncAllTasks.remove(existingTask);
         }
-        syncAllTasks.add(task);
-        syncAllTasksMap.put(id, task);
-        System.out.println("updateAllTaskRequestsPM-called. Task " +task.getTaskId());
+        this.syncAllTasks.add(aTaskPM);
+        this.syncAllTasksMap.put(id, aTaskPM);
+        System.out.println("exiting - updateAllTaskRequestsPM-called. Task " + id);
     }
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {

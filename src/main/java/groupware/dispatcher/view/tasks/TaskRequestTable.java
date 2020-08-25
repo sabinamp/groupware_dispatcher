@@ -4,6 +4,7 @@ import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.view.util.ViewMixin;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 
@@ -23,6 +24,11 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         init();
     }
 
+    @Override
+    public void initializeSelf() {
+        this.setPrefSize(500, 400);
+
+    }
     @Override
     public void initializeParts() {
 
@@ -47,7 +53,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         columnType.setMinWidth(100);
 
         TableColumn<TaskRequestPM, RequestReply> columnAccepted = new TableColumn<>("Accepted");
-        columnAccepted.setCellValueFactory(cell-> cell.getValue().acceptedProperty());
+        columnAccepted.setCellValueFactory(cell-> cell.getValue().requestReplyProperty());
         columnAccepted.setCellFactory(cell-> new AcceptedCell());
         columnAccepted.setMinWidth(100);
 
@@ -57,6 +63,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         columnDone.setMinWidth(100);
 
         getColumns().addAll(Arrays.asList(columnTaskId, columnCourierId, columnOrderID, columnType, columnAccepted, columnDone));
+
 
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         tsm = getSelectionModel();
@@ -75,19 +82,24 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
 
     @Override
     public void setupValueChangedListeners() {
-
+      /*  taskPModel.getSyncAllTasks().addListener(new ListChangeListener<TaskRequestPM>() {
+            @Override
+            public void onChanged(Change<? extends TaskRequestPM> c) {
+                refresh();
+            }
+        });*/
 
     }
-/*    @Override
+/*   @Override
     public void setupBindings() {
         // tracking selection
-        tsm.selectedIndexProperty().addListener((obs) -> {
+       *//* tsm.selectedIndexProperty().addListener((obs) -> {
 
             System.out.println("Selected: "+ tsm.getSelectedItems().get(0));
             System.out.println("Focused: " +
                     getFocusModel().getFocusedItem());
-        });
-      //  itemsProperty().bind(pm.allTaskEntriesProperty());
+        });*//*
+        itemsProperty().bind(taskPModel.allTaskEntriesProperty());
 
     }*/
 

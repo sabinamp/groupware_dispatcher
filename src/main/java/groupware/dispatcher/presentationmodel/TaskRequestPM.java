@@ -16,7 +16,7 @@ public class TaskRequestPM {
 
     private final ObjectProperty<LocalDateTime> dueOn = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> sentWhen = new SimpleObjectProperty<>();
-    private final ObjectProperty<RequestReply> accepted= new SimpleObjectProperty<>();
+    private final ObjectProperty<RequestReply> requestReply = new SimpleObjectProperty<>();
     private final BooleanProperty done= new SimpleBooleanProperty();
 
 
@@ -28,7 +28,7 @@ public class TaskRequestPM {
     public void reset() {
         this.setDone(false);
         this.setDueOn(null);
-        this.setAccepted(null);
+        this.setRequestReply(null);
         this.setAssigneeId("");
         this.setOrderId("");
         this.setDeliveryType(null);
@@ -43,7 +43,7 @@ public class TaskRequestPM {
         taskPM.setAssigneeId(taskRequest.getAssigneeId());
         taskPM.setTaskType(taskRequest.getTaskType());
         taskPM.setDeliveryType(taskRequest.getDeliveryType());
-        taskPM.setAccepted(taskRequest.getConfirmed());
+        taskPM.setRequestReply(taskRequest.getConfirmed());
         taskPM.setDone(taskRequest.isDone());
         taskPM.setDueOn(taskRequest.getDueOn());
         return taskPM;
@@ -56,7 +56,7 @@ public class TaskRequestPM {
         taskRequest.setOrderId(taskPM.getOrderId());
         taskRequest.setDueOn(taskPM.getDueOn());
         taskRequest.setAssigneeId(taskPM.getAssigneeId());
-        taskRequest.setConfirmed(taskPM.getAccepted());
+        taskRequest.setConfirmed(taskPM.getRequestReply());
         taskRequest.setSentWhen(taskPM.getSentWhen());
         taskRequest.setDeliveryType(taskPM.getDeliveryType());
         taskRequest.setTaskType(taskPM.getTaskType());
@@ -165,15 +165,30 @@ public class TaskRequestPM {
         this.done.set(done);
     }
 
-    public RequestReply getAccepted() {
-        return accepted.get();
+    public RequestReply getRequestReply() {
+        return requestReply.get();
     }
 
-    public ObjectProperty<RequestReply> acceptedProperty() {
-        return accepted;
+    public ObjectProperty<RequestReply> requestReplyProperty() {
+        return requestReply;
     }
 
-    public void setAccepted(RequestReply accepted) {
-        this.accepted.set(accepted);
+    public void setRequestReply(RequestReply requestReply) {
+        this.requestReply.set(requestReply);
+    }
+
+    @Override
+    public String toString() {
+        return "TaskRequestPM{" +
+                "taskId=" + taskId +
+                ", orderId=" + orderId +
+                ", assigneeId=" + assigneeId +
+                ", deliveryType=" + deliveryType +
+                ", taskType=" + taskType +
+                ", dueOn=" + dueOn +
+                ", sentWhen=" + sentWhen +
+                ", accepted=" + requestReply +
+                ", done=" + done +
+                '}';
     }
 }

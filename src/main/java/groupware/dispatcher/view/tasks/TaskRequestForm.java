@@ -9,7 +9,6 @@ import groupware.dispatcher.view.util.ViewMixin;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -201,7 +200,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
             task.setAssigneeId(assigneeId);
             task.setTaskType(taskTypeChoiceBox.getValue());
             task.setDeliveryType(deliveryTypeChoiceBox.getValue());
-            task.setAccepted(RequestReply.PENDING);
+            task.setRequestReply(RequestReply.PENDING);
             task.setSentWhen(LocalDateTime.now());
 
             LocalDate date = datePicker.getValue();
