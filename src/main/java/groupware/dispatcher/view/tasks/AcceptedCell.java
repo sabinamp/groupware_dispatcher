@@ -30,8 +30,7 @@ public class AcceptedCell extends TableCell<TaskRequestPM, RequestReply> {
         } else {
             if(item.equals(RequestReply.PENDING) ){
                 rectangle = new Rectangle(20,20, Color.web("Orange"));
-            }
-            if (item.equals(RequestReply.ACCEPTED) ){
+            } else if (item.equals(RequestReply.ACCEPTED) ){
                 rectangle = new Rectangle(20, 20, Color.web("Green"));
             }else if (item.equals(RequestReply.TIMEOUT)){
                 rectangle = new Rectangle(20,20, Color.web("Blue"));
