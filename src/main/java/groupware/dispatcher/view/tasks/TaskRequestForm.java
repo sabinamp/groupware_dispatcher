@@ -22,9 +22,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TaskRequestForm extends VBox implements ViewMixin {
-    private static int currentTaskIdentifier = 0;
+   // private static int currentTaskIdentifier = 0;
     private GridPane gp;
     private Text taskDueOnLabel;
     private Text courierIdLabel;
@@ -188,14 +189,14 @@ public class TaskRequestForm extends VBox implements ViewMixin {
     }
 
     private void save(ActionEvent evt) {
-        currentTaskIdentifier++;
+        //currentTaskIdentifier++;
         if(orderIdChoiceBox.getValue() != null && courierIdChoiceBox.getValue() != null && taskTypeChoiceBox.getValue() != null){
             String relatedOrderId = orderIdChoiceBox.getValue().getOrderId();
             String assigneeId = courierIdChoiceBox.getValue().getCourierId();
             System.out.println("TaskRequestForm - Saving " + datePicker.getValue() + taskTypeChoiceBox.getValue()+ deliveryTypeChoiceBox.getValue()
                     + " orderId "+relatedOrderId + " courierID " + assigneeId);
             TaskRequestPM task = new TaskRequestPM();
-            task.setTaskId("T"+currentTaskIdentifier);
+            task.setTaskId("T"+generateIdentifier());
             task.setOrderId(orderIdChoiceBox.getValue().getOrderId());
             task.setAssigneeId(assigneeId);
             task.setTaskType(taskTypeChoiceBox.getValue());
@@ -247,5 +248,11 @@ public class TaskRequestForm extends VBox implements ViewMixin {
 
     public void setCurrentTask(TaskRequestPM currentTask) {
         this.currentTask.set(currentTask);
+    }
+
+    private int generateIdentifier(){
+        // Generate random integers
+        return ThreadLocalRandom.current().nextInt();
+        
     }
 }

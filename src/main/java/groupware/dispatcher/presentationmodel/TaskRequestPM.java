@@ -2,6 +2,7 @@ package groupware.dispatcher.presentationmodel;
 
 import groupware.dispatcher.service.model.*;
 import javafx.beans.property.*;
+import javafx.beans.value.WritableObjectValue;
 
 import java.time.LocalDateTime;
 
@@ -173,8 +174,8 @@ public class TaskRequestPM {
         return requestReply;
     }
 
-    public void setRequestReply(RequestReply requestReply) {
-        this.requestReply.set(requestReply);
+    public void setRequestReply(RequestReply requestReply){
+     this.requestReply.set(requestReply);
     }
 
     @Override

@@ -11,7 +11,6 @@ import groupware.dispatcher.service.util.ModelObjManager;
 import groupware.dispatcher.service.util.MqttUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -20,7 +19,7 @@ public class OrdersBrokerClient extends BrokerClient {
     private static final String IDENTIFIER_OrderGetPublisher = "dispatcher_OrderGetPublisher";
     private static final String IDENTIFIER_OrderSubscriber = "dispatcher_OrderSubscriber";
     private static final String IDENTIFIER_SubscribeToNewOrders = "dispatcher_SubscribeToNewOrders";
-    private static final String IDENTIFIER_orderConfirmationPublisher = "dispatcher_OrderConfirmationPublisher";
+    private static final String IDENTIFIER_orderStatusPublisher = "dispatcher_OrderConfirmationPublisher";
     Mqtt3AsyncClient orderGetPublisher;
     Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
@@ -36,34 +35,34 @@ public class OrdersBrokerClient extends BrokerClient {
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync();
+                .buildAsync().toAsync();
         subscribeToNewOrders = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_SubscribeToNewOrders)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync();
+                .buildAsync().toAsync();
         orderSubscriber = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_OrderSubscriber)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync();
+                .buildAsync().toAsync();
         orderStatusPublisher = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(IDENTIFIER_OrderSubscriber)
+                .identifier(IDENTIFIER_orderStatusPublisher)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync();
+                .buildAsync().toAsync();
     }
 
 
     public void connectToBrokerAndSubscribeToNewOrders(){
         System.out.println("connecting to Broker");
-        connectClient(this.subscribeToNewOrders, 120);
+        connectClient(this.subscribeToNewOrders, 120, true);
         subscribeToNewOrders();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.subscribeToNewOrders);
     }
@@ -84,7 +83,7 @@ public class OrdersBrokerClient extends BrokerClient {
                    }
                 }
             } ).send()
-            .whenComplete((mqtt3SubAck, throwable) -> {
+            .whenCompleteAsync((mqtt3SubAck, throwable) -> {
                 if (throwable != null) {
                     // Handle failure to subscribe
                     LOGGER.warning(IDENTIFIER_SubscribeToNewOrders+ "Couldn't subscribe to topic  "+ topicName);
@@ -97,29 +96,21 @@ public class OrdersBrokerClient extends BrokerClient {
     }
 
 
-
     public void connectAndRequestExistingOrder(String orderId){
-        connectClient(this.orderGetPublisher, 30);
-        publishToTopic(orderGetPublisher,"orders/all_info/get/"+orderId,null);
-        System.out.println("connecting to Broker and publishing the request for the existing order. "+orderId);
+        connectClient(this.orderGetPublisher, 200, true);
+        publishToTopic(orderGetPublisher,"orders/all_info/get/"+orderId,null, true);
+        System.out.println("connecting to Broker and publishing the request for an existing order. "+orderId);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(orderGetPublisher);
     }
 
     public void connectAndSubscribeForExistingOrders() {
-        connectClient(this.orderSubscriber, 80);
+        connectClient(this.orderSubscriber, 80, true);
         System.out.println("connecting to Broker and subscribing for existing orders. ");
         subscribeToGetOrderByIdResponse();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.orderSubscriber);
 
     }
 
-    private void connectClient(Mqtt3AsyncClient client, int keepAlive) {
-        client.connectWith()
-                .keepAlive(keepAlive)
-                .cleanSession(false)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
-    }
 
     private CompletableFuture<Mqtt3SubAck> subscribeToGetOrderByIdResponse(){
         String topic= "orders/all_info/get/+/response";
@@ -160,7 +151,7 @@ public class OrdersBrokerClient extends BrokerClient {
     }
 
     public void stopClientBrokerConnection(){
-        orderGetPublisher.disconnect();
+        //orderGetPublisher.disconnect();
         subscribeToNewOrders.disconnect();
         orderSubscriber.disconnect();
     }
@@ -177,13 +168,13 @@ public class OrdersBrokerClient extends BrokerClient {
 
     //called by BrokerConnection
     void subscribeToOrders(){
-
+        connectAndSubscribeForExistingOrders();
         connectAndRequestExistingOrder("OR1111");
         connectAndRequestExistingOrder("OR1122");
         connectAndRequestExistingOrder("OR1123");
         connectAndRequestExistingOrder("OR1124");
-        //connectAndRequestExistingOrders();
-        connectAndSubscribeForExistingOrders();
+
+
         connectToBrokerAndSubscribeToNewOrders();
     }
 

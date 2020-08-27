@@ -72,8 +72,8 @@ public class CourierBrokerClient extends BrokerClient{
    public void connectAndRequestCourier(String courierId){
         String topicName= "couriers/info/get/" + courierId;
         System.out.println("connecting to Broker and requesting courier data, courierId: "+courierId);
-        connectClient( this.clientCourierInfo, 60, false);
-        publishToTopic(this.clientCourierInfo,topicName,null);
+        connectClient( this.clientCourierInfo, 60, true);
+        publishToTopic(this.clientCourierInfo,topicName,null, true);
    }
 
 

@@ -13,6 +13,7 @@ import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 import groupware.dispatcher.service.util.MqttUtils;
 import groupware.dispatcher.view.util.TaskEvent;
+import javafx.application.Platform;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
@@ -64,7 +65,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
 
         connectClient( this.clientTaskRequestsPublisher, 60, false);
         publishToTopic(clientTaskRequestsPublisher, topicNewTaskRequestFilter,
-                        taskRequestService.convertToJson(taskRequest));
+                        taskRequestService.convertToJson(taskRequest), true);
         System.out.println("connectPublishTaskRequest() called");
         MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
 
@@ -77,7 +78,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
 
         connectClient( this.clientTaskTimeoutPublisher, 60, false);
         publishToTopic(clientTaskTimeoutPublisher, timeoutTaskRequestTopicFilter,
-                null);
+                null, true);
         System.out.println("connectPublishTaskRequestTimeout() called");
         MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskTimeoutPublisher);
 
@@ -98,9 +99,8 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         return clientTaskSubscriber.subscribeWith()
                 .topicFilter(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
-                .callback(publish -> {
-                   handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE), publish, taskId);
-                })
+                .callback(publish ->
+                  handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE), publish, taskId) )
                 .send()
                 .whenCompleteAsync((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
@@ -135,7 +135,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         // Process the received message
         String topicEnd= publish.getTopic().getLevels().get(3);
         String assigneeID = publish.getTopic().getLevels().get(1);
-        TaskRequest task= taskRequestService.getTaskRequestById(taskId);
+        //TaskRequest task= taskRequestService.getTaskRequestById(taskId);
         switch (topicEnd) {
             case "accept": {
                 taskRequestService.updateTaskRequestReply(taskId, RequestReply.ACCEPTED,

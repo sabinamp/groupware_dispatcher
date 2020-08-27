@@ -27,7 +27,7 @@ public class OrderIDCell extends TableCell<TaskRequestPM, String> {
         } else {
             if (item != null) {
                 setText(item);
-                txt = new Text(item.toUpperCase());
+                //txt = new Text(item.toUpperCase());
             }
         }
     }

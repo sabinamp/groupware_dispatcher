@@ -60,18 +60,18 @@ public class AppStarter extends Application {
 
             allOrdersPM = new AllOrdersPM();
             orderService.setOrderEventListener(allOrdersPM);
+
             BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
             brokerConnection.startBrokerConnection();
-
             Platform.runLater(()-> {
                 // updating live UI object requires JavaFX App Thread
                 //do not exit
+
                 try{
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
 
             });
         }
@@ -96,15 +96,16 @@ public class AppStarter extends Application {
             //do not exit
             try{
                 Thread.sleep(500);
+                allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
+                taskRequestService.setTaskRequestBrokerEventListener(allTaskRequestsPM);
+                taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
 
         });
-        allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
-        taskRequestService.setTaskRequestBrokerEventListener(allTaskRequestsPM);
-        taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);
+
 
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));

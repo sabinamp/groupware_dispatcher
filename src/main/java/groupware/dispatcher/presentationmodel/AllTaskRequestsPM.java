@@ -6,6 +6,8 @@ import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.util.TaskEvent;
 import javafx.application.Platform;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -48,7 +50,6 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
     private void setupValueChangedListeners() {
         syncAllTasks.addListener((ListChangeListener.Change<? extends TaskRequestPM> change) -> {
             System.out.println("AllTaskRequestsPM Update"+ change);
-
         });
     }
 
@@ -84,7 +85,7 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
         if(existingTask != null){
             this.syncAllTasks.remove(existingTask);
         }
-        this.syncAllTasks.add(aTaskPM);
+        syncAllTasks.add(aTaskPM);
         this.syncAllTasksMap.put(id, aTaskPM);
         System.out.println("exiting - updateAllTaskRequestsPM-called. Task " + id);
     }
@@ -103,18 +104,25 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
 
     @Override
     public void handleNewTaskEvent(TaskEvent event, TaskRequestPM task) {
-        this.updateAllTaskRequestsPM(task);
+
         if(event.getEventType().equals(TaskEvent.NEW_TASK)){
             taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task), null);
-            Platform.runLater(() -> showAlertWithNoHeaderText(event, task, "New task sent"));
+            Platform.runLater(() -> {
+                this.updateAllTaskRequestsPM(task);
+                showAlertWithNoHeaderText(event, task, "New task sent");
+            });
         }
     }
 
     @Override
     public void handleTaskUpdateEvent(TaskEvent event, TaskRequestPM taskRequest, String update) {
-        this.updateAllTaskRequestsPM(taskRequest);
+
         if(event.getEventType().equals(TaskEvent.UPDATE)){
-            Platform.runLater(() -> showAlertWithNoHeaderText(event, taskRequest, update));
+            Platform.runLater(() -> {
+                this.updateAllTaskRequestsPM(taskRequest);
+                showAlertWithNoHeaderText(event, taskRequest, update);
+
+            });
         }
     }
 
@@ -133,4 +141,5 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
     public ObservableMap<String, TaskRequestPM> getSyncAllTasksMap() {
         return syncAllTasksMap;
     }
+
 }

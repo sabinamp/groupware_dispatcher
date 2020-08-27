@@ -4,11 +4,20 @@ import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.RequestReply;
 import groupware.dispatcher.view.util.ViewMixin;
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WritableObjectValue;
+import javafx.beans.value.WritableStringValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.TableViewSkinBase;
+import javafx.util.Callback;
 
 import java.util.Arrays;
+import java.util.Map;
 
 
 public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMixin {
@@ -52,17 +61,24 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         columnType.setCellFactory(cell-> new DeliveryTypeCell());
         columnType.setMinWidth(100);
 
-        TableColumn<TaskRequestPM, RequestReply> columnAccepted = new TableColumn<>("Accepted");
-        columnAccepted.setCellValueFactory(cell-> cell.getValue().requestReplyProperty());
-        columnAccepted.setCellFactory(cell-> new AcceptedCell());
-        columnAccepted.setMinWidth(100);
+        TableColumn<TaskRequestPM, RequestReply> replyColumn = new TableColumn<>("Reply");
+        replyColumn.setCellValueFactory(cell->  cell.getValue().requestReplyProperty());
+        replyColumn.setCellFactory(cell-> new ReplyCell());
+      /* replyColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<TaskRequestPM, RequestReply>, ObservableValue<RequestReply>>() {
+            @Override
+            public ObservableValue<RequestReply> call(TableColumn.CellDataFeatures<TaskRequestPM, RequestReply> param) {
+                WritableObjectValue<RequestReply> result=param.getValue().requestReplyProperty();
+                return (ObservableValue<RequestReply>) result;
+            }
+        });*/
+        replyColumn.setMinWidth(100);
 
         TableColumn<TaskRequestPM, Boolean> columnDone = new TableColumn<>("Status");
         columnDone.setCellValueFactory(cell-> cell.getValue().doneProperty());
         columnDone.setCellFactory(cell-> new BooleanCell());
         columnDone.setMinWidth(100);
 
-        getColumns().addAll(Arrays.asList(columnTaskId, columnCourierId, columnOrderID, columnType, columnAccepted, columnDone));
+        getColumns().addAll(Arrays.asList(columnTaskId, columnCourierId, columnOrderID, columnType, replyColumn, columnDone));
 
 
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
@@ -73,36 +89,39 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         selectedEntries = tsm.getSelectedItems();
         selectedEntryIndex = tsm.getSelectedIndices();
 
-
     }
 
     @Override
     public void layoutParts() {
+
     }
 
     @Override
     public void setupValueChangedListeners() {
-      /*  taskPModel.getSyncAllTasks().addListener(new ListChangeListener<TaskRequestPM>() {
-            @Override
-            public void onChanged(Change<? extends TaskRequestPM> c) {
-                refresh();
-            }
-        });*/
 
     }
-/*   @Override
-    public void setupBindings() {
-        // tracking selection
-       *//* tsm.selectedIndexProperty().addListener((obs) -> {
 
-            System.out.println("Selected: "+ tsm.getSelectedItems().get(0));
-            System.out.println("Focused: " +
-                    getFocusModel().getFocusedItem());
-        });*//*
+
+
+  @Override
+    public void setupBindings() {
+
         itemsProperty().bind(taskPModel.allTaskEntriesProperty());
 
+    }
+
+
+   /* @Override
+    public void handlePMUpdateEvent() {
+        Platform.runLater(new Runnable() {
+            public void run() {
+                updateMyTableView();
+            }
+        });
+    }
+
+    private void updateMyTableView() {
+      getItems().clear();
+      getItems().addAll(taskPModel.getSyncAllTasks());
     }*/
-
-
-
 }

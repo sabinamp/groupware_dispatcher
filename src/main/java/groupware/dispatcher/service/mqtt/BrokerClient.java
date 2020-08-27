@@ -22,14 +22,14 @@ public class BrokerClient {
                 .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
     }
 
-    CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload){
+    CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload, boolean retained){
        return client.publishWith()
                 .topic(myTopic)
-                .retain(true)
+                .retain(retained)
                 .payload(myPayload == null? null: myPayload.getBytes())
                 .qos(MqttQos.EXACTLY_ONCE)
                 .send()
-                .whenComplete((mqtt3Publish, throwable) -> {
+                .whenCompleteAsync((mqtt3Publish, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to publish
                         logger.info(" - failed to publish to the topic " + myTopic);
@@ -42,10 +42,10 @@ public class BrokerClient {
     }
 
 
-    Mqtt3Publish publishMessage(String topic, String myPayload){
+    Mqtt3Publish publishMessage(String topic, String myPayload, boolean retained){
         return Mqtt3Publish.builder()
                 .topic(topic)
-                .retain(true)
+                .retain(retained)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .payload(myPayload == null? null: myPayload.getBytes())
                 .build();

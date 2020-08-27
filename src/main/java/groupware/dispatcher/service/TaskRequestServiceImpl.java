@@ -102,9 +102,7 @@ public class TaskRequestServiceImpl{
                 stepStarted.setCurrentStatus(OrderStatus.STARTED);
                 stepStarted.setUpdatedWhen(LocalDateTime.now());
                 orderService.updateOrderStatus(task.getOrderId(),stepStarted );
-            }/*else{
-                orderService.updateOrderAssignee(task.getOrderId(),assigneeID);
-            }*/
+            }
         }
         boolean successful = this.updateTaskRequest(taskId, task, update);
         System.out.println("updateTaskRequestReply() called. Successfully updated the task request : " + successful);

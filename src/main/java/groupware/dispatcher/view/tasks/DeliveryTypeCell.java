@@ -2,15 +2,12 @@ package groupware.dispatcher.view.tasks;
 
 import groupware.dispatcher.presentationmodel.TaskRequestPM;
 import groupware.dispatcher.service.model.DeliveryType;
-import groupware.dispatcher.service.model.TaskType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 public class DeliveryTypeCell extends TableCell<TaskRequestPM, DeliveryType> {
@@ -41,7 +38,6 @@ public class DeliveryTypeCell extends TableCell<TaskRequestPM, DeliveryType> {
             }
 
             setText(item.toString());
-
             imageView.getChildren().add(rectangle);
             setGraphic(imageView);
         }
