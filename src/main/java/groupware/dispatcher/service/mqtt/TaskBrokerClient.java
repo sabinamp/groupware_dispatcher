@@ -22,10 +22,8 @@ import java.util.logging.Logger;
 
 public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEventListener {
     private static final String IDENTIFIER_ClientTaskRequestsPublisher = "dispatcher_ClientTaskRequestsPublisher";
-    private static final String IDENTIFIER_ClientTaskSubscriber = "dispatcher_ClientTaskSubscriber";
-    private static final String IDENTIFIER_ClientTaskTimeoutPublisher = "dispatcher_ClientTaskTimeoutPublisher";
+      private static final String IDENTIFIER_ClientTaskTimeoutPublisher = "dispatcher_ClientTaskTimeoutPublisher";
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
-   // private Mqtt3AsyncClient clientTaskSubscriber;
     private Mqtt3AsyncClient clientTaskTimeoutPublisher;
 
     private TaskRequestServiceImpl taskRequestService;
@@ -42,12 +40,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
-    /*    clientTaskSubscriber = MqttClient.builder().useMqttVersion3()
-                .identifier(IDENTIFIER_ClientTaskSubscriber)
-                .serverHost("127.0.0.1")
-                .serverPort(1883)
-                .automaticReconnectWithDefaultConfig()
-                .buildAsync();*/
+
         clientTaskTimeoutPublisher = MqttClient.builder().useMqttVersion3()
                 .identifier(IDENTIFIER_ClientTaskTimeoutPublisher)
                 .serverHost("127.0.0.1")

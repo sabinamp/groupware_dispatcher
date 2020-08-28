@@ -41,10 +41,15 @@ public class OrderServiceImpl implements OrderService{
         }else {
             if(orders.get(id) != null){
                 orders.put(id, order);
-                orderEventListener.handleOrderUpdateEvent(OrderPM.ofOrder(order));
+                if(orderEventListener!= null){
+                    orderEventListener.handleOrderUpdateEvent(OrderPM.ofOrder(order));
+                }
+
             }else{
                 orders.put(id, order);
-                orderEventListener.handleNewOrderEvent(OrderPM.ofOrder(order));
+                if(orderEventListener!= null) {
+                    orderEventListener.handleNewOrderEvent(OrderPM.ofOrder(order));
+                }
             }
             return true;
         }

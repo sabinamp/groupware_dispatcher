@@ -59,9 +59,9 @@ public class CourierServiceImpl implements CourierService {
             }
             couriers.put(courierId, courier);
             CourierPM currentCourierPM = CourierPM.of(courierId, courier);
-            if(updating){
+            if(updating && allCouriersPMListener != null){
                 allCouriersPMListener.handleCourierUpdateEvent(currentCourierPM);
-            }else{
+            }else if(allCouriersPMListener != null){
                 allCouriersPMListener.handleNewCourierEvent(currentCourierPM);
             }
             return true;

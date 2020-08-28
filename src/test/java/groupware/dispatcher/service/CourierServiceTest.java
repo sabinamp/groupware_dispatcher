@@ -28,7 +28,8 @@ public class CourierServiceTest {
         info.setConn(Conn.ONLINE);
 
         ContactInfo contactInfo1 = new ContactInfo();
-        Email email1 = new Email(); email1.setEmail("hello@yahoo.com");
+        Email email1 = new Email();
+        email1.setEmail("hello@yahoo.com");
         contactInfo1.setEmail(email1);
 
         info.setContactInfo(contactInfo1);
