@@ -25,7 +25,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
     private static final String IDENTIFIER_ClientTaskSubscriber = "dispatcher_ClientTaskSubscriber";
     private static final String IDENTIFIER_ClientTaskTimeoutPublisher = "dispatcher_ClientTaskTimeoutPublisher";
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
-    private Mqtt3AsyncClient clientTaskSubscriber;
+   // private Mqtt3AsyncClient clientTaskSubscriber;
     private Mqtt3AsyncClient clientTaskTimeoutPublisher;
 
     private TaskRequestServiceImpl taskRequestService;
@@ -42,12 +42,12 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
-        clientTaskSubscriber = MqttClient.builder().useMqttVersion3()
+    /*    clientTaskSubscriber = MqttClient.builder().useMqttVersion3()
                 .identifier(IDENTIFIER_ClientTaskSubscriber)
                 .serverHost("127.0.0.1")
                 .serverPort(1883)
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync();
+                .buildAsync();*/
         clientTaskTimeoutPublisher = MqttClient.builder().useMqttVersion3()
                 .identifier(IDENTIFIER_ClientTaskTimeoutPublisher)
                 .serverHost("127.0.0.1")
@@ -86,17 +86,17 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
 
     public void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest taskRequest){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
-        connectClient( this.clientTaskSubscriber, 120, false);
-        subscribeToTaskRequestUpdates(taskId, taskRequest);
+        connectClient( this.clientTaskRequestsPublisher, 120, false);
+        subscribeToTaskRequestUpdates(clientTaskRequestsPublisher,taskId, taskRequest);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
 
     }
 
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(String taskId, TaskRequest task) {
+    private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(Mqtt3AsyncClient client,String taskId, TaskRequest task) {
         String courierId=task.getAssigneeId();
         String topic="orders/"+courierId+"/"+taskId+"/#";
-        return clientTaskSubscriber.subscribeWith()
+        return client.subscribeWith()
                 .topicFilter(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .callback(publish ->

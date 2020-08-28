@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 
-public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMixin, PmModifiedEventListener {
+public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMixin {
     private AllTaskRequestsPM taskPModel;
 
     private ObservableList<TaskRequestPM> selectedEntries;
@@ -38,9 +38,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
     public TaskRequestTable(AllTaskRequestsPM pm){
         super(pm.getAllTaskEntries());
         this.taskPModel = pm;
-        this.taskPModel.setModifiedEventListener(this);
         init();
-
 
     }
 
@@ -133,8 +131,5 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
     }
 
 
-    @Override
-    public void handleModifiedEvent() {
-        updateTableContent();
-    }
+
 }

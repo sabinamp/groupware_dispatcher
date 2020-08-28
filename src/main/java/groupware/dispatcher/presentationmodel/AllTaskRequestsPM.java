@@ -38,17 +38,6 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
     private ObjectProperty<ObservableList<TaskRequestPM>> allTaskEntries = new SimpleObjectProperty<>();
     private ObjectProperty<TaskRequestPM> currentTaskRequest = new SimpleObjectProperty<>();
 
-    public PmModifiedEventListener getModifiedEventListener() {
-        return modifiedEventListener;
-    }
-
-    public void setModifiedEventListener(PmModifiedEventListener modifiedEventListener) {
-        this.modifiedEventListener = modifiedEventListener;
-    }
-
-    private PmModifiedEventListener modifiedEventListener;
-
-
 
    public AllTaskRequestsPM(AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, TaskRequestServiceImpl taskRequestService){
         this.allCouriersPM= allCouriersPM;
@@ -133,9 +122,6 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
             Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, update);
-                if(modifiedEventListener != null){
-                    modifiedEventListener.handleModifiedEvent();
-                }
 
             });
         }

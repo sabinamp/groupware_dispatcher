@@ -102,10 +102,7 @@ public class AppStarter extends Application {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-
         });
-
 
         Button exitBtn = new Button("Exit");
         exitBtn.setTextFill(Color.rgb(50,50,100));

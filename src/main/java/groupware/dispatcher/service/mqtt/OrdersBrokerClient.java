@@ -16,7 +16,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class OrdersBrokerClient extends BrokerClient {
-    private static final String IDENTIFIER_OrderGetPublisher = "dispatcher_OrderGetPublisher";
+
     private static final String IDENTIFIER_OrderSubscriber = "dispatcher_OrderSubscriber";
     private static final String IDENTIFIER_SubscribeToNewOrders = "dispatcher_SubscribeToNewOrders";
     private static final String IDENTIFIER_orderStatusPublisher = "dispatcher_OrderConfirmationPublisher";
@@ -29,13 +29,7 @@ public class OrdersBrokerClient extends BrokerClient {
 
     public OrdersBrokerClient(OrderService orderServiceImpl){
         orderService= orderServiceImpl;
-        orderGetPublisher = MqttClient.builder()
-                .useMqttVersion3()
-                .identifier(IDENTIFIER_OrderGetPublisher)
-                .serverHost("127.0.0.1")
-                .serverPort(1883)
-                .automaticReconnectWithDefaultConfig()
-                .buildAsync().toAsync();
+
         subscribeToNewOrders = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_SubscribeToNewOrders)
@@ -97,10 +91,10 @@ public class OrdersBrokerClient extends BrokerClient {
 
 
     public void connectAndRequestExistingOrder(String orderId){
-        connectClient(this.orderGetPublisher, 200, true);
-        publishToTopic(orderGetPublisher,"orders/all_info/get/"+orderId,null, true);
+        connectClient(this.orderSubscriber, 80, true);
+        publishToTopic(orderSubscriber,"orders/all_info/get/"+orderId,null, true);
         System.out.println("connecting to Broker and publishing the request for an existing order. "+orderId);
-        MqttUtils.addDisconnectOnRuntimeShutDownHock(orderGetPublisher);
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(orderSubscriber);
     }
 
     public void connectAndSubscribeForExistingOrders() {
