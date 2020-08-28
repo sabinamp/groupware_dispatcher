@@ -82,7 +82,6 @@ public class TaskRequestServiceImpl{
                     System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                                 "The task with id : "+ id+" added.");
                     startTaskTimer(taskRequest);
-
                 }
             }
             return true;

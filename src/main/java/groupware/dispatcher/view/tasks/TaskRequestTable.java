@@ -3,10 +3,16 @@ package groupware.dispatcher.view.tasks;
 import groupware.dispatcher.presentationmodel.*;
 import groupware.dispatcher.service.model.DeliveryType;
 import groupware.dispatcher.service.model.RequestReply;
+import groupware.dispatcher.service.util.TimerService;
 import groupware.dispatcher.view.util.ViewMixin;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.WritableObjectValue;
 import javafx.beans.value.WritableStringValue;
@@ -20,24 +26,29 @@ import java.util.Arrays;
 import java.util.Map;
 
 
-public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMixin {
+public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMixin, PmModifiedEventListener {
     private AllTaskRequestsPM taskPModel;
 
     private ObservableList<TaskRequestPM> selectedEntries;
     private ObservableList<Integer> selectedEntryIndex;
     private TableViewSelectionModel<TaskRequestPM> tsm;
+    private TimerService timerService;
 
+    private IntegerProperty totalNbItems= new SimpleIntegerProperty();
     public TaskRequestTable(AllTaskRequestsPM pm){
-        super();
+        super(pm.getAllTaskEntries());
         this.taskPModel = pm;
+        this.taskPModel.setModifiedEventListener(this);
         init();
+
+
     }
 
     @Override
     public void initializeSelf() {
         this.setPrefSize(500, 400);
-
     }
+
     @Override
     public void initializeParts() {
 
@@ -64,13 +75,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         TableColumn<TaskRequestPM, RequestReply> replyColumn = new TableColumn<>("Reply");
         replyColumn.setCellValueFactory(cell->  cell.getValue().requestReplyProperty());
         replyColumn.setCellFactory(cell-> new ReplyCell());
-      /* replyColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<TaskRequestPM, RequestReply>, ObservableValue<RequestReply>>() {
-            @Override
-            public ObservableValue<RequestReply> call(TableColumn.CellDataFeatures<TaskRequestPM, RequestReply> param) {
-                WritableObjectValue<RequestReply> result=param.getValue().requestReplyProperty();
-                return (ObservableValue<RequestReply>) result;
-            }
-        });*/
+
         replyColumn.setMinWidth(100);
 
         TableColumn<TaskRequestPM, Boolean> columnDone = new TableColumn<>("Status");
@@ -84,7 +89,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         tsm = getSelectionModel();
         tsm.setSelectionMode(SelectionMode.SINGLE);
-        setItems(taskPModel.getSyncAllTasks());
+        setItems(taskPModel.getAllTaskEntries());
         // getting selected items
         selectedEntries = tsm.getSelectedItems();
         selectedEntryIndex = tsm.getSelectedIndices();
@@ -101,27 +106,35 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
 
     }
 
-
-
-  @Override
+    @Override
     public void setupBindings() {
-
         itemsProperty().bind(taskPModel.allTaskEntriesProperty());
+    }
 
+    public int getTotalNbItems() {
+        return totalNbItems.get();
+    }
+
+    public IntegerProperty totalNbItemsProperty() {
+        return totalNbItems;
+    }
+
+    public void setTotalNbItems(int totalNbItems) {
+        this.totalNbItems.set(totalNbItems);
     }
 
 
-   /* @Override
-    public void handlePMUpdateEvent() {
-        Platform.runLater(new Runnable() {
-            public void run() {
-                updateMyTableView();
-            }
+
+    private void updateTableContent() {
+        Platform.runLater(() -> {
+            setItems(taskPModel.getAllTaskEntries());
+            refresh();
         });
     }
 
-    private void updateMyTableView() {
-      getItems().clear();
-      getItems().addAll(taskPModel.getSyncAllTasks());
-    }*/
+
+    @Override
+    public void handleModifiedEvent() {
+        updateTableContent();
+    }
 }

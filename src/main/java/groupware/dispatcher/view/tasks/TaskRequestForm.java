@@ -253,6 +253,6 @@ public class TaskRequestForm extends VBox implements ViewMixin {
     private int generateIdentifier(){
         // Generate random integers
         return ThreadLocalRandom.current().nextInt();
-        
+
     }
 }
