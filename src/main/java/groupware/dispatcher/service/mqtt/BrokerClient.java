@@ -16,10 +16,14 @@ public class BrokerClient {
     void connectClient(Mqtt3AsyncClient client, int keepAlive, boolean cleanSession){
 
         client.connectWith()
+                .simpleAuth()
+                .username("mqtt-dispatcher")
+                .password("groupwaredispatcher".getBytes())
+                .applySimpleAuth()
                 .keepAlive(keepAlive)
                 .cleanSession(cleanSession)
                 .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck));
+                .thenAcceptAsync(connAck -> System.out.println(client.getState()+"connected " + connAck));
     }
 
     CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload, boolean retained){

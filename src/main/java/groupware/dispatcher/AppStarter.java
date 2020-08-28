@@ -8,6 +8,7 @@ import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.OrderServiceImpl;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.service.mqtt.BrokerConnection;
+import groupware.dispatcher.service.util.MqttUtils;
 import groupware.dispatcher.view.ApplicationUI;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -79,12 +80,10 @@ public class AppStarter extends Application {
 
     @Override
     public void start(Stage primaryStage){
-
-
+        MqttUtils.setUPSSLConfig();
         rootPM = new RootPM();
         allCouriersPM =new AllCouriersPM();
         courierService.setAllCouriersPMListener(allCouriersPM);
-
 
         allOrdersPM = new AllOrdersPM();
         orderService.setOrderEventListener(allOrdersPM);
@@ -113,9 +112,7 @@ public class AppStarter extends Application {
         });
 
         rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, taskRequestService);
-
         rootPanel.addClockToHeader(txtTime);
-
         rootPanel.addExitButton(exitBtn);
         Scene scene = new Scene(rootPanel, 1000,800);
         primaryStage.setTitle("Dispatcher GUI");

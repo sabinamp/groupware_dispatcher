@@ -36,15 +36,23 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         clientTaskRequestsPublisher = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_ClientTaskRequestsPublisher)
-                .serverHost("127.0.0.1")
-                .serverPort(1883)
+                .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
+                .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
+                .sslConfig()
+                .keyManagerFactory(MqttUtils.myKeyManagerFactory)
+                .trustManagerFactory(MqttUtils.myTrustManagerFactory)
+                .applySslConfig()
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
 
         clientTaskTimeoutPublisher = MqttClient.builder().useMqttVersion3()
                 .identifier(IDENTIFIER_ClientTaskTimeoutPublisher)
-                .serverHost("127.0.0.1")
-                .serverPort(1883)
+                .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
+                .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
+                .sslConfig()
+                .keyManagerFactory(MqttUtils.myKeyManagerFactory)
+                .trustManagerFactory(MqttUtils.myTrustManagerFactory)
+                .applySslConfig()
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
     }
@@ -59,7 +67,7 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         connectClient( this.clientTaskRequestsPublisher, 60, false);
         publishToTopic(clientTaskRequestsPublisher, topicNewTaskRequestFilter,
                         taskRequestService.convertToJson(taskRequest), true);
-        System.out.println("connectPublishTaskRequest() called");
+        System.out.println("connectPublishTaskRequest() called with the MQTT3AsyncClient"+clientTaskRequestsPublisher);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
 
     }
