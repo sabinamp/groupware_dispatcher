@@ -20,7 +20,6 @@ public class OrdersBrokerClient extends BrokerClient {
     private static final String IDENTIFIER_OrderSubscriber = "dispatcher_OrderSubscriber";
     private static final String IDENTIFIER_SubscribeToNewOrders = "dispatcher_SubscribeToNewOrders";
     private static final String IDENTIFIER_orderStatusPublisher = "dispatcher_OrderConfirmationPublisher";
-    Mqtt3AsyncClient orderGetPublisher;
     Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
     Mqtt3AsyncClient orderStatusPublisher;
@@ -150,9 +149,7 @@ public class OrdersBrokerClient extends BrokerClient {
         orderSubscriber.disconnect();
     }
 
-    public void stopClient1BrokerConnection(){
-        orderGetPublisher.disconnect();
-    }
+
     public void stopClient2BrokerConnection(){
         subscribeToNewOrders.disconnect();
     }
