@@ -34,10 +34,10 @@ public class OrdersBrokerClient extends BrokerClient {
                 .identifier(IDENTIFIER_SubscribeToNewOrders)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-                .sslConfig()
+              /* .sslConfig()
                 .keyManagerFactory(MqttUtils.myKeyManagerFactory)
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()
+                .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync().toAsync();
         orderSubscriber = MqttClient.builder()
@@ -45,10 +45,10 @@ public class OrdersBrokerClient extends BrokerClient {
                 .identifier(IDENTIFIER_OrderSubscriber)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-                .sslConfig()
+               /* .sslConfig()
                 .keyManagerFactory(MqttUtils.myKeyManagerFactory)
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()
+                .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync().toAsync();
         orderStatusPublisher = MqttClient.builder()
@@ -56,10 +56,10 @@ public class OrdersBrokerClient extends BrokerClient {
                 .identifier(IDENTIFIER_orderStatusPublisher)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-                .sslConfig()
+              /*  .sslConfig()
                 .keyManagerFactory(MqttUtils.myKeyManagerFactory)
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()
+                .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync().toAsync();
     }

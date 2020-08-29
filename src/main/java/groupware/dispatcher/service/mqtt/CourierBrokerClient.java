@@ -42,10 +42,10 @@ public class CourierBrokerClient extends BrokerClient{
                 .identifier(IDENTIFIER_ClientCourierInfo)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-                .sslConfig()
+               /* .sslConfig()
                 .keyManagerFactory(MqttUtils.myKeyManagerFactory)
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()
+                .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientCourierInfoSubscriber = MqttClient.builder()
@@ -53,10 +53,10 @@ public class CourierBrokerClient extends BrokerClient{
                 .identifier(IDENTIFIER_ClientCourierInfoSubscriber)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-                .sslConfig()
+              /*  .sslConfig()
                 .keyManagerFactory(MqttUtils.myKeyManagerFactory)
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()
+                .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
         clientCourierUpdates = MqttClient.builder()
@@ -64,10 +64,10 @@ public class CourierBrokerClient extends BrokerClient{
                 .identifier(IDENTIFIER_ClientCourierUpdates)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-                .sslConfig()
+             /*   .sslConfig()
                 .keyManagerFactory(MqttUtils.myKeyManagerFactory)
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()
+                .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
 
@@ -91,32 +91,16 @@ public class CourierBrokerClient extends BrokerClient{
 
     public void connectAndSubscribeForCourierInfoResponse(){
         System.out.println("connecting to Broker and subscribing for courier info. ");
-        this.clientCourierInfoSubscriber.connectWith()
-                .keepAlive(120)
-                .cleanSession(false)
-                .send()
-                .thenAcceptAsync(connAck -> System.out.println("connected " + connAck))
-                .thenComposeAsync(v -> subscribeToGetCourierById())
-                .whenCompleteAsync((connAck, throwable) -> {
-                    if (throwable != null) {
-                        // Handle connection failure
-                        logger.info("connectAndSubscribeForCourierInfo. The connection to the broker failed."
-                                + throwable.getMessage());
-                        System.out.println("connectAndSubscribeForCourierInfo. The connection to the broker failed."+ throwable.getMessage());
-                    } else {
-                        System.out.println("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
-                        logger.info("connectAndSubscribeForCourierInfo - successful connection to the broker. The client clientCourierInfo is connected");
-                        //clientCourierInfoSubscriber.unsubscribeWith().topicFilter( "couriers/info/get/#").send();
-                    }
+        connectClient(this.clientCourierInfoSubscriber, 80, true);
+        subscribeToGetCourierById(this.clientCourierInfoSubscriber);
 
-                });
     }
 
-     CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(){
+     CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(Mqtt3AsyncClient client){
         String topicName = "couriers/info/get/+/response";
         System.out.println("entering subscribeToGetCourierById for the topic "+topicName);
 
-        return this.clientCourierInfoSubscriber.subscribeWith()
+        return client.subscribeWith()
                 .topicFilter(topicName)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .callback(mqtt3Publish -> {
@@ -157,13 +141,13 @@ public class CourierBrokerClient extends BrokerClient{
     public void connectToBrokerAndSubscribeToCourierUpdates(){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToCourierUpdates");
         connectClient(this.clientCourierUpdates, 160, false);
-        subscribeToCourierUpdates();
+        subscribeToCourierUpdates(this.clientCourierUpdates);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.clientCourierUpdates);
 
     }
 
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToCourierUpdates(){
+    private CompletableFuture<Mqtt3SubAck> subscribeToCourierUpdates(Mqtt3AsyncClient client){
         String topicUpdateInfo="couriers/info/update/#";
         String topicUpdateStatus="couriers/status/update/#";
         String topicUpdateConnected="couriers/conn/update/#";
@@ -171,7 +155,7 @@ public class CourierBrokerClient extends BrokerClient{
         String topic = "couriers/+/update/#";
         System.out.println("entering subscribeToCourierUpdates - subscribe topic : "+topic);
 
-       return clientCourierUpdates.subscribeWith()
+       return client.subscribeWith()
                 .topicFilter(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .callback(publish -> {

@@ -1,10 +1,16 @@
 package groupware.dispatcher.service.mqtt;
 
 import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.datatypes.MqttUtf8String;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.message.auth.Mqtt3SimpleAuth;
 import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.Mqtt3Subscribe;
+import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -12,18 +18,32 @@ import java.util.logging.Logger;
 public class BrokerClient {
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(BrokerClient.class));
+    private static final String BROKER_USERNAME="mqtt-dispatcher";
+    private static final String DISPATCHER_PSW ="groupwaredispatcher";
 
     void connectClient(Mqtt3AsyncClient client, int keepAlive, boolean cleanSession){
+       /* Mqtt3SimpleAuth groupwareStoreAuthentication = new Mqtt3SimpleAuth() {
+            @Override
+            public MqttUtf8String getUsername() {
+                return MqttUtf8String.of(BROKER_USERNAME);
+            }
+
+            @Override
+            public Optional<ByteBuffer> getPassword() {
+                return Optional.of(ByteBufferToStringConversion.string2ByteBuffer(DISPATCHER_PSW,
+                        StandardCharsets.UTF_8));
+            }
+        };*/
 
         client.connectWith()
                 .simpleAuth()
-                .username("mqtt-dispatcher")
-                .password("groupwaredispatcher".getBytes())
+                .username(BrokerClient.BROKER_USERNAME)
+                .password(BrokerClient.DISPATCHER_PSW.getBytes())
                 .applySimpleAuth()
                 .keepAlive(keepAlive)
                 .cleanSession(cleanSession)
                 .send()
-                .thenAcceptAsync(connAck -> System.out.println(client.getState()+"connected " + connAck));
+                .thenAcceptAsync(connAck -> System.out.println(client.getState()+" connected " + connAck));
     }
 
     CompletableFuture<Mqtt3Publish> publishToTopic(Mqtt3AsyncClient client,String myTopic, String  myPayload, boolean retained){

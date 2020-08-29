@@ -35,6 +35,7 @@ public class BrokerConnection {
     };
 
     public void startBrokerConnection(){
+
         connectCourierServiceToBroker.run();
         connectOrderServiceToBroker.run();
     }

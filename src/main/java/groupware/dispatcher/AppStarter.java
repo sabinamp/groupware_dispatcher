@@ -80,7 +80,7 @@ public class AppStarter extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        MqttUtils.setUPSSLConfig();
+
         rootPM = new RootPM();
         allCouriersPM =new AllCouriersPM();
         courierService.setAllCouriersPMListener(allCouriersPM);
@@ -94,7 +94,7 @@ public class AppStarter extends Application {
             // updating live UI object requires JavaFX App Thread
             //do not exit
             try{
-                Thread.sleep(500);
+                Thread.sleep(300);
                 allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
                 taskRequestService.setTaskRequestBrokerEventListener(allTaskRequestsPM);
                 taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);

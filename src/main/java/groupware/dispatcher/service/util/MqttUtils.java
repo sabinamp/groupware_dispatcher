@@ -11,12 +11,12 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class MqttUtils {
-    public static final String BROKER_HIVEMQ_ADR = "ssl://localhost";
-    public static final int BROKER_HIVEMQ_PORT = 8883;
-    public static final int KEEP_ALIVE = 120;
-    public static KeyManagerFactory myKeyManagerFactory;
+    public static final String BROKER_HIVEMQ_ADR = "127.0.0.1";
+    public static final int BROKER_HIVEMQ_PORT = 1883;
+    public static final int KEEP_ALIVE = 80;
+   /* public static KeyManagerFactory myKeyManagerFactory;
     private static KeyStore trustStore;
-    public static TrustManagerFactory myTrustManagerFactory;
+    public static TrustManagerFactory myTrustManagerFactory;*/
 
     private static final Logger logger;
     static {
@@ -32,7 +32,7 @@ public class MqttUtils {
         }
     }
 
-  
+
     static void disconnectOnExit(Mqtt3AsyncClient client) {
         if (client != null) {
           //  logger.info("Disconnect Client " + client.getConfig().getClientIdentifier().get());
@@ -44,7 +44,7 @@ public class MqttUtils {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnectOnExit(client)));
     }
 
-    public static void setUPSSLConfig() {
+  /*  public static void setUPSSLConfig() {
             try {
                 trustStore = KeyStore.getInstance("JKS");
                 KeyStore keyStoreK= KeyStore.getInstance("JKS");
@@ -67,7 +67,7 @@ public class MqttUtils {
                 e.printStackTrace();
             }
 
-    }
+    }*/
 
     private static InputStream getInputStream(String fileName) {
         return MqttUtils.class.getResourceAsStream(fileName);

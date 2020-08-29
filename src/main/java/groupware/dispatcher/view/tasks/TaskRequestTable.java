@@ -87,7 +87,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
         setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         tsm = getSelectionModel();
         tsm.setSelectionMode(SelectionMode.SINGLE);
-        setItems(taskPModel.getAllTaskEntries());
+        setItems(taskPModel.getSyncAllTasks());
         // getting selected items
         selectedEntries = tsm.getSelectedItems();
         selectedEntryIndex = tsm.getSelectedIndices();
