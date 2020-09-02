@@ -1,6 +1,8 @@
 package groupware.dispatcher.service.mqtt;
 
 import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.mqtt3.lifecycle.Mqtt3ClientConnectedContext;
+import com.hivemq.client.util.TypeSwitch;
 import groupware.dispatcher.service.OrderService;
 import groupware.dispatcher.service.model.*;
 import com.hivemq.client.mqtt.MqttClient;
@@ -16,19 +18,33 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class OrdersBrokerClient extends BrokerClient {
-
+    private static final String IDENTIFIER_OrderRequestPublisher = "dispatcher_OrderRequestPublisher";
     private static final String IDENTIFIER_OrderSubscriber = "dispatcher_OrderSubscriber";
     private static final String IDENTIFIER_SubscribeToNewOrders = "dispatcher_SubscribeToNewOrders";
     private static final String IDENTIFIER_orderStatusPublisher = "dispatcher_OrderConfirmationPublisher";
     Mqtt3AsyncClient subscribeToNewOrders;
     Mqtt3AsyncClient orderSubscriber;
     Mqtt3AsyncClient orderStatusPublisher;
+    Mqtt3AsyncClient orderRequestPublisher;
     private OrderService orderService;
     private static final Logger LOGGER = LogManager.getLogManager().getLogger(String.valueOf(OrdersBrokerClient.class));
 
     public OrdersBrokerClient(OrderService orderServiceImpl){
         orderService= orderServiceImpl;
-
+        orderRequestPublisher= MqttClient.builder()
+                .useMqttVersion3()
+                .identifier(IDENTIFIER_SubscribeToNewOrders)
+                .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
+                .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
+                .automaticReconnectWithDefaultConfig()
+                .addConnectedListener(context -> {
+                    TypeSwitch.when(context).is(Mqtt3ClientConnectedContext.class, context3 -> System.out.println(context3.getConnAck()));
+                    publishToTopic(this.orderRequestPublisher,"orders/all_info/get/OR1111",null, true);
+                    publishToTopic(this.orderRequestPublisher,"orders/all_info/get/OR1122",null, true);
+                    publishToTopic(this.orderRequestPublisher,"orders/all_info/get/OR1123",null, true);
+                    publishToTopic(this.orderRequestPublisher,"orders/all_info/get/OR1124",null, true);
+                })
+                .buildAsync();
         subscribeToNewOrders = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_SubscribeToNewOrders)
@@ -39,7 +55,7 @@ public class OrdersBrokerClient extends BrokerClient {
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
                 .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync().toAsync();
+                .buildAsync();
         orderSubscriber = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_OrderSubscriber)
@@ -50,7 +66,7 @@ public class OrdersBrokerClient extends BrokerClient {
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
                 .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync().toAsync();
+                .buildAsync();
         orderStatusPublisher = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_orderStatusPublisher)
@@ -61,7 +77,7 @@ public class OrdersBrokerClient extends BrokerClient {
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
                 .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
-                .buildAsync().toAsync();
+                .buildAsync();
     }
 
 
@@ -101,15 +117,18 @@ public class OrdersBrokerClient extends BrokerClient {
     }
 
 
-    public void connectAndRequestExistingOrder(String orderId){
-        connectClient(this.orderSubscriber, 80, true);
-        publishToTopic(orderSubscriber,"orders/all_info/get/"+orderId,null, true);
-        System.out.println("connecting to Broker and publishing the request for an existing order. "+orderId);
+    public void connectAndRequestExistingOrders(){
+       /* if(!this.orderRequestPublisher.getState().isConnected()){
+            connectClient(this.orderRequestPublisher, 60, false);
+            publishToTopic(this.orderRequestPublisher,"orders/all_info/get/"+orderId,null, true);
+        }*/
+        connectClient(this.orderRequestPublisher, 120, false);
+        System.out.println("connecting to Broker and publishing the request for existing orders. ");
         MqttUtils.addDisconnectOnRuntimeShutDownHock(orderSubscriber);
     }
 
     public void connectAndSubscribeForExistingOrders() {
-        connectClient(this.orderSubscriber, 80, true);
+        connectClient(this.orderSubscriber, 80, false);
         System.out.println("connecting to Broker and subscribing for existing orders. ");
         subscribeToGetOrderByIdResponse();
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.orderSubscriber);
@@ -172,11 +191,7 @@ public class OrdersBrokerClient extends BrokerClient {
     //called by BrokerConnection
     void subscribeToOrders(){
         connectAndSubscribeForExistingOrders();
-        connectAndRequestExistingOrder("OR1111");
-        connectAndRequestExistingOrder("OR1122");
-        connectAndRequestExistingOrder("OR1123");
-        connectAndRequestExistingOrder("OR1124");
-
+        connectAndRequestExistingOrders();
 
         connectToBrokerAndSubscribeToNewOrders();
     }

@@ -3,29 +3,28 @@ package groupware.dispatcher.service.mqtt;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.lifecycle.Mqtt3ClientConnectedContext;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
-import groupware.dispatcher.presentationmodel.AllCouriersPM;
-import groupware.dispatcher.presentationmodel.CourierPM;
-import groupware.dispatcher.service.CourierService;
+import com.hivemq.client.util.TypeSwitch;
 import groupware.dispatcher.service.CourierServiceImpl;
-import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
 import groupware.dispatcher.service.util.ModelObjManager;
 import groupware.dispatcher.service.util.MqttUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class CourierBrokerClient extends BrokerClient{
-    private static final String IDENTIFIER_ClientCourierInfo = "dispatcher_ClientCourierInfo";
+    private static final String IDENTIFIER_ClientCourierInfoRequestPublisher = "dispatcher_ClientCourierInfoRequestPublisher";
     private static final String IDENTIFIER_ClientCourierUpdates = "dispatcher_ClientCourierUpdates";
     private static final String IDENTIFIER_ClientCourierInfoSubscriber = "dispatcher_ClientCourierInfoSubscriber";
 
-    private Mqtt3AsyncClient clientCourierInfo;
+    private Mqtt3AsyncClient clientCourierInfoRequestPublisher;
     private Mqtt3AsyncClient clientCourierUpdates;
     private Mqtt3AsyncClient clientCourierInfoSubscriber;
 
@@ -37,9 +36,9 @@ public class CourierBrokerClient extends BrokerClient{
     public CourierBrokerClient(CourierServiceImpl courierService){
         this.courierService= courierService;
 
-        clientCourierInfo = MqttClient.builder()
+        clientCourierInfoRequestPublisher = MqttClient.builder()
                 .useMqttVersion3()
-                .identifier(IDENTIFIER_ClientCourierInfo)
+                .identifier(IDENTIFIER_ClientCourierInfoRequestPublisher)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
                /* .sslConfig()
@@ -47,6 +46,12 @@ public class CourierBrokerClient extends BrokerClient{
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
                 .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
+                .addConnectedListener(context -> {
+                    TypeSwitch.when(context)
+                            .is(Mqtt3ClientConnectedContext.class, context3 -> System.out.println(context3.getConnAck()));
+                    //publish to couriers/info/get/courierId -for each courier
+                    connectAndRequestCouriers();
+                })
                 .buildAsync();
         clientCourierInfoSubscriber = MqttClient.builder()
                 .useMqttVersion3()
@@ -74,7 +79,7 @@ public class CourierBrokerClient extends BrokerClient{
     }
 
     void stopClientBrokerConnection(){
-        clientCourierInfo.disconnect();
+        clientCourierInfoRequestPublisher.disconnect();
         clientCourierUpdates.disconnect();
         clientCourierInfoSubscriber.disconnect();
     }
@@ -84,10 +89,31 @@ public class CourierBrokerClient extends BrokerClient{
    public void connectAndRequestCourier(String courierId){
         String topicName= "couriers/info/get/" + courierId;
         System.out.println("connecting to Broker and requesting courier data, courierId: "+courierId);
-        connectClient( this.clientCourierInfo, 60, true);
-        publishToTopic(this.clientCourierInfo,topicName,null, true);
+        if(!this.clientCourierInfoSubscriber.getState().isConnected()){
+            connectClient( this.clientCourierInfoSubscriber, 60, false);
+            publishToTopic(this.clientCourierInfoSubscriber,topicName,null, true);
+        }
+
    }
 
+    public void connectAndRequestCouriers(){
+        Set<String> courierIds= new HashSet<>();
+        courierIds.add("C100");
+        courierIds.add("C101");
+        courierIds.add("C102");
+        courierIds.add("C103");
+        courierIds.add("C104");
+        courierIds.add("C105");
+        courierIds.add("C106");
+        courierIds.add("C107");
+        courierIds.forEach(courierId->{
+            String topicName= "couriers/info/get/" + courierId;
+            System.out.println(" requesting courier data, courierId: "+courierId);
+            publishToTopic(this.clientCourierInfoSubscriber,topicName,null, true);
+
+        });
+
+    }
 
     public void connectAndSubscribeForCourierInfoResponse(){
         System.out.println("connecting to Broker and subscribing for courier info. ");
@@ -208,14 +234,8 @@ public class CourierBrokerClient extends BrokerClient{
 
     void subscribeToCouriers(){
 
-        connectAndRequestCourier("C100");
-        connectAndRequestCourier("C101");
-        connectAndRequestCourier("C102");
-        connectAndRequestCourier("C103");
-        connectAndRequestCourier("C104");
-        connectAndRequestCourier("C105");
-        connectAndRequestCourier("C106");
-        connectAndRequestCourier("C107");
+
+        connectClient(clientCourierInfoRequestPublisher, 120, false);
         connectAndSubscribeForCourierInfoResponse();
         connectToBrokerAndSubscribeToCourierUpdates();
 
