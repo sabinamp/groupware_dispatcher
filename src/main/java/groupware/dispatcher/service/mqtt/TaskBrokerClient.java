@@ -77,9 +77,11 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         String timeoutTaskRequestTopicFilter="orders/"+courierId+"/"+taskId+"/timeout";
         if(!clientTaskTimeoutPublisher.getState().isConnected()){
             connectClient( this.clientTaskTimeoutPublisher, 60, false);
+        }else{
+            publishToTopic(clientTaskTimeoutPublisher, timeoutTaskRequestTopicFilter,
+                    null, true);
         }
-        publishToTopic(clientTaskTimeoutPublisher, timeoutTaskRequestTopicFilter,
-                null, true);
+
         System.out.println("connectPublishTaskRequestTimeout() called");
         MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskTimeoutPublisher);
 
@@ -89,8 +91,10 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
         if(!clientTaskRequestsPublisher.getState().isConnected()){
             connectClient( this.clientTaskRequestsPublisher, 80, false);
+        }else{
+            subscribeToTaskRequestUpdates(clientTaskRequestsPublisher,taskId, taskRequest);
         }
-        subscribeToTaskRequestUpdates(clientTaskRequestsPublisher,taskId, taskRequest);
+
         MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
 
     }

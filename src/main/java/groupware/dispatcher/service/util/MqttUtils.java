@@ -1,6 +1,8 @@
 package groupware.dispatcher.service.util;
 
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -40,7 +42,16 @@ public class MqttUtils {
         }
     }
 
+    static void disconnectOnExit(Mqtt3BlockingClient client) {
+        if (client != null) {
+            //  logger.info("Disconnect Client " + client.getConfig().getClientIdentifier().get());
+            client.disconnect();
+        }
+    }
     public static void addDisconnectOnRuntimeShutDownHock(Mqtt3AsyncClient client) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnectOnExit(client)));
+    }
+    public static void addDisconnectBlockingOnRuntimeShutDownHock(Mqtt3BlockingClient client) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnectOnExit(client)));
     }
 

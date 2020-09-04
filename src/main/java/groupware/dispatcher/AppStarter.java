@@ -94,7 +94,7 @@ public class AppStarter extends Application {
             // updating live UI object requires JavaFX App Thread
             //do not exit
             try{
-                Thread.sleep(300);
+                Thread.sleep(200);
                 allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
                 taskRequestService.setTaskRequestBrokerEventListener(allTaskRequestsPM);
                 taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);

@@ -74,6 +74,11 @@ public class CourierBrokerClient extends BrokerClient{
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
                 .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
+                .addConnectedListener(context -> {
+                    TypeSwitch.when(context)
+                            .is(Mqtt3ClientConnectedContext.class, context3 -> System.out.println(context3.getConnAck()));
+                    subscribeToCourierUpdates();
+                })
                 .buildAsync();
 
     }
@@ -167,13 +172,12 @@ public class CourierBrokerClient extends BrokerClient{
     public void connectToBrokerAndSubscribeToCourierUpdates(){
         System.out.println("connecting to Broker connectToBrokerAndSubscribeToCourierUpdates");
         connectClient(this.clientCourierUpdates, 160, false);
-        subscribeToCourierUpdates(this.clientCourierUpdates);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.clientCourierUpdates);
 
     }
 
 
-    private CompletableFuture<Mqtt3SubAck> subscribeToCourierUpdates(Mqtt3AsyncClient client){
+    private CompletableFuture<Mqtt3SubAck> subscribeToCourierUpdates(){
         String topicUpdateInfo="couriers/info/update/#";
         String topicUpdateStatus="couriers/status/update/#";
         String topicUpdateConnected="couriers/conn/update/#";
@@ -181,7 +185,7 @@ public class CourierBrokerClient extends BrokerClient{
         String topic = "couriers/+/update/#";
         System.out.println("entering subscribeToCourierUpdates - subscribe topic : "+topic);
 
-       return client.subscribeWith()
+       return this.clientCourierUpdates.subscribeWith()
                 .topicFilter(topic)
                 .qos(MqttQos.EXACTLY_ONCE)
                 .callback(publish -> {
@@ -231,14 +235,13 @@ public class CourierBrokerClient extends BrokerClient{
     public CourierServiceImpl getOrderService() {
         return courierService;
     }
-
+    private void connectAndPublishRequestForCourierData(){
+        connectClient(clientCourierInfoRequestPublisher, 120, true);
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientCourierInfoRequestPublisher);
+    }
     void subscribeToCouriers(){
-
-
-        connectClient(clientCourierInfoRequestPublisher, 120, false);
+        connectAndPublishRequestForCourierData();
         connectAndSubscribeForCourierInfoResponse();
         connectToBrokerAndSubscribeToCourierUpdates();
-
-
     }
 }
