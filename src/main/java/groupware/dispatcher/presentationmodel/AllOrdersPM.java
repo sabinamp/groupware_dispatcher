@@ -141,14 +141,20 @@ public class AllOrdersPM implements OrderEventListener {
     @Override
     public void handleNewOrderEvent(OrderPM order) {
 
-        this.updateAllOrdersPM(order);
-        Platform.runLater(() ->showAlertWithDefaultHeaderText(false, order));
+
+        Platform.runLater(() ->{
+            this.updateAllOrdersPM(order);
+            showAlertWithDefaultHeaderText(false, order);
+        });
     }
 
     @Override
     public void handleOrderUpdateEvent(OrderPM orderPM) {
-        this.updateAllOrdersPM(orderPM);
-        Platform.runLater(() ->showAlertWithDefaultHeaderText(true, orderPM));
+
+        Platform.runLater(() ->{
+            this.updateAllOrdersPM(orderPM);
+            showAlertWithDefaultHeaderText(true, orderPM);
+        });
     }
 
 

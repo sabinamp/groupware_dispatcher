@@ -21,6 +21,7 @@ public class BrokerClient {
     private static final java.util.UUID UUID = java.util.UUID.randomUUID();
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(BrokerClient.class));
     private static final String BROKER_USERNAME="mqtt-dispatcher";
+    //the password should be hashed but for this project it is plain text
     private static final String DISPATCHER_PSW ="groupwaredispatcher";
 
     void connectClient(Mqtt3AsyncClient client, int keepAlive, boolean cleanSession){

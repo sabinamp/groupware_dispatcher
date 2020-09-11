@@ -1,13 +1,11 @@
 package groupware.dispatcher.presentationmodel;
 
 
-import groupware.dispatcher.service.TaskRequestBrokerEventListener;
+import groupware.dispatcher.service.TaskRequestPMEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.util.TaskEvent;
 import javafx.application.Platform;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -18,7 +16,7 @@ import javafx.stage.StageStyle;
 
 
 
-public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
+public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private final ObservableList<TaskRequestPM> allTasks = FXCollections.observableArrayList(/*new Callback<>() {
         @Override
         public Observable[] call(TaskRequestPM param) {
@@ -69,6 +67,9 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
         }else if(event.getEventType().equals(TaskEvent.UPDATE)){
             content= "A Task Request Update has been received. Topic: "+update+"\n Task id: "+taskRequestPM.getTaskId()
                     +"\n Task assignee : "+ taskRequestPM.getAssigneeId() + "\n Order ID: "+taskRequestPM.getOrderId();
+        }else if(event.getEventType().equals(TaskEvent.TASK_TIMEOUT)){
+            content= "Task Request Timeout. Topic: "+update+"\n Task id: "+taskRequestPM.getTaskId()
+                    +"\n Task assignee : "+ taskRequestPM.getAssigneeId() + "\n Order ID: "+taskRequestPM.getOrderId();
         }
         alert.setHeight(200);
         alert.setContentText(content);
@@ -108,6 +109,7 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
 
         if(event.getEventType().equals(TaskEvent.NEW_TASK)){
             taskRequestService.updateTaskRequest(task.getTaskId(), TaskRequestPM.toTaskRequest(task), null);
+
             Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(task);
                 showAlertWithNoHeaderText(event, task, "New task sent");
@@ -122,7 +124,12 @@ public class AllTaskRequestsPM implements TaskRequestBrokerEventListener {
             Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, update);
-
+            });
+        }
+       else if( event.getEventType().equals(TaskEvent.TASK_TIMEOUT)){
+            Platform.runLater(() -> {
+                this.updateAllTaskRequestsPM(taskRequest);
+                showAlertWithNoHeaderText(event, taskRequest, "Task Request Timeout");
             });
         }
     }

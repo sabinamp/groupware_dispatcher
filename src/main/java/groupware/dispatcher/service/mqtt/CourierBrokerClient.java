@@ -3,9 +3,7 @@ package groupware.dispatcher.service.mqtt;
 import com.hivemq.client.mqtt.MqttClient;
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
-import com.hivemq.client.mqtt.mqtt3.lifecycle.Mqtt3ClientConnectedContext;
 import com.hivemq.client.mqtt.mqtt3.message.subscribe.suback.Mqtt3SubAck;
-import com.hivemq.client.util.TypeSwitch;
 import groupware.dispatcher.service.CourierServiceImpl;
 import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.util.ByteBufferToStringConversion;
@@ -20,13 +18,12 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class CourierBrokerClient extends BrokerClient{
-    private static final String IDENTIFIER_ClientCourierInfoRequestPublisher = "dispatcher_ClientCourierInfoRequestPublisher";
+    //private static final String IDENTIFIER_ClientCourierInfoRequestPublisher = "dispatcher_ClientCourierInfoRequestPublisher";
     private static final String IDENTIFIER_ClientCourierUpdates = "dispatcher_ClientCourierUpdates";
-    private static final String IDENTIFIER_ClientCourierInfoSubscriber = "dispatcher_ClientCourierInfoSubscriber";
 
-    private Mqtt3AsyncClient clientCourierInfoRequestPublisher;
+   // private Mqtt3AsyncClient clientCourierInfoRequestPublisher;
     private Mqtt3AsyncClient clientCourierUpdates;
-    private Mqtt3AsyncClient clientCourierInfoSubscriber;
+
 
     private CourierServiceImpl courierService;
 
@@ -36,34 +33,25 @@ public class CourierBrokerClient extends BrokerClient{
     public CourierBrokerClient(CourierServiceImpl courierService){
         this.courierService= courierService;
 
-        clientCourierInfoRequestPublisher = MqttClient.builder()
+       /* clientCourierInfoRequestPublisher = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_ClientCourierInfoRequestPublisher)
                 .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
                 .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-               /* .sslConfig()
+                .sslConfig()
                 .keyManagerFactory(MqttUtils.myKeyManagerFactory)
                 .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()*/
+                .applySslConfig()
                 .automaticReconnectWithDefaultConfig()
                 .addConnectedListener(context -> {
                     TypeSwitch.when(context)
                             .is(Mqtt3ClientConnectedContext.class, context3 -> System.out.println(context3.getConnAck()));
                     //publish to couriers/info/get/courierId -for each courier
                     connectAndRequestCouriers();
+                    subscribeToGetCourierById(this.clientCourierInfoRequestPublisher);
                 })
-                .buildAsync();
-        clientCourierInfoSubscriber = MqttClient.builder()
-                .useMqttVersion3()
-                .identifier(IDENTIFIER_ClientCourierInfoSubscriber)
-                .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
-                .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-              /*  .sslConfig()
-                .keyManagerFactory(MqttUtils.myKeyManagerFactory)
-                .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()*/
-                .automaticReconnectWithDefaultConfig()
-                .buildAsync();
+                .buildAsync();*/
+
         clientCourierUpdates = MqttClient.builder()
                 .useMqttVersion3()
                 .identifier(IDENTIFIER_ClientCourierUpdates)
@@ -75,33 +63,18 @@ public class CourierBrokerClient extends BrokerClient{
                 .applySslConfig()*/
                 .automaticReconnectWithDefaultConfig()
                 .addConnectedListener(context -> {
-                    TypeSwitch.when(context)
-                            .is(Mqtt3ClientConnectedContext.class, context3 -> System.out.println(context3.getConnAck()));
+                    //TypeSwitch.when(context).is(Mqtt3ClientConnectedContext.class, context3 -> System.out.println(context3.getConnAck()));
+                    //publish to couriers/info/get/courierId -for each courier
+                    connectAndRequestCouriers(clientCourierUpdates);
+                    subscribeToGetCourierById(this.clientCourierUpdates);
                     subscribeToCourierUpdates();
                 })
                 .buildAsync();
 
     }
 
-    void stopClientBrokerConnection(){
-        clientCourierInfoRequestPublisher.disconnect();
-        clientCourierUpdates.disconnect();
-        clientCourierInfoSubscriber.disconnect();
-    }
 
-
-
-   public void connectAndRequestCourier(String courierId){
-        String topicName= "couriers/info/get/" + courierId;
-        System.out.println("connecting to Broker and requesting courier data, courierId: "+courierId);
-        if(!this.clientCourierInfoSubscriber.getState().isConnected()){
-            connectClient( this.clientCourierInfoSubscriber, 60, false);
-            publishToTopic(this.clientCourierInfoSubscriber,topicName,null, true);
-        }
-
-   }
-
-    public void connectAndRequestCouriers(){
+    public void connectAndRequestCouriers(Mqtt3AsyncClient mqtt3AsyncClient){
         Set<String> courierIds= new HashSet<>();
         courierIds.add("C100");
         courierIds.add("C101");
@@ -114,18 +87,12 @@ public class CourierBrokerClient extends BrokerClient{
         courierIds.forEach(courierId->{
             String topicName= "couriers/info/get/" + courierId;
             System.out.println(" requesting courier data, courierId: "+courierId);
-            publishToTopic(this.clientCourierInfoSubscriber,topicName,null, true);
+            publishToTopic(mqtt3AsyncClient,topicName,null, true);
 
         });
 
     }
 
-    public void connectAndSubscribeForCourierInfoResponse(){
-        System.out.println("connecting to Broker and subscribing for courier info. ");
-        connectClient(this.clientCourierInfoSubscriber, 80, true);
-        subscribeToGetCourierById(this.clientCourierInfoSubscriber);
-
-    }
 
      CompletableFuture<Mqtt3SubAck> subscribeToGetCourierById(Mqtt3AsyncClient client){
         String topicName = "couriers/info/get/+/response";
@@ -169,16 +136,16 @@ public class CourierBrokerClient extends BrokerClient{
 
 
 
-    public void connectToBrokerAndSubscribeToCourierUpdates(){
-        System.out.println("connecting to Broker connectToBrokerAndSubscribeToCourierUpdates");
-        connectClient(this.clientCourierUpdates, 160, false);
+    public void connectCourierInfoUpdates(){
+        System.out.println("connecting to Broker connectCourierInfoUpdates");
+        connectClient(this.clientCourierUpdates, 1800, false);
         MqttUtils.addDisconnectOnRuntimeShutDownHock(this.clientCourierUpdates);
 
     }
 
 
     private CompletableFuture<Mqtt3SubAck> subscribeToCourierUpdates(){
-        String topicUpdateInfo="couriers/info/update/#";
+       // String topicUpdateInfo="couriers/info/update/#";
         String topicUpdateStatus="couriers/status/update/#";
         String topicUpdateConnected="couriers/conn/update/#";
         String topicUpdateAssignedOrders="couriers/assigned_orders/update/#";
@@ -209,15 +176,15 @@ public class CourierBrokerClient extends BrokerClient{
                                 courierService.updateAssignedOrders(courierId, receivedString);
                                 System.out.println("update received for the courier " + receivedString);
                                 break;
-                            case "info":
+                           /* case "info":
                                 courierService.updateCourierInfo(courierId, ModelObjManager.convertJsonToCourierInfo(receivedString));
                                 System.out.println("update received for the courier " + receivedString);
-                                break;
+                                break;*/
                         }
                     }
                 })
                 .send()
-                .whenCompleteAsync((mqtt3SubAck, throwable) -> {
+                .whenComplete((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to subscribe
                         logger.warning("Couldn't subscribe to topic " + topic);
@@ -235,13 +202,10 @@ public class CourierBrokerClient extends BrokerClient{
     public CourierServiceImpl getOrderService() {
         return courierService;
     }
-    private void connectAndPublishRequestForCourierData(){
-        connectClient(clientCourierInfoRequestPublisher, 120, true);
-        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientCourierInfoRequestPublisher);
-    }
+
+
+
     void subscribeToCouriers(){
-        connectAndPublishRequestForCourierData();
-        connectAndSubscribeForCourierInfoResponse();
-        connectToBrokerAndSubscribeToCourierUpdates();
+        connectCourierInfoUpdates();
     }
 }

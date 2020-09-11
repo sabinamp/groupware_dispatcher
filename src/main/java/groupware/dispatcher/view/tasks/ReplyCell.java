@@ -25,20 +25,19 @@ public class ReplyCell extends TableCell<TaskRequestPM, RequestReply> {
 
     @Override
     protected void updateItem(RequestReply item, boolean empty) {
-       // super.updateItem(item, empty);
+       super.updateItem(item, empty);
         if ( empty || item ==null) {
             // adding new item
             setText("");
             setGraphic(null);
         } else {
-
-            if(RequestReply.PENDING.equals(item) ){
+            if(item.equals((RequestReply.PENDING)) ){
                 rectangle = new Rectangle(20,20, Color.web("Orange"));
-            } else if (RequestReply.ACCEPTED.equals(item) ){
+            } else if (item.equals(RequestReply.ACCEPTED) ){
                 rectangle = new Rectangle(20, 20, Color.web("Green"));
-            }else if (RequestReply.TIMEOUT.equals(item)){
+            }else if (item.equals(RequestReply.TIMEOUT) ){
                 rectangle = new Rectangle(20,20, Color.web("Blue"));
-            }else if (RequestReply.DENIED.equals(item)){
+            }else if (item.equals(RequestReply.DENIED)){
                 rectangle = new Rectangle(20,20, Color.web("Red"));
             }
             setText(item.toString());

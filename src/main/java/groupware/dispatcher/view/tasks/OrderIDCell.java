@@ -21,8 +21,8 @@ public class OrderIDCell extends TableCell<TaskRequestPM, String> {
     @Override
     protected void updateItem(String item, boolean empty) {
         //super.updateItem(item, empty);
-        if (empty) {
-            setText(null);
+        if (empty|| item ==null) {
+            setText("");
             setGraphic(null);
         } else {
             if (item != null) {

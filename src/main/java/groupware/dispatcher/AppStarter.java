@@ -51,7 +51,7 @@ public class AppStarter extends Application {
             });
         }
     });
-    Runnable connectToBroker = new Runnable() {
+  /*  Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
             rootPM = new RootPM();
@@ -76,7 +76,7 @@ public class AppStarter extends Application {
 
             });
         }
-    };
+    };*/
 
     @Override
     public void start(Stage primaryStage){
@@ -89,15 +89,14 @@ public class AppStarter extends Application {
         orderService.setOrderEventListener(allOrdersPM);
         BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
         brokerConnection.startBrokerConnection();
-
         Platform.runLater(()-> {
             // updating live UI object requires JavaFX App Thread
             //do not exit
             try{
                 Thread.sleep(200);
                 allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
-                taskRequestService.setTaskRequestBrokerEventListener(allTaskRequestsPM);
-                taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);
+                taskRequestService.setTaskRequestBrokerEventListener(BrokerConnection.taskBrokerClient);
+                taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

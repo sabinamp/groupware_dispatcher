@@ -1,13 +1,11 @@
 package groupware.dispatcher.service;
 
-import groupware.dispatcher.presentationmodel.AllOrdersPM;
 import groupware.dispatcher.presentationmodel.OrderPM;
 import groupware.dispatcher.service.model.*;
 import groupware.dispatcher.service.util.ModelObjManager;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
