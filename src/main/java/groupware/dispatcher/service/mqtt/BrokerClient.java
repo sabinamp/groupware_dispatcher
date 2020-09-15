@@ -35,6 +35,7 @@ public class BrokerClient {
                 .send()
                 .thenAcceptAsync(connAck -> System.out.println(client.toString()+client.getState() + connAck));
     }
+
     void connectClientWithWill(Mqtt3AsyncClient client, int keepAlive, boolean cleanSession, String willTopic){
         client.connectWith()
                 .simpleAuth()
@@ -73,11 +74,11 @@ public class BrokerClient {
                     if (throwable != null) {
                         // Handle failure to publish
                         logger.info(" - failed to publish to the topic " + myTopic);
-                        System.out.println("-failed to publish to the topic " + myTopic);
+                        System.out.println("-failed to publish to the topic " + myTopic+ throwable.getMessage());
                     } else {
                         // Handle successful publish, e.g. logging or incrementing a metric
                         logger.info(" - published to the topic " + myTopic);
-                        System.out.println("-failed to publish to the topic " + myTopic);
+                        System.out.println("-published to the topic " + myTopic);
                     }
                 });
 

@@ -140,6 +140,5 @@ public class AllCouriersPM implements CourierEventListener {
     @Override
     public void handleCourierUpdateEvent(CourierPM courierInfo) {
         Platform.runLater(()-> updateAllCouriersPM(courierInfo));
-
     }
 }

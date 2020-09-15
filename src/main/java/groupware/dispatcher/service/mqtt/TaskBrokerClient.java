@@ -54,9 +54,11 @@ public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestE
         String courierId= taskRequest.getAssigneeId();
         String taskId= taskRequest.getTaskId();
         String topicNewTaskRequestFilter="orders/"+courierId+"/"+taskId+"/request";
+
         publishToTopic(this.clientTaskRequestsPublisher, topicNewTaskRequestFilter,
-                taskRequestService.convertToJson(taskRequest), false);
-        subscribeToTaskRequestUpdates(this.clientTaskRequestsPublisher,taskRequest.getTaskId(), taskRequest);
+                taskRequestService.convertToJson(taskRequest), true)
+                .whenComplete((mqtt3Publish,throwable)->subscribeToTaskRequestUpdates(this.clientTaskRequestsPublisher, taskRequest.getTaskId(), taskRequest));
+
         System.out.println("publishTaskRequest() called with the MQTT3AsyncClient"+ID_ClientTaskRequestsPublisher);
     }
 
@@ -74,8 +76,10 @@ public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestE
     private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(Mqtt3AsyncClient client,String taskId, TaskRequest task) {
         String courierId=task.getAssigneeId();
         String topic="orders/"+courierId+"/"+taskId+"/#";
-        return client.subscribeWith()
-                .topicFilter(topic).qos(MqttQos.EXACTLY_ONCE)
+        return client.subscribeWith().addSubscription()
+                .topicFilter(topic)
+                .qos(MqttQos.AT_MOST_ONCE)
+                .applySubscription()
                 .callback(publish -> handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE), publish, taskId) )
                 .send()
                 .whenComplete((mqtt3SubAck, throwable) -> {
@@ -106,7 +110,7 @@ public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestE
 
     @Override
     public void handleTaskUpdateEvent(TaskEvent event,Mqtt3Publish publish, String taskId) {
-        System.out.println("handleTaskUpdateEvent() called");
+        System.out.println("handleTaskUpdateEvent() called- after subscribing to "+ publish.getTopic());
         // Process the received message
         String topicEnd= publish.getTopic().getLevels().get(3);
         String assigneeID = publish.getTopic().getLevels().get(1);

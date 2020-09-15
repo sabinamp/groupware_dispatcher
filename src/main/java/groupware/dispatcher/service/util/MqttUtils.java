@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class MqttUtils {
     public static final String BROKER_HIVEMQ_ADR = "127.0.0.1";
     public static final int BROKER_HIVEMQ_PORT = 1883;
-    public static final int KEEP_ALIVE = 80;
+    public static final int KEEP_ALIVE = 1200;
    /* public static KeyManagerFactory myKeyManagerFactory;
     private static KeyStore trustStore;
     public static TrustManagerFactory myTrustManagerFactory;*/
