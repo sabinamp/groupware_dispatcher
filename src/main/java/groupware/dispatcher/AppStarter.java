@@ -89,14 +89,15 @@ public class AppStarter extends Application {
         orderService.setOrderEventListener(allOrdersPM);
         BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
         brokerConnection.startBrokerConnection();
+        allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
+        taskRequestService.setTaskRequestBrokerEventListener(BrokerConnection.taskBrokerClient);
+        taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
         Platform.runLater(()-> {
             // updating live UI object requires JavaFX App Thread
             //do not exit
             try{
                 Thread.sleep(200);
-                allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
-                taskRequestService.setTaskRequestBrokerEventListener(BrokerConnection.taskBrokerClient);
-                taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -110,7 +111,7 @@ public class AppStarter extends Application {
 
         });
 
-        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, taskRequestService);
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, allTaskRequestsPM, taskRequestService);
         rootPanel.addClockToHeader(txtTime);
         rootPanel.addExitButton(exitBtn);
         Scene scene = new Scene(rootPanel, 1000,800);

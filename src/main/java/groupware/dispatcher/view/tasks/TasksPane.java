@@ -28,10 +28,10 @@ public class TasksPane extends BorderPane implements ViewMixin {
     private TreeItem<String> ordersRoot;
     private TreeItem<String> tRoot;
 
-    public TasksPane(AllCouriersPM allCouriersPM, AllOrdersPM allOrdersPM, TaskRequestServiceImpl taskRequestService){
+    public TasksPane(AllCouriersPM allCouriersPM, AllOrdersPM allOrdersPM, AllTaskRequestsPM allTaskRequestsPM, TaskRequestServiceImpl taskRequestService){
         this.allOrdersPM = allOrdersPM;
         this.allCouriersPM = allCouriersPM;
-        this.allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
+        this.allTaskRequestsPM = allTaskRequestsPM;
         init();
     }
 

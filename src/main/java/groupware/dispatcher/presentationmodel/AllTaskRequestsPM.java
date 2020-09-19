@@ -114,11 +114,11 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
             Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(task);
                 showAlertWithNoHeaderText(event, task, "New delivery task sent");
-                ObservableList<TaskRequestPM> tasks;
+
                 synchronized (this.syncAllTasks){
-                     tasks= FXCollections.observableList(this.getSyncAllTasks());
+                    notifications.publish(Notifications.EVENT_MODEL_UPDATE, getSyncAllTasks());
                 }
-                notifications.publish(Notifications.EVENT_MODEL_UPDATE, tasks);
+
             });
 
         }
@@ -131,11 +131,11 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
                 Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, update);
-                    ObservableList<TaskRequestPM> tasks;
-                    synchronized (this.syncAllTasks){
-                        tasks= FXCollections.observableList(this.getSyncAllTasks());
-                    }
-                    notifications.publish(Notifications.EVENT_MODEL_UPDATE, tasks);
+
+                synchronized (this.syncAllTasks){
+                    notifications.publish(Notifications.EVENT_MODEL_UPDATE, getSyncAllTasks());
+                }
+
             });
 
         }
@@ -144,15 +144,12 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
             Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, "Task Request Timeout");
-                ObservableList<TaskRequestPM> tasks;
+
                 synchronized (this.syncAllTasks){
-                    tasks= FXCollections.observableList(this.getSyncAllTasks());
+                    notifications.publish(Notifications.EVENT_MODEL_UPDATE, getSyncAllTasks());
                 }
-                notifications.publish(Notifications.EVENT_MODEL_UPDATE, tasks);
             });
-
         }
-
     }
 
     public ObservableList<TaskRequestPM> getAllTaskEntries() {
