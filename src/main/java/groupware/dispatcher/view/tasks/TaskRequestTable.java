@@ -112,7 +112,7 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
 
     @Override
     public void setupValueChangedListeners() {
-            this.addEventHandler(TaskEvent.NEW_TASK, event -> updateTableContent(taskPModel.getSyncAllTasks()));
+           // this.addEventHandler(TaskEvent.NEW_TASK, event -> updateTableContent(taskPModel.getSyncAllTasks()));
     }
 
     @Override
@@ -133,15 +133,13 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
     }
 
 
-    void updateTableContent(ObservableList<TaskRequestPM> update) {
+/*    void updateTableContent(ObservableList<TaskRequestPM> update) {
 
-             Platform.runLater(() -> {
-                this.setItems(update);
-                refresh();
-            });
-
-
-    }
+        Platform.runLater(() -> {
+            this.setItems(update);
+            refresh();
+        });
+    }*/
 }
 
 
