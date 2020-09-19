@@ -13,7 +13,6 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
-import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.StageStyle;
 
@@ -32,8 +31,8 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private AllCouriersPM allCouriersPM;
     private AllOrdersPM allOrdersPM;
     private TaskRequestServiceImpl taskRequestService;
-    private final Notifications notifications =
-            new Notifications();
+    /*private final Notifications notifications =
+            new Notifications();*/
     private final ObservableList<TaskRequestPM> syncAllTasks = FXCollections.synchronizedObservableList(allTasks);
 
     private final ObservableMap<String, TaskRequestPM> allTasksMap = FXCollections.observableHashMap();
@@ -46,7 +45,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         this.allCouriersPM= allCouriersPM;
         this.allOrdersPM = allOrdersPM;
         this.taskRequestService = taskRequestService;
-
+        setAllTaskEntries(syncAllTasks);
         setupValueChangedListeners();
     }
 
@@ -115,9 +114,9 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
                 this.updateAllTaskRequestsPM(task);
                 showAlertWithNoHeaderText(event, task, "New delivery task sent");
 
-                synchronized (this.syncAllTasks){
+               /* synchronized (this.syncAllTasks){
                     notifications.publish(Notifications.EVENT_MODEL_UPDATE, getSyncAllTasks());
-                }
+                }*/
 
             });
 
@@ -131,10 +130,10 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
                 Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, update);
-
+/*
                 synchronized (this.syncAllTasks){
                     notifications.publish(Notifications.EVENT_MODEL_UPDATE, getSyncAllTasks());
-                }
+                }*/
 
             });
 
@@ -145,9 +144,9 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, "Task Request Timeout");
 
-                synchronized (this.syncAllTasks){
+               /* synchronized (this.syncAllTasks){
                     notifications.publish(Notifications.EVENT_MODEL_UPDATE, getSyncAllTasks());
-                }
+                }*/
             });
         }
     }

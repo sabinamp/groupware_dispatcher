@@ -38,16 +38,16 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
     private ObservableList<Integer> selectedEntryIndex;
     private TableViewSelectionModel<TaskRequestPM> tsm;
     private TimerService timerService;
-    private final Notifications notifications = new Notifications();
+    //private final Notifications notifications = new Notifications();
     private IntegerProperty totalNbItems = new SimpleIntegerProperty();
 
 
     public TaskRequestTable(AllTaskRequestsPM pm) {
         super();
         this.taskPModel = pm;
-        notifications.subscribe(Notifications.EVENT_MODEL_UPDATE,
+       /* notifications.subscribe(Notifications.EVENT_MODEL_UPDATE,
                 this,
-                this::updateTableContent);
+                this::updateTableContent);*/
         init();
 
     }
@@ -112,17 +112,12 @@ public class TaskRequestTable extends TableView<TaskRequestPM> implements ViewMi
 
     @Override
     public void setupValueChangedListeners() {
-          /*  this.addEventHandler(TaskEvent.NEW_TASK, new EventHandler<TaskEvent>() {
-                @Override
-                public void handle(TaskEvent event) {
-                    updateTableContent(taskPModel.getSyncAllTasks());
-                }
-            });*/
+            this.addEventHandler(TaskEvent.NEW_TASK, event -> updateTableContent(taskPModel.getSyncAllTasks()));
     }
 
     @Override
     public void setupBindings() {
-        //itemsProperty().bind(taskPModel.allTaskEntriesProperty());
+        itemsProperty().bind(taskPModel.allTaskEntriesProperty());
     }
 
     public int getTotalNbItems() {
