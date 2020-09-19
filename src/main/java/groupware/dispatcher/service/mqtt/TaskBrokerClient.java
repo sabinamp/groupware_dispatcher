@@ -76,7 +76,11 @@ public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestE
     private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(Mqtt3AsyncClient client,String taskId, TaskRequest task) {
         String courierId=task.getAssigneeId();
         String topic="orders/"+courierId+"/"+taskId+"/#";
-        return client.subscribeWith().addSubscription()
+        String topic1="orders/"+courierId+"/"+taskId+"/timeout";
+        String topic2="orders/"+courierId+"/"+taskId+"/deny";
+        String topic3="orders/"+courierId+"/"+taskId+"/completed";
+        return client.subscribeWith()
+                .addSubscription()
                 .topicFilter(topic)
                 .qos(MqttQos.AT_MOST_ONCE)
                 .applySubscription()
@@ -85,10 +89,10 @@ public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestE
                 .whenComplete((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to subscribe
-                        logger.warning("Couldn't subscribe to topic " + topic);
+                        logger.warning("Couldn't subscribe to topic " );
                     } else {
                         // Handle successful subscription, e.g. logging or incrementing a metric
-                        logger.info(" - subscribed to topic " + topic);
+                        logger.info(" - subscribed to topic " );
                     }
                 });
     }
@@ -128,7 +132,9 @@ public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestE
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
             }
-            case "timeout":  break;
+            case "timeout":
+            case "request":
+                break;
             case "completed": {
                 System.out.println("task completed- update received for the task request " + taskId);
                 if( publish.getPayload().isPresent()){
@@ -142,8 +148,6 @@ public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestE
                 }
                 break;
             }
-            case "request":
-                break;
         }
     }
 

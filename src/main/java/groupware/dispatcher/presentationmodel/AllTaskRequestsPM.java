@@ -3,6 +3,7 @@ package groupware.dispatcher.presentationmodel;
 
 import groupware.dispatcher.service.TaskRequestPMEventListener;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
+import groupware.dispatcher.view.tasks.Notifications;
 import groupware.dispatcher.view.util.TaskEvent;
 import javafx.application.Platform;
 
@@ -11,6 +12,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+
+import javafx.concurrent.Task;
 import javafx.scene.control.Alert;
 import javafx.stage.StageStyle;
 
@@ -21,7 +24,7 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         @Override
         public Observable[] call(TaskRequestPM param) {
             return new Observable[]{param.taskIdProperty(),param.assigneeIdProperty(),
-            param.orderIdProperty(), param.deliveryTypeProperty(), param.acceptedProperty(),
+            param.orderIdProperty(), param.deliveryTypeProperty(), param.requestReplyProperty(),
             param.doneProperty()};
         }
     }*/);
@@ -29,8 +32,10 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     private AllCouriersPM allCouriersPM;
     private AllOrdersPM allOrdersPM;
     private TaskRequestServiceImpl taskRequestService;
-
+    private final Notifications notifications =
+            new Notifications();
     private final ObservableList<TaskRequestPM> syncAllTasks = FXCollections.synchronizedObservableList(allTasks);
+
     private final ObservableMap<String, TaskRequestPM> allTasksMap = FXCollections.observableHashMap();
     private final ObservableMap<String, TaskRequestPM> syncAllTasksMap = FXCollections.synchronizedObservableMap(allTasksMap);
     private ObjectProperty<ObservableList<TaskRequestPM>> allTaskEntries = new SimpleObjectProperty<>();
@@ -42,7 +47,6 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
         this.allOrdersPM = allOrdersPM;
         this.taskRequestService = taskRequestService;
 
-        setAllTaskEntries(syncAllTasks);
         setupValueChangedListeners();
     }
 
@@ -71,25 +75,22 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
             content= "Task Request Timeout. Topic: "+update+"\n Task id: "+taskRequestPM.getTaskId()
                     +"\n Task assignee : "+ taskRequestPM.getAssigneeId() + "\n Order ID: "+taskRequestPM.getOrderId();
         }
-        alert.setHeight(200);
+        alert.setHeight(220);
         alert.setContentText(content);
         alert.showAndWait();
-    }
-
-    public ObservableList<TaskRequestPM> getSyncAllTasks() {
-        return this.syncAllTasks;
     }
 
 
     public void updateAllTaskRequestsPM(TaskRequestPM aTaskPM){
         String id = aTaskPM.getTaskId();
         TaskRequestPM existingTask = syncAllTasksMap.get(id);
-        if(existingTask != null){
-            this.syncAllTasks.remove(existingTask);
+        synchronized (syncAllTasks){
+            if(existingTask != null){
+                syncAllTasks.remove(existingTask);
+            }
+            syncAllTasks.add(aTaskPM);
         }
-        syncAllTasks.add(aTaskPM);
-        this.syncAllTasksMap.put(id, aTaskPM);
-        System.out.println("exiting - updateAllTaskRequestsPM-called. Task " + id);
+        syncAllTasksMap.put(id, aTaskPM);
     }
 
     public ObjectProperty<TaskRequestPM> currentTaskRequestProperty() {
@@ -112,26 +113,46 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
 
             Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(task);
-                showAlertWithNoHeaderText(event, task, "New task sent");
+                showAlertWithNoHeaderText(event, task, "New delivery task sent");
+                ObservableList<TaskRequestPM> tasks;
+                synchronized (this.syncAllTasks){
+                     tasks= FXCollections.observableList(this.getSyncAllTasks());
+                }
+                notifications.publish(Notifications.EVENT_MODEL_UPDATE, tasks);
             });
+
         }
     }
 
     @Override
     public void handleTaskUpdateEvent(TaskEvent event, TaskRequestPM taskRequest, String update) {
-
         if(event.getEventType().equals(TaskEvent.UPDATE)){
-            Platform.runLater(() -> {
+
+                Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, update);
+                    ObservableList<TaskRequestPM> tasks;
+                    synchronized (this.syncAllTasks){
+                        tasks= FXCollections.observableList(this.getSyncAllTasks());
+                    }
+                    notifications.publish(Notifications.EVENT_MODEL_UPDATE, tasks);
             });
+
         }
        else if( event.getEventType().equals(TaskEvent.TASK_TIMEOUT)){
+
             Platform.runLater(() -> {
                 this.updateAllTaskRequestsPM(taskRequest);
                 showAlertWithNoHeaderText(event, taskRequest, "Task Request Timeout");
+                ObservableList<TaskRequestPM> tasks;
+                synchronized (this.syncAllTasks){
+                    tasks= FXCollections.observableList(this.getSyncAllTasks());
+                }
+                notifications.publish(Notifications.EVENT_MODEL_UPDATE, tasks);
             });
+
         }
+
     }
 
     public ObservableList<TaskRequestPM> getAllTaskEntries() {
@@ -147,10 +168,12 @@ public class AllTaskRequestsPM implements TaskRequestPMEventListener {
     }
 
     public ObservableMap<String, TaskRequestPM> getSyncAllTasksMap() {
-        return syncAllTasksMap;
+            return syncAllTasksMap;
     }
 
 
+    public ObservableList<TaskRequestPM> getSyncAllTasks() {
+           return this.syncAllTasks;
 
-
+    }
 }

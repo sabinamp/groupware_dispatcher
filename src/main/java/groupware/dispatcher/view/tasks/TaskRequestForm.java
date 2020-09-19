@@ -189,7 +189,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
     }
 
     private void save(ActionEvent evt) {
-        //currentTaskIdentifier++;
+
         if(orderIdChoiceBox.getValue() != null && courierIdChoiceBox.getValue() != null && taskTypeChoiceBox.getValue() != null){
             String relatedOrderId = orderIdChoiceBox.getValue().getOrderId();
             String assigneeId = courierIdChoiceBox.getValue().getCourierId();
@@ -212,7 +212,7 @@ public class TaskRequestForm extends VBox implements ViewMixin {
 
             TaskEvent taskEvent= new TaskEvent(TaskEvent.NEW_TASK);
             this.allTaskRequestsPM.handleNewTaskEvent(taskEvent, task);
-            //this.fireEvent(taskEvent);
+            this.fireEvent(taskEvent);
             resetFields();
         }else{
             showAlertNoCurrentTask();

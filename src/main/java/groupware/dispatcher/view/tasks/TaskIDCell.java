@@ -21,7 +21,7 @@ public class TaskIDCell extends TableCell<TaskRequestPM, String> {
 
     @Override
     protected void updateItem(String item, boolean empty) {
-        //super.updateItem(item, empty);
+        super.updateItem(item, empty);
         if (empty || item ==null) {
             setText(null);
             setGraphic(null);
