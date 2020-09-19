@@ -1,6 +1,8 @@
 package groupware.dispatcher.service.util;
 
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
 public class MqttUtils {
     public static final String BROKER_HIVEMQ_ADR = "127.0.0.1";
     public static final int BROKER_HIVEMQ_PORT = 1883;
-    public static final int KEEP_ALIVE = 80;
+    public static final int KEEP_ALIVE = 1200;
    /* public static KeyManagerFactory myKeyManagerFactory;
     private static KeyStore trustStore;
     public static TrustManagerFactory myTrustManagerFactory;*/
@@ -40,7 +42,16 @@ public class MqttUtils {
         }
     }
 
+    static void disconnectOnExit(Mqtt3BlockingClient client) {
+        if (client != null) {
+            //  logger.info("Disconnect Client " + client.getConfig().getClientIdentifier().get());
+            client.disconnect();
+        }
+    }
     public static void addDisconnectOnRuntimeShutDownHock(Mqtt3AsyncClient client) {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnectOnExit(client)));
+    }
+    public static void addDisconnectBlockingOnRuntimeShutDownHock(Mqtt3BlockingClient client) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> disconnectOnExit(client)));
     }
 

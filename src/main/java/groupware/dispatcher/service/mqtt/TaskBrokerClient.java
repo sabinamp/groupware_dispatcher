@@ -19,11 +19,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEventListener {
+public class TaskBrokerClient extends BrokerClient implements BrokerTaskRequestEventListener {
     private static final String ID_ClientTaskRequestsPublisher = "dispatcher_ClientTaskRequestsPublisher";
-      private static final String IDENTIFIER_ClientTaskTimeoutPublisher = "dispatcher_ClientTaskTimeoutPublisher";
     private Mqtt3AsyncClient clientTaskRequestsPublisher;
-    private Mqtt3AsyncClient clientTaskTimeoutPublisher;
 
     private TaskRequestServiceImpl taskRequestService;
     private static final Logger logger = LogManager.getLogManager().getLogger(String.valueOf(TaskBrokerClient.class));
@@ -44,79 +42,61 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
                 .automaticReconnectWithDefaultConfig()
                 .buildAsync();
 
-        clientTaskTimeoutPublisher = MqttClient.builder().useMqttVersion3()
-                .identifier(IDENTIFIER_ClientTaskTimeoutPublisher)
-                .serverHost(MqttUtils.BROKER_HIVEMQ_ADR)
-                .serverPort(MqttUtils.BROKER_HIVEMQ_PORT)
-                /*.sslConfig()
-                .keyManagerFactory(MqttUtils.myKeyManagerFactory)
-                .trustManagerFactory(MqttUtils.myTrustManagerFactory)
-                .applySslConfig()*/
-                .automaticReconnectWithDefaultConfig()
-                .buildAsync();
     }
 
 
+    public void connectClientTaskRequestPublisher(){
+        connectClient( this.clientTaskRequestsPublisher, 1800, false);
+        MqttUtils.addDisconnectOnRuntimeShutDownHock(this.clientTaskRequestsPublisher);
+    }
 
-    private void connectPublishTaskRequest(TaskRequest taskRequest) {
+    private void publishTaskRequest(TaskRequest taskRequest) {
         String courierId= taskRequest.getAssigneeId();
         String taskId= taskRequest.getTaskId();
         String topicNewTaskRequestFilter="orders/"+courierId+"/"+taskId+"/request";
 
-        connectClient(this.clientTaskRequestsPublisher, 60, false);
-        publishToTopic(clientTaskRequestsPublisher, topicNewTaskRequestFilter,
-                        taskRequestService.convertToJson(taskRequest), true);
-        System.out.println("connectPublishTaskRequest() called with the MQTT3AsyncClient"+clientTaskRequestsPublisher.toString());
-        MqttUtils.addDisconnectOnRuntimeShutDownHock(this.clientTaskRequestsPublisher);
+        publishToTopic(this.clientTaskRequestsPublisher, topicNewTaskRequestFilter,
+                taskRequestService.convertToJson(taskRequest), true)
+                .whenComplete((mqtt3Publish,throwable)->subscribeToTaskRequestUpdates(this.clientTaskRequestsPublisher, taskRequest.getTaskId(), taskRequest));
 
+        System.out.println("publishTaskRequest() called with the MQTT3AsyncClient"+ID_ClientTaskRequestsPublisher);
     }
 
-    private void connectPublishTaskRequestTimeout(TaskRequest taskRequest) {
+
+    private void publishTaskRequestTimeout(TaskRequest taskRequest) {
         String courierId= taskRequest.getAssigneeId();
         String taskId= taskRequest.getTaskId();
         String timeoutTaskRequestTopicFilter="orders/"+courierId+"/"+taskId+"/timeout";
-        if(!clientTaskTimeoutPublisher.getState().isConnected()){
-            connectClient( this.clientTaskTimeoutPublisher, 60, false);
-        }
-        publishToTopic(clientTaskTimeoutPublisher, timeoutTaskRequestTopicFilter,
-                null, true);
-        System.out.println("connectPublishTaskRequestTimeout() called");
-        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskTimeoutPublisher);
-
+        publishToTopic(clientTaskRequestsPublisher, timeoutTaskRequestTopicFilter, null, true);
+        System.out.println("publishTaskRequestTimeout() called");
     }
 
-    public void connectToBrokerAndSubscribeToTaskUpdates(String taskId, TaskRequest taskRequest){
-        System.out.println("connecting to Broker connectToBrokerAndSubscribeToTaskUpdates");
-        if(!clientTaskRequestsPublisher.getState().isConnected()){
-            connectClient( this.clientTaskRequestsPublisher, 80, false);
-        }
-        subscribeToTaskRequestUpdates(clientTaskRequestsPublisher,taskId, taskRequest);
-        MqttUtils.addDisconnectOnRuntimeShutDownHock(clientTaskRequestsPublisher);
-
-    }
 
 
     private CompletableFuture<Mqtt3SubAck> subscribeToTaskRequestUpdates(Mqtt3AsyncClient client,String taskId, TaskRequest task) {
         String courierId=task.getAssigneeId();
         String topic="orders/"+courierId+"/"+taskId+"/#";
+        String topic1="orders/"+courierId+"/"+taskId+"/timeout";
+        String topic2="orders/"+courierId+"/"+taskId+"/deny";
+        String topic3="orders/"+courierId+"/"+taskId+"/completed";
         return client.subscribeWith()
+                .addSubscription()
                 .topicFilter(topic)
-                .qos(MqttQos.EXACTLY_ONCE)
-                .callback(publish ->
-                  handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE), publish, taskId) )
+                .qos(MqttQos.AT_MOST_ONCE)
+                .applySubscription()
+                .callback(publish -> handleTaskUpdateEvent(new TaskEvent(TaskEvent.UPDATE), publish, taskId) )
                 .send()
-                .whenCompleteAsync((mqtt3SubAck, throwable) -> {
+                .whenComplete((mqtt3SubAck, throwable) -> {
                     if (throwable != null) {
                         // Handle failure to subscribe
-                        logger.warning("Couldn't subscribe to topic " + topic);
-                        System.out.println(" - could not subscribe to topic " + topic);
+                        logger.warning("Couldn't subscribe to topic " );
                     } else {
                         // Handle successful subscription, e.g. logging or incrementing a metric
-                        logger.info(" - subscribed to topic " + topic);
-                        System.out.println(" - subscribed to topic " + topic);
+                        logger.info(" - subscribed to topic " );
                     }
                 });
     }
+
 
     public TaskRequestServiceImpl getTaskRequestService() {
         return taskRequestService;
@@ -124,21 +104,21 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
 
     @Override
     public void handleNewTaskEvent(TaskEvent event, TaskRequest taskRequest) {
-        connectPublishTaskRequest(taskRequest);
-        connectToBrokerAndSubscribeToTaskUpdates(taskRequest.getTaskId(), taskRequest);
+        publishTaskRequest(taskRequest);
     }
 
     @Override
     public void handleTimeoutTaskEvent(TaskEvent event, TaskRequest task) {
-        connectPublishTaskRequestTimeout(task);
+        publishTaskRequestTimeout(task);
     }
 
     @Override
     public void handleTaskUpdateEvent(TaskEvent event,Mqtt3Publish publish, String taskId) {
+        System.out.println("handleTaskUpdateEvent() called- after subscribing to "+ publish.getTopic());
         // Process the received message
         String topicEnd= publish.getTopic().getLevels().get(3);
         String assigneeID = publish.getTopic().getLevels().get(1);
-        //TaskRequest task= taskRequestService.getTaskRequestById(taskId);
+
         switch (topicEnd) {
             case "accept": {
                 taskRequestService.updateTaskRequestReply(taskId, RequestReply.ACCEPTED,
@@ -152,27 +132,22 @@ public class TaskBrokerClient extends BrokerClient implements TaskRequestPMEvent
                 System.out.println(topicEnd + " update received for the task request " + taskId);
                 break;
             }
-            case "timeout":  break; /*{
-                taskRequestService.updateTaskRequestReply(taskId, RequestReply.TIMEOUT,
-                        "Task "+taskId +"Task timed out. Topic End: "+topicEnd, assigneeID);
-                System.out.println("task timed out - update received for the task request " + taskId);
+            case "timeout":
+            case "request":
                 break;
-            }*/
             case "completed": {
                 System.out.println("task completed- update received for the task request " + taskId);
                 if( publish.getPayload().isPresent()){
                     String receivedString= ByteBufferToStringConversion.byteBuffer2String(publish.getPayload().get(), StandardCharsets.UTF_8);
                     TaskRequest updatedTask = ModelObjManager.convertJsonToTaskRequest(receivedString);
 
-                    taskRequestService.updateTaskRequestStatusCompleted(taskId, true,"Task "+taskId +""+topicEnd,
+                    taskRequestService.updateTaskRequestStatusCompleted(taskId, true,"Task "+taskId +" "+topicEnd,
                             assigneeID, updatedTask );
                 }else{
                     System.out.println("task completed- but message payload missing " + taskId);
                 }
                 break;
             }
-            case "request":
-                break;
         }
     }
 

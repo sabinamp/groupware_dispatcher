@@ -21,15 +21,14 @@ public class TaskIDCell extends TableCell<TaskRequestPM, String> {
 
     @Override
     protected void updateItem(String item, boolean empty) {
-        //super.updateItem(item, empty);
-        if (empty) {
+        super.updateItem(item, empty);
+        if (empty || item ==null) {
             setText(null);
             setGraphic(null);
         } else {
-            if (item != null) {
-                setText(item);
-                txt = new Text(item.toUpperCase());
-            }
+            setText(item);
+            txt = new Text(item.toUpperCase());
+
         }
     }
 }

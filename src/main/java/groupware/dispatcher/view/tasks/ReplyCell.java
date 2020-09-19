@@ -12,12 +12,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class ReplyCell extends TableCell<TaskRequestPM, RequestReply> {
-    private final StackPane imageView;
+    //private final StackPane imageView;
     private Rectangle rectangle;
     private static final Insets INSETS = new Insets(2, 5, 2, 8);
 
     public ReplyCell(){
-        imageView = new StackPane();
+        //imageView = new StackPane();
         setContentDisplay(ContentDisplay.LEFT);
         setPadding(INSETS);
         setAlignment(Pos.CENTER_LEFT);
@@ -25,27 +25,30 @@ public class ReplyCell extends TableCell<TaskRequestPM, RequestReply> {
 
     @Override
     protected void updateItem(RequestReply item, boolean empty) {
-       // super.updateItem(item, empty);
-        if ( empty || item ==null) {
-            // adding new item
-            setText("");
+       super.updateItem(item, empty);
+
+        if ( item == null || empty  ) {
+            setText(null);
             setGraphic(null);
         } else {
+            // adding new item
 
-            if(RequestReply.PENDING.equals(item) ){
-                rectangle = new Rectangle(20,20, Color.web("Orange"));
-            } else if (RequestReply.ACCEPTED.equals(item) ){
-                rectangle = new Rectangle(20, 20, Color.web("Green"));
-            }else if (RequestReply.TIMEOUT.equals(item)){
-                rectangle = new Rectangle(20,20, Color.web("Blue"));
-            }else if (RequestReply.DENIED.equals(item)){
-                rectangle = new Rectangle(20,20, Color.web("Red"));
-            }
-            setText(item.toString());
-            imageView.getChildren().add(rectangle);
-            setGraphic(imageView);
-            setTooltip(new Tooltip(item.toString()));
-            System.out.println("current value of request reply:"+item.toString());
+                if(item.equals(RequestReply.PENDING)){
+                    rectangle = new Rectangle(20,20, Color.web("Orange"));
+                } else if (item.equals(RequestReply.ACCEPTED) ){
+                    rectangle = new Rectangle(20, 20, Color.web("Green"));
+                }else if (item.equals(RequestReply.TIMEOUT) ){
+                    rectangle = new Rectangle(20,20, Color.web("Blue"));
+                }else if (item.equals(RequestReply.DENIED)){
+                    rectangle = new Rectangle(20,20, Color.web("Red"));
+                }
+                setText(item.toString());
+                setGraphic(rectangle);
+                setTooltip(new Tooltip(item.toString()));
+                System.out.println("current value of request reply:"+item.toString());
+
+            //imageView.getChildren().add(rectangle);
+
         }
     }
 }

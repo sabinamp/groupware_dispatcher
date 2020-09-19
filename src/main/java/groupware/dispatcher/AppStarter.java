@@ -51,7 +51,7 @@ public class AppStarter extends Application {
             });
         }
     });
-    Runnable connectToBroker = new Runnable() {
+  /*  Runnable connectToBroker = new Runnable() {
         @Override
         public void run() {
             rootPM = new RootPM();
@@ -76,7 +76,7 @@ public class AppStarter extends Application {
 
             });
         }
-    };
+    };*/
 
     @Override
     public void start(Stage primaryStage){
@@ -89,15 +89,15 @@ public class AppStarter extends Application {
         orderService.setOrderEventListener(allOrdersPM);
         BrokerConnection brokerConnection = new BrokerConnection(courierService, orderService, taskRequestService);
         brokerConnection.startBrokerConnection();
-
+        allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
+        taskRequestService.setTaskRequestBrokerEventListener(BrokerConnection.taskBrokerClient);
+        taskRequestService.setTaskRequestPMEventListener(allTaskRequestsPM);
         Platform.runLater(()-> {
             // updating live UI object requires JavaFX App Thread
             //do not exit
             try{
-                Thread.sleep(300);
-                allTaskRequestsPM = new AllTaskRequestsPM(allOrdersPM, allCouriersPM, taskRequestService);
-                taskRequestService.setTaskRequestBrokerEventListener(allTaskRequestsPM);
-                taskRequestService.setTaskRequestPMEventListener(BrokerConnection.taskBrokerClient);
+                Thread.sleep(200);
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -111,7 +111,7 @@ public class AppStarter extends Application {
 
         });
 
-        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, taskRequestService);
+        rootPanel = new ApplicationUI(rootPM, allOrdersPM, allCouriersPM, allTaskRequestsPM, taskRequestService);
         rootPanel.addClockToHeader(txtTime);
         rootPanel.addExitButton(exitBtn);
         Scene scene = new Scene(rootPanel, 1000,800);

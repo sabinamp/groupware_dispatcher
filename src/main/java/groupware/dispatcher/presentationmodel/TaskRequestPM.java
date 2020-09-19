@@ -5,6 +5,7 @@ import javafx.beans.property.*;
 import javafx.beans.value.WritableObjectValue;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class TaskRequestPM {
 
@@ -29,7 +30,7 @@ public class TaskRequestPM {
     public void reset() {
         this.setDone(false);
         this.setDueOn(null);
-        this.setRequestReply(null);
+        this.setRequestReply(RequestReply.PENDING);
         this.setAssigneeId("");
         this.setOrderId("");
         this.setDeliveryType(null);
@@ -179,6 +180,27 @@ public class TaskRequestPM {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TaskRequestPM that = (TaskRequestPM) o;
+        return getTaskId().equals(that.getTaskId()) &&
+                getOrderId().equals(that.getOrderId()) &&
+                getAssigneeId().equals(that.getAssigneeId()) &&
+                Objects.equals(getDeliveryType(), that.getDeliveryType()) &&
+                Objects.equals(getTaskType(), that.getTaskType()) &&
+                Objects.equals(getDueOn(), that.getDueOn()) &&
+                Objects.equals(getSentWhen(), that.getSentWhen()) &&
+                getRequestReply().equals(that.getRequestReply()) &&
+                Objects.equals(isDone(), that.isDone());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTaskId(), getOrderId(), getAssigneeId());
+    }
+
+    @Override
     public String toString() {
         return "TaskRequestPM{" +
                 "taskId=" + taskId +
@@ -188,7 +210,7 @@ public class TaskRequestPM {
                 ", taskType=" + taskType +
                 ", dueOn=" + dueOn +
                 ", sentWhen=" + sentWhen +
-                ", accepted=" + requestReply +
+                ", reply=" + requestReply +
                 ", done=" + done +
                 '}';
     }

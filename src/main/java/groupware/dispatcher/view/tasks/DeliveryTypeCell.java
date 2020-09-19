@@ -24,7 +24,7 @@ public class DeliveryTypeCell extends TableCell<TaskRequestPM, DeliveryType> {
 
     @Override
     protected void updateItem(DeliveryType item, boolean empty) {
-       // super.updateItem(item, empty);
+        super.updateItem(item, empty);
         if ( empty ||  item == null) {
             // adding new item
             setText(null);

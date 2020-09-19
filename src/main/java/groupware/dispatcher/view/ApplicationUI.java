@@ -2,6 +2,7 @@ package groupware.dispatcher.view;
 
 import groupware.dispatcher.presentationmodel.AllCouriersPM;
 import groupware.dispatcher.presentationmodel.AllOrdersPM;
+import groupware.dispatcher.presentationmodel.AllTaskRequestsPM;
 import groupware.dispatcher.presentationmodel.RootPM;
 import groupware.dispatcher.service.TaskRequestServiceImpl;
 import groupware.dispatcher.view.couriers.CouriersPane;
@@ -23,15 +24,18 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
         private TasksPane tasksPane;
         private AllOrdersPM allOrdersPM;
         private AllCouriersPM allCouriersPM;
+        private AllTaskRequestsPM allTaskRequestsPM;
         private TaskRequestServiceImpl taskRequestService;
 
 
         private final RootPM rootPM;
 
-        public ApplicationUI(RootPM rootPM, AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, TaskRequestServiceImpl taskRequestService) {
+        public ApplicationUI(RootPM rootPM, AllOrdersPM allOrdersPM, AllCouriersPM allCouriersPM, AllTaskRequestsPM allTaskRequestsPM,
+                             TaskRequestServiceImpl taskRequestService) {
                 this.rootPM = rootPM;
                 this.allOrdersPM = allOrdersPM;
                 this.allCouriersPM = allCouriersPM;
+                this.allTaskRequestsPM = allTaskRequestsPM;
                 this.taskRequestService = taskRequestService;
                 init();
         }
@@ -48,7 +52,7 @@ public class ApplicationUI extends BorderPane implements ViewMixin {
                 footer = new Footer(rootPM);
                 couriersPane = new CouriersPane(allCouriersPM);
                 ordersPane = new OrdersPane(allOrdersPM);
-                tasksPane = new TasksPane(allCouriersPM, allOrdersPM, taskRequestService);
+                tasksPane = new TasksPane(allCouriersPM, allOrdersPM, allTaskRequestsPM, taskRequestService);
 
                 header.ordersBtn.setOnAction(event -> setMainContent(ordersPane));
                 header.couriersBtn.setOnAction(event ->

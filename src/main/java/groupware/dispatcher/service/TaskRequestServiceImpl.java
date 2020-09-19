@@ -27,8 +27,8 @@ public class TaskRequestServiceImpl{
     private CourierServiceImpl courierService;
 
     private AllTaskRequestsPM allTaskRequestsPM;
-    private TaskRequestBrokerEventListener taskRequestBrokerEventListener;
     private TaskRequestPMEventListener taskRequestPMEventListener;
+    private BrokerTaskRequestEventListener taskRequestBrokerEventListener;
     private TimerService timerService;
     static{
         tasks= new HashMap<>();
@@ -45,9 +45,8 @@ public class TaskRequestServiceImpl{
 
         String taskId= request.getTaskId();
         Runnable timeoutTrigger= () -> Platform.runLater(()-> updateTaskRequestReply(taskId,RequestReply.TIMEOUT,TASK_TIMEOUT_UPDATE, request.getAssigneeId()));
-        //1 minute for testing
-        timerService.schedule(timeoutTrigger, 60000, taskId);
-
+        //2 minutes for testing
+        timerService.schedule(timeoutTrigger, 240000, taskId);
     }
 
     public TaskRequest getTaskRequestById(String taskId){
@@ -65,20 +64,20 @@ public class TaskRequestServiceImpl{
             if(updating){
                 System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                         "The task with id : "+ id+" updated.");
-                if(taskRequestBrokerEventListener != null &&(taskRequestPMEventListener != null)){
+                if(taskRequestBrokerEventListener != null && taskRequestPMEventListener != null){
                     if(update != null && update.equals(TASK_TIMEOUT_UPDATE)){
-                        taskRequestPMEventListener.handleTimeoutTaskEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), taskRequest);
-                        taskRequestBrokerEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), TaskRequestPM.of(taskRequest), TASK_TIMEOUT_UPDATE);
+                        taskRequestBrokerEventListener.handleTimeoutTaskEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), taskRequest);
+                        taskRequestPMEventListener.handleTaskUpdateEvent(new TaskEvent(TaskEvent.TASK_TIMEOUT), TaskRequestPM.of(taskRequest), TASK_TIMEOUT_UPDATE);
                     }else{
                         TaskEvent updateEvent = new TaskEvent(TaskEvent.UPDATE);
-                        taskRequestBrokerEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
                         timerService.cancel(id,true);
+                        taskRequestPMEventListener.handleTaskUpdateEvent(updateEvent, TaskRequestPM.of(taskRequest), update);
                     }
 
                 }
             }else{
-                if(taskRequestPMEventListener != null){
-                    taskRequestPMEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
+                if(taskRequestBrokerEventListener != null){
+                    taskRequestBrokerEventListener.handleNewTaskEvent(new TaskEvent(TaskEvent.NEW_TASK), taskRequest);
                     System.out.println("TaskRequestServiceImplementation updateTaskRequest() called. " +
                                 "The task with id : "+ id+" added.");
                     startTaskTimer(taskRequest);
@@ -103,6 +102,7 @@ public class TaskRequestServiceImpl{
                 orderService.updateOrderStatus(task.getOrderId(),stepStarted );
             }
         }
+
         boolean successful = this.updateTaskRequest(taskId, task, update);
         System.out.println("updateTaskRequestReply() called. Successfully updated the task request : " + successful);
         return successful;
@@ -151,19 +151,19 @@ public class TaskRequestServiceImpl{
        return ModelObjManager.convertToJSON(taskRequest);
     }
 
-    public TaskRequestBrokerEventListener getTaskRequestBrokerEventListener() {
-        return taskRequestBrokerEventListener;
-    }
-
-    public void setTaskRequestBrokerEventListener(TaskRequestBrokerEventListener taskRequestBrokerEventListener) {
-        this.taskRequestBrokerEventListener = taskRequestBrokerEventListener;
-    }
-
     public TaskRequestPMEventListener getTaskRequestPMEventListener() {
         return taskRequestPMEventListener;
     }
 
     public void setTaskRequestPMEventListener(TaskRequestPMEventListener taskRequestPMEventListener) {
         this.taskRequestPMEventListener = taskRequestPMEventListener;
+    }
+
+    public BrokerTaskRequestEventListener getTaskRequestBrokerEventListener() {
+        return taskRequestBrokerEventListener;
+    }
+
+    public void setTaskRequestBrokerEventListener(BrokerTaskRequestEventListener taskRequestBrokerEventListener) {
+        this.taskRequestBrokerEventListener = taskRequestBrokerEventListener;
     }
 }
